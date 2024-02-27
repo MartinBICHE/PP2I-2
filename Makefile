@@ -2,7 +2,7 @@ CC = clang
 CFLAGS = -Wall -Wextra -std=c11
 LDFLAGS = -lSDL2
 
-TARGET = your_program_name
+TARGET = main
 SOURCE = main.c
 
 install:
