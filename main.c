@@ -28,19 +28,6 @@ int main(int argc, const char * argv[]) {
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    if(SDL_SetRenderDrawColor(renderer,112,168,237, SDL_ALPHA_OPAQUE) != 0) {
-        SDL_ExitWithError("Impossible de changer la couleur pour le rendu");
-    }
-
-    if(SDL_RenderDrawPoint(renderer, 100, 450) != 0){
-        SDL_ExitWithError("Impossible de dessiner un point");
-    }
-
-    if(SDL_RenderDrawLine(renderer, 50,50,500,500) != 0){
-        SDL_ExitWithError("Impossible de dessiner un point");
-    }
-
-
     if(renderer == NULL) {
         SDL_ExitWithError("Creation de rendu échouée");
 
