@@ -1,6 +1,17 @@
+CC = clang
+CFLAGS = -Wall -Wextra -std=c11
+LDFLAGS = -lSDL2
+
+TARGET = your_program_name
+SOURCE = main.c
+
 install:
-	sudo apt install libsdl2-2.0-0 libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-mixer-2.0-0 libsdl2-net-2.0-0 libsdl2-ttf-2.0-0
-run:
-	clang main.c -o main pkg-config --libs --cflags sdl2
+	sudo apt-get install libsdl2-dev 
+
+run: 
+	$(CC) $(CFLAGS) -o main main.c $(LDFLAGS)
+	./main
+
+
 clean:
-	rm -f main *.o
+	rm -f $(TARGET)
