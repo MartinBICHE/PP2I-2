@@ -1,17 +1,12 @@
-CC = clang
-CFLAGS = -Wall -Wextra -std=c11
-LDFLAGS = -lSDL2
+main: main.o 
+	clang main.c -o main `pkg-config --libs --cflags sdl2`
 
-TARGET = main
-SOURCE = main.c
-
-install:
-	sudo apt-get install libsdl2-dev 
-
-run: 
-	$(CC) $(CFLAGS) -o main main.c $(LDFLAGS)
-	./main
-
+main.o: main.c
+	clang main.c -c -Wall `pkg-config --libs --cflags sdl2`
 
 clean:
-	rm -f $(TARGET)
+	rm -f *.o
+
+run:
+	make main
+	./main
