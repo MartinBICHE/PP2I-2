@@ -1,51 +1,57 @@
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_image.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <SDL2/SDL.h>
 
-void SDL_ExitWithError(const char *message);
+int main(int argc, char *argv[]){
+    SDL_Window *window;
+    SDL_Renderer *renderer;
 
-int main(int argc, const char * argv[]) {
-    SDL_version nb;
-    SDL_VERSION(&nb);
+    SDL_Init(SDL_INIT_EVERYTHING);
 
-    printf("Bienvenue sur la SDL %d,%d,%d!\n", nb.major, nb.minor,nb.patch);
-
-    SDL_Window *window = NULL;
-    SDL_Renderer *renderer = NULL;
-
-    if(SDL_Init( SDL_INIT_VIDEO ) != 0){
-        SDL_Log("Erreur : Initialisation SDL > %s\n", SDL_GetError());
-        exit(EXIT_FAILURE);
-    }
-
-    window = SDL_CreateWindow("Scarf",SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600,0);
-
-
-    if (window == NULL) {
-        SDL_Log("Erreur : Initialisation SDL > %s\n", SDL_GetError());
-        exit(EXIT_FAILURE); 
-    }
+    window = SDL_CreateWindow("Jeux xd",    /* nom de la fênetre */
+            SDL_WINDOWPOS_UNDEFINED,        /* position x dans la fênetre */ 
+            SDL_WINDOWPOS_UNDEFINED,        /* position y dans la fênetre */ 
+            840,                            /*largeur de la fênetre */
+            680,                            /*hauteur de la fênetre */
+            0);                             /*de flags, ex: SDL_WINDOW_FULLSCREEN, 0 sinon */
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-    if(renderer == NULL) {
-        SDL_ExitWithError("Creation de rendu échouée");
-
-    }
-
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);      /* couleurs en rbg(0, 0, 0) puis l'opacité: 255 */
+    SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
+    SDL_Event event;
+    int quit = 0;
+    while (!quit){
+        while (SDL_PollEvent(&event)){
+            if (event.type == SDL_QUIT){   /* idk ce que ça fait actually */
+                quit = 1;
+            }
+            if (event.type == SDL_KEYDOWN){
+                switch(event.key.keysym.sym){
+                    case SDLK_ESCAPE:           /*on quitte la fênetre lorsqu'on appuie sur esc*/
+                        quit = 1;
+                        SDL_DestroyWindow(window);
+                        break;
+                }
+            }
+            if (event.type == SDL_WINDOWEVENT_CLOSE){   /*idem ici lorsqu'on ferme la fênetre */
+                quit = 1;
+                SDL_DestroyWindow(window);
+                break;
+            }
+        }
 
-    SDL_Delay(10000);
+        SDL_Surface *sprite = NULL;
+        SDL_Surface *spriteTexture;
 
-    SDL_DestroyRenderer(renderer);
+        sprite = IMG_Load("./spritesheet/ss_mc.png");
+        spriteTexture = SDL_CreateTextureFromSurface(renderer, sprite);
+    }
     SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
     SDL_Quit();
-
-    return EXIT_SUCCESS;
-}
-
-void SDL_ExitWithError(const char *message){
-    SDL_Log("ERREUR : %s > %s\n", message, SDL_GetError());
-    SDL_Quit;
-    exit(EXIT_FAILURE);
+    return 0;
 }
