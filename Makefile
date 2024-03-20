@@ -12,6 +12,10 @@ run:
 	$(CC) $(CFLAGS) -o main main.c $(LDFLAGS)
 	./main
 
+test:
+	$(CC) $(CFLAGS) -o test test.c $(LDFLAGS)
+	./test
+
 
 clean:
 	rm -f $(TARGET)
