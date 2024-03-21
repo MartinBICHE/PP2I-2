@@ -13,6 +13,8 @@ Map *init_map(char *name) {
         fgets(res->matrix[i], 49, f) ;
 	}
     fclose(f) ;
+	res->start_x = 4.0*PIX_RECT ;
+	res->start_y = 4.0*PIX_RECT ;
 	return res ;
 }
 

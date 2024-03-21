@@ -6,6 +6,7 @@
 #include "const.h"
 #include "test.h"
 #include "map.h"
+#include "perso.h"
 // #include <SDL2/SDL2_gfxPrimitives.h>
 // #include <SDL2/SDL_image.h>
 
@@ -35,10 +36,12 @@ int main(int argc, char **argv) {
 		exit(-1) ;
 	}
 
-	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = SDL_ALPHA_OPAQUE} ;
+	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255} ;
 	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255} ;
+	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 255} ;
 
 	Map *map =init_map("map1/data.txt") ;
+	Perso *perso = create_perso(map) ;
 	
 
 	SDL_Event event ;
@@ -71,6 +74,14 @@ int main(int argc, char **argv) {
 			printf("Error drawing the map") ;
 			exit(-1) ;
 		}
+		if (SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a)) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError()) ;
+			exit(-1) ;
+		}
+		if (display_perso(renderer, perso)) {
+			printf("Error drawing the perso") ;
+			exit(-1) ;
+		}
 		SDL_RenderPresent(renderer) ;
 
 
@@ -79,5 +90,6 @@ int main(int argc, char **argv) {
 
 	atexit(SDL_Quit) ;
 	free(map) ;
+	free(perso) ;
 	return 0 ;
 }
