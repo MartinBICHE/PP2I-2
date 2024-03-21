@@ -1,12 +1,38 @@
-main: main.o 
-	clang main.c -o main `pkg-config --libs --cflags sdl2 SDL2_image` -lSDL2_ttf
+#Fichiers
+TARGET = demo
+SRCS = main.c dialog_box.c
+OBJS = $(SRCS:.c=.o)
 
-main.o: main.c
-	clang main.c -c -Wall `pkg-config --libs --cflags sdl2 SDL2_image`
+#Compilation
+CC = clang
+CFLAGS = -std=gnu11 -Wall -pedantic -O3
+
+#Debug 
+CFLAGS += -g
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS += -fsanitize=address
+
+
+#Libs
+CFLAGS += $(shell pkg-config --cflags sdl2)
+LDFLAGS += $(shell pkg-config --libs sdl2)
+CFLAGS += $(shell pkg-config --cflags SDL2_image)
+LDFLAGS += $(shell pkg-config --libs SDL2_image)
+# CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
+# LDFLAGS += $(shell pkg-config --libs SDL2_tff)
+
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $^ $(LDFLAGS) -o $@ -lSDL2_ttf 
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o
+	rm -f $(OBJS) $(TARGET)
 
 run:
-	make main
-	./main
+	make
+	./demo
