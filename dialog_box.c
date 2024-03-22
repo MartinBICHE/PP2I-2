@@ -73,52 +73,53 @@ void print_string(const char *text, TTF_Font *font, SDL_Color color, SDL_Rendere
 
 /* ça donne une seg fault pour l'instant mais c'est censée découper le texte pour ne pas dépasser les dimensions de la boite (par exemple) */
 
+char *strdup(const char *c)
+{
+    char *dup = malloc(strlen(c) + 1);
+
+    if (dup != NULL)
+       strcpy(dup, c);
+
+    return dup;
+}
+
 void text_in_box(const char *text, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer, int x, int y, int scale, int maxWidth) {
 
     int currentX = x;
     int currentY = y;
 
-    // Split text into words
-    char *word = strtok((char *)text, " ");
+    char *text_copy = strdup(text);
+    char *deb = text_copy;
+    
+    char *word = strtok((char *)text_copy, " ");
     while (word != NULL) {
-        // Render the word
         SDL_Surface *surface = TTF_RenderText_Blended(font, word, color);
         if (surface == NULL) {
-            // Error handling if necessary
-            return;
+            puts("Error in surface init");
+            exit(-1);
         }
 
         SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
         SDL_FreeSurface(surface);
         if (texture == NULL) {
-            // Error handling if necessary
-            return;
+            puts("Error in texture init");
+            exit(-1);
         }
 
-        // Get the width and height of the rendered text
         int textWidth, textHeight;
         SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
 
-        // Check if adding the word exceeds the maxWidth
         if (currentX + textWidth * scale > maxWidth) {
-            // Move to the next line
             currentX = x;
-            currentY += textHeight * scale;
+            currentY += textHeight * scale ;
         }
-
-        // Render the texture at the current position
         SDL_Rect dstRect = {currentX, currentY, textWidth * scale, textHeight * scale};
         SDL_RenderCopy(renderer, texture, NULL, &dstRect);
-
-        // Update the current position
-        currentX += textWidth * scale;
-
-        // Free the texture
+        currentX += textWidth * scale + 30;
         SDL_DestroyTexture(texture);
-
-        // Move to the next word
         word = strtok(NULL, " ");
     }
+    free(text_copy);
     free(word);
 }
 
