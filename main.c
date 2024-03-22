@@ -17,10 +17,6 @@
 #include "main.h"
 #include "map.h"
 
-
-
-
-
 int main(int argc, char **argv) {
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError()) ;

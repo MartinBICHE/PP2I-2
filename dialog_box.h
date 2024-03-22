@@ -1,3 +1,6 @@
+#ifndef dialog_h
+#define dialog_h
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
@@ -11,4 +14,4 @@ void text_in_box(const char *text, TTF_Font *font, SDL_Color color, SDL_Renderer
 
 
 
-
+#endif
