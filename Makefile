@@ -1,17 +1,37 @@
+#Fichiers
+TARGET = demo
+SRCS = main.c map.c   #à completer par vos fichiers
+OBJS = $(SRCS:.c=.o)
+
+#Compilation
 CC = clang
-CFLAGS = -Wall -Wextra -std=c11
-LDFLAGS = -lSDL2 -lSDL2_image
+CFLAGS = -std=gnu11 -Wall -pedantic -O3
 
-TARGET = main
-SOURCE = main.c
+#Debug 
+CFLAGS += -g
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS += -fsanitize=address
 
-install:
-	sudo apt-get install libsdl2-dev
+#Libs
+CFLAGS += $(shell pkg-config --cflags sdl2)
+LDFLAGS += $(shell pkg-config --libs sdl2)
+# CFLAGS += $(shell pkg-config --cflags SDL2_image)
+# LDFLAGS += $(shell pkg-config --libs SDL2_image)
+# CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
+# LDFLAGS += $(shell pkg-config --libs SDL2_tff)
 
-run: 
-	$(CC) $(CFLAGS) -o main main.c $(LDFLAGS)
-	./main
 
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $^ $(LDFLAGS) -o $@ -lSDL2_ttf 
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(OBJS) $(TARGET)
+
+run:
+	make
+	./demo

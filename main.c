@@ -3,55 +3,79 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
+#include "const.h"
+#include "main.h"
+#include "map.h"
 
-int main(int argc, char *argv[]){
-    SDL_Window *window;
-    SDL_Renderer *renderer;
+int main(int argc, char **argv) {
+	if (SDL_Init(SDL_INIT_EVERYTHING)) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError()) ;
+		exit(-1) ;
+	}
 
-    SDL_Init(SDL_INIT_EVERYTHING);
 
-    window = SDL_CreateWindow("Jeux xd",    /* nom de la fênetre */
-            SDL_WINDOWPOS_UNDEFINED,        /* position x dans la fênetre */ 
-            SDL_WINDOWPOS_UNDEFINED,        /* position y dans la fênetre */ 
-            840,                            /*largeur de la fênetre */
-            680,                            /*hauteur de la fênetre */
-            0);                             /*de flags, ex: SDL_WINDOW_FULLSCREEN, 0 sinon */
+	SDL_Window *window ;
+	window = SDL_CreateWindow("SDL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINWIDTH, WINHEIGHT, SDL_WINDOW_SHOWN) ;
+	if (!window) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in window init : %s", SDL_GetError()) ;
+		exit(-1) ;
+	}
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);      /* couleurs en rbg(0, 0, 0) puis l'opacité: 255 */
-    SDL_RenderClear(renderer);
-    SDL_RenderPresent(renderer);
-    SDL_Event event;
-    int quit = 0;
-    while (!quit){
-        while (SDL_PollEvent(&event)){
-            if (event.type == SDL_QUIT){   /* idk ce que ça fait actually */
-                quit = 1;
-            }
-            if (event.type == SDL_KEYDOWN){
-                switch(event.key.keysym.sym){
-                    case SDLK_ESCAPE:           /*on quitte la fênetre lorsqu'on appuie sur esc*/
-                        quit = 1;
-                        SDL_DestroyWindow(window);
-                        break;
-                }
-            }
-            if (event.type == SDL_WINDOWEVENT_CLOSE){   /*idem ici lorsqu'on ferme la fênetre */
-                quit = 1;
-                SDL_DestroyWindow(window);
-                break;
-            }
-        }
+	SDL_Renderer *renderer ;
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED) ;
+	if (!renderer) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError()) ;
+		exit(-1) ;
+	}
 
-        SDL_Surface *sprite = NULL;
-        SDL_Surface *spriteTexture;
+	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255} ;
+	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255} ;
 
-        sprite = IMG_Load("./spritesheet/ss_mc.png");
-        spriteTexture = SDL_CreateTextureFromSurface(renderer, sprite);
-    }
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
-    SDL_Quit();
-    return 0;
+	Map *map =init_map("map1/data.txt") ;
+	
+
+	SDL_Event event ;
+	int running = 1 ;
+
+	while (running) {
+		if (SDL_PollEvent(&event)) {
+			switch(event.type) {
+			case SDL_QUIT :
+				running = 0 ;
+				break ;
+			case SDL_KEYUP :
+				break ;
+			}
+		}
+
+		if (SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a)) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError()) ;
+			exit(-1) ;
+		}
+		if (SDL_RenderClear(renderer)) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render clear : %s", SDL_GetError()) ;
+			exit(-1) ;
+		}
+		if (SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a)) {
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError()) ;
+			exit(-1) ;
+		}
+		if (draw_map(renderer, map)) {
+			printf("Error drawing the map") ;
+			exit(-1) ;
+		}
+
+		SDL_RenderPresent(renderer) ;
+
+
+	}
+
+
+	atexit(SDL_Quit) ;
+	free(map) ;
+	return 0 ;
 }
