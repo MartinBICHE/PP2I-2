@@ -1,6 +1,7 @@
 #Fichiers
 TARGET = demo
-SRCS = main.c map.c   #à completer par vos fichiers
+SRCS = main.c map.c display.c time.c  #à completer par vos fichiers
+>>>>>>> main
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
