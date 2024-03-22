@@ -105,9 +105,9 @@ int main(){
            if (box){
                SDL_RenderClear(renderer);
                render_sprite(renderer, 420, 250, 40, "noir.png");
-               /* print_string("Good morning, good morning", font, white_color, renderer, 430, 550, 1); */
-               const char *text_del1 = "Phrase lkksdj jslfkdsl kfjdljkls ";
-               text_in_box(text_del1, font, white_color, renderer, 430, 550, 1, 810);
+               print_string("Good morning, good morning", font, white_color, renderer, 430, 550, 1);
+               /* const char *text_del1 = "Phrase lkksdj jslfkdsl kfjdljkls "; */
+               /* text_in_box(text_del1, font, white_color, renderer, 430, 550, 1, 810); */
            }
            if (time){
                Uint32 start_time = SDL_GetTicks();
@@ -123,7 +123,7 @@ int main(){
 
 
            /* render_sprite(renderer, 420, 250, 40, "noir.png"); */
-           const char *text_del ="Ceci est un example de phrase longue pour voir si le texte s'affiche bien dans la boite";
+           /* const char *text_del ="Ceci est un example de phrase longue pour voir si le texte s'affiche bien dans la boite"; */
            /* text_in_box(text_del, font, white_color, renderer, 430, 550, 1, 810); */
            SDL_RenderPresent(renderer);
     }
