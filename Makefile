@@ -1,6 +1,6 @@
 #Fichiers
 TARGET = demo
-SRCS = main.c dialog_box.c  #à completer par vos fichiers
+SRCS = main.c display.c time.c  #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
 #Compilation

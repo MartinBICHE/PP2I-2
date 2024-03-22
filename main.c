@@ -15,7 +15,8 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include "dialog_box.h" /*fichier qui contient des fonctions utiles tout au long du projet, ex: afficher un sprite, afficher tu texte, (c'est réutilisable car on peut fixer les paramètres) */
+#include "display.h"
+#include "time.h"
 
 
 
@@ -122,9 +123,6 @@ int main(){
            }
 
 
-           /* render_sprite(renderer, 420, 250, 40, "noir.png"); */
-           /* const char *text_del ="Ceci est un example de phrase longue pour voir si le texte s'affiche bien dans la boite"; */
-           /* text_in_box(text_del, font, white_color, renderer, 430, 550, 1, 810); */
            SDL_RenderPresent(renderer);
     }
 
