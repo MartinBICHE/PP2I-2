@@ -49,3 +49,5 @@ void SDL_ExitWithError(const char *message){
     SDL_Quit;
     exit(EXIT_FAILURE);
 }
+
+
