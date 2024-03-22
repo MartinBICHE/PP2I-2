@@ -1,28 +1,38 @@
+#Fichiers
+TARGET = demo
+SRCS = main.c map.c   #à completer par vos fichiers
+OBJS = $(SRCS:.c=.o)
+
+#Compilation
 CC = clang
-CFLAGS = -Wall -Wextra -std=c11
-LDFLAGS = -lSDL2
+CFLAGS = -std=gnu11 -Wall -pedantic -O3
 
-TARGET = main test test.o map.o perso.o
-SOURCE = main.c
+#Debug 
+CFLAGS += -g
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+LDFLAGS += -fsanitize=address
 
-install:
-	sudo apt-get install libsdl2-dev 
 
-run: 
-	$(CC) $(CFLAGS) -o main main.c $(LDFLAGS)
-	./main
+#Libs
+CFLAGS += $(shell pkg-config --cflags sdl2)
+LDFLAGS += $(shell pkg-config --libs sdl2)
+# CFLAGS += $(shell pkg-config --cflags SDL2_image)
+# LDFLAGS += $(shell pkg-config --libs SDL2_image)
+# CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
+# LDFLAGS += $(shell pkg-config --libs SDL2_tff)
 
-test: test.o map.o perso.o
-	$(CC) -o test $(CFLAGS) test.o map.o perso.o $(LDFLAGS) $(SDL_LIBS)
 
-test.o: test.c test.h
-	$(CC) -c $(CFLAGS) test.c $(LDFLAGS) $(SDL_LIBS)
+all: $(TARGET)
 
-map.o: map.c map.h
-	$(CC) -c $(CFLAGS) map.c $(LDFLAGS) $(SDL_LIBS)
+$(TARGET): $(OBJS)
+	$(CC) $^ $(LDFLAGS) -o $@ -lSDL2_ttf 
 
-perso.o: perso.c perso.h
-	$(CC) -c $(CFLAGS) perso.c $(LDFLAGS) $(SDL_LIBS)
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(OBJS) $(TARGET)
+
+run:
+	make
+	./demo
