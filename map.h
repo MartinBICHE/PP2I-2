@@ -2,6 +2,7 @@
 #define MAP_H
 
 Map *init_map(char*) ;
-int draw_map(SDL_Renderer*, Map*) ;
+void display_tile(SDL_Renderer*, int, int, int, int , char*);
+int draw_map(SDL_Renderer*, Map*, char*) ;
 
 #endif

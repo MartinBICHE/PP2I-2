@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError()) ;
 			exit(-1) ;
 		}
-		if (draw_map(renderer, map)) {
+		if (draw_map(renderer, map, "./asset/tileset/ground-1.png")) {
 			printf("Error drawing the map") ;
 			exit(-1) ;
 		}
