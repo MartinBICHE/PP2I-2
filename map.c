@@ -72,13 +72,25 @@ int draw_map(SDL_Renderer *renderer, Map *map, char *ImagePath) {
 				display_tile(renderer,4,4,j,i,ImagePath); // Coin inferieur droit
 			}
 			if (map->matrix[i][j] == '8') {
-				display_tile(renderer,1,2,j,i,ImagePath); // Sol
+				if (j%3==0) {
+					display_tile(renderer,1,2,j,i,ImagePath);
+				} else if (j%3==1) {
+					display_tile(renderer,2,2,j,i,ImagePath);
+				} else {
+					display_tile(renderer,3,2,j,i,ImagePath); // Sol
+				}
 			}
 			if (map->matrix[i][j] == '5') {
 				display_tile(renderer,1,3,j,i,ImagePath); // Vide
 			}
 			if (map->matrix[i][j] == '2') {
-				display_tile(renderer,1,4,j,i,ImagePath); // Plafond
+				if (j%3==0) {
+					display_tile(renderer,1,4,j,i,ImagePath);
+				} else if (j%3==1) {
+					display_tile(renderer,2,4,j,i,ImagePath);
+				} else {
+					display_tile(renderer,3,4,j,i,ImagePath);// Plafond
+				}
 			}
 			if (map->matrix[i][j] == 'u') {
 				display_tile(renderer,0,1,j,i,ImagePath); // Angle superieur droit
@@ -96,7 +108,13 @@ int draw_map(SDL_Renderer *renderer, Map *map, char *ImagePath) {
 				display_tile(renderer,0,0,j,i,ImagePath); // Plateforme extremite droit
 			}
 			if (map->matrix[i][j] == 'z') {
-				display_tile(renderer,1,0,j,i,ImagePath); // Plateforme corps
+				if (j%3==0) {
+					display_tile(renderer,1,0,j,i,ImagePath);
+				} else if (j%3==1) {
+					display_tile(renderer,2,0,j,i,ImagePath);
+				} else {
+					display_tile(renderer,3,0,j,i,ImagePath);// Plafond
+				} // Plateforme corps
 			}
 			if (map->matrix[i][j] == 'e') {
 				display_tile(renderer,4,0,j,i,ImagePath); // Plateforme extremite gauche

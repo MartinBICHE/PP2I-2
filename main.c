@@ -48,6 +48,9 @@ int main(int argc, char **argv) {
 	int running = 1 ;
 
 	while (running) {
+
+		Uint64 start = SDL_GetTicks() ;
+
 		if (SDL_PollEvent(&event)) {
 			switch(event.type) {
 			case SDL_QUIT :
@@ -76,6 +79,10 @@ int main(int argc, char **argv) {
 		}
 
 		SDL_RenderPresent(renderer) ;
+
+		Uint64 end = SDL_GetTicks() ;
+		float elapsedMS = (end - start) ;
+		SDL_Delay(fmaxf((16.666f - elapsedMS)/1.0f, 0)) ;
 
 
 	}
