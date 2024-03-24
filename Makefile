@@ -1,7 +1,6 @@
 #Fichiers
 TARGET = demo
 SRCS = main.c map.c display.c time.c  #à completer par vos fichiers
->>>>>>> main
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
@@ -13,12 +12,11 @@ CFLAGS += -g
 CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 LDFLAGS += -fsanitize=address
 
-
 #Libs
 CFLAGS += $(shell pkg-config --cflags sdl2)
 LDFLAGS += $(shell pkg-config --libs sdl2)
-# CFLAGS += $(shell pkg-config --cflags SDL2_image)
-# LDFLAGS += $(shell pkg-config --libs SDL2_image)
+CFLAGS += $(shell pkg-config --cflags SDL2_image)
+LDFLAGS += $(shell pkg-config --libs SDL2_image)
 # CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
 # LDFLAGS += $(shell pkg-config --libs SDL2_tff)
 
