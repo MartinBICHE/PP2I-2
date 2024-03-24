@@ -2,7 +2,6 @@
 #define CONST_H
 
 
-
 #define HEIGHT 8 // i, y
 #define WIDTH 48 // j, x
 #define PIX_RECT 30

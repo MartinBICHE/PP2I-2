@@ -12,10 +12,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SDL2/SDL.h>
-#include "control.h"
+#include "mc.h"
 #include "const.h"
 #include "main.h"
 #include "map.h"
+#include <stdbool.h>
+
+int distance =0;
 
 int main(int argc, char **argv) {
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -77,14 +80,17 @@ int main(int argc, char **argv) {
 			printf("Error drawing the map") ;
 			exit(-1) ;
 		}
+		if (spriteMovement(renderer, event, &distance, "./asset/spritesheet/ss_mc.png")) {
+			printf("Error rendering sprite") ;
+			exit(-1) ;
+		}
+
 
 		SDL_RenderPresent(renderer) ;
 
 		Uint64 end = SDL_GetTicks() ;
 		float elapsedMS = (end - start) ;
 		SDL_Delay(fmaxf((16.666f - elapsedMS)/1.0f, 0)) ;
-
-
 	}
 
 
