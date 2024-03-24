@@ -6,6 +6,7 @@
 #include "const.h"
 
 
+
 Map *init_map(char *name) {
 	Map *res = malloc(sizeof(Map)) ;
 	FILE *f = fopen(name, "r") ;
@@ -17,6 +18,22 @@ Map *init_map(char *name) {
 	res->start_x = 4.0*PIX_RECT ;
 	res->start_y = 4.0*PIX_RECT ;
 	return res ;
+}
+
+
+
+
+void loadBackgroundTextures(SDL_Renderer *renderer, SDL_Texture *bgTextures[]) {
+    int index = 6;
+	for (int i = 0; i < 6; ++i) {
+        char imagePath[100];
+        snprintf(imagePath, 100, "./asset/background/Foret/plan-%d.png", index-i);
+        bgTextures[i] = IMG_LoadTexture(renderer, imagePath);
+        if (!bgTextures[i]) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error loading background texture %d: %s", i + 1, SDL_GetError());
+            exit(-1);
+        }
+    }
 }
 
 
@@ -48,6 +65,7 @@ void display_tile(SDL_Renderer *renderer,int xoffset, int yoffset, int xpos,int 
 	if (SDL_RenderCopy(renderer, tileTexture, &tileRect, &destRect)) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
 	}
+	SDL_DestroyTexture(tileTexture);
 }
 
 int draw_map(SDL_Renderer *renderer, Map *map, char *ImagePath) {

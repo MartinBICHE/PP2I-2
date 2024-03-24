@@ -3,6 +3,6 @@
 #include <SDL2/SDL_render.h>
 #define MC_H
 
-int spriteMovement(SDL_Renderer*, SDL_Event, int running, const char *ImagePath);
+int spriteMovement(SDL_Renderer*, SDL_Event, int*, const char*);
 
 #endif
