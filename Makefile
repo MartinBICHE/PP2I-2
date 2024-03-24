@@ -1,6 +1,6 @@
 #Fichiers
 TARGET = demo
-SRCS = main.c map.c display.c time.c  #à completer par vos fichiers
+SRCS = main.c map.c display.c time.c mc.c #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
@@ -33,5 +33,5 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 run:
-	make
 	./demo
+
