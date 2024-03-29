@@ -1,40 +1,41 @@
-# Fichiers 
-TARGET = demo 
-SRCS = main.c
+#Fichiers
+TARGET = demo
+SRCS = main.c map.c display.c time.c mc.c menu.c #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
-# Compilation
+#Compilation
 CC = clang
 CFLAGS = -std=gnu11 -Wall -pedantic -O3
 
-# Debug
+#Debug 
 CFLAGS += -g
 CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 LDFLAGS += -fsanitize=address
 
-# Libs 
+#Libs
 CFLAGS += $(shell pkg-config --cflags sdl2)
-LDFLAGS += $(shell pkg-config --libs  sdl2)
+LDFLAGS += $(shell pkg-config --libs sdl2)
 CFLAGS += $(shell pkg-config --cflags sdl2_image)
-LDFLAGS += $(shell pkg-config --libs  sdl2_image)
+LDFLAGS += $(shell pkg-config --libs sdl2_image)
 CFLAGS += $(shell pkg-config --cflags sdl2_gfx)
 LDFLAGS += $(shell pkg-config --libs  sdl2_gfx)
 CFLAGS += $(shell pkg-config --cflags sdl2_mixer)
 LDFLAGS += $(shell pkg-config --libs  sdl2_mixer)
-CFLAGS += $(shell pkg-config --cflags sdl2_ttf)
-LDFLAGS += $(shell pkg-config --libs  sdl2_ttf)
+# CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
+# LDFLAGS += $(shell pkg-config --libs SDL2_tff)
 
-# par défaut 
+
 all: $(TARGET)
 
-# linkage 
 $(TARGET): $(OBJS)
-	$(CC) $^ $(LDFLAGS) -o $@
+	$(CC) $^ $(LDFLAGS) -o $@ -lSDL2_ttf 
 
-# compilation
-%.o: %.cflags
+%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# nettoyage 
 clean:
 	rm -f $(OBJS) $(TARGET)
+
+run:
+	./demo
+
