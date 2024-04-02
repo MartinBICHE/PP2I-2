@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SDL2/SDL.h>
-#include "player.h"
 #include "const.h"
 #include "main.h"
 #include "map.h"
