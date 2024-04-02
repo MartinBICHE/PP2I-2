@@ -9,10 +9,10 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <SDL2/SDL.h>
-#include "mc.h"
 #include "const.h"
 #include "main.h"
 #include "map.h"
@@ -91,34 +91,6 @@ int main(int argc, char **argv) {
 			exit(-1) ;
 		}
 
-		// if (displayBackground(renderer,"./asset/background/Foret/plan-6.png")) {
-		// 	printf("Error drawing the background") ;
-		// 	exit(-1) ;
-		// }
-		// if (displayBackground(renderer,"./asset/background/Foret/plan-5.png")) {
-		// 	printf("Error drawing the background") ;
-		// 	exit(-1) ;
-		// }
-		// if (displayBackground(renderer,"./asset/background/Foret/plan-4.png")) {
-		// 	printf("Error drawing the background") ;
-		// 	exit(-1) ;
-		// }
-		// if (displayBackground(renderer,"./asset/background/Foret/plan-3.png")) {
-		// 	printf("Error drawing the background") ;
-		// 	exit(-1) ;
-		// }
-		// if (displayBackground(renderer,"./asset/background/Foret/plan-2.png")) {
-		// 	printf("Error drawing the background") ;
-		// 	exit(-1) ;
-		// }
-		// if (displayBackground(renderer,"./asset/background/Foret/plan-1.png")) {
-		// 	printf("Error drawing the background") ;
-		// 	exit(-1) ;
-		// }
-		if (spriteMovement(renderer, event, &distance, "./asset/spritesheet/ss_mc.png")) {
-			printf("Error rendering sprite") ;
-			exit(-1) ;
-		}
 
 
 		SDL_RenderPresent(renderer) ;
@@ -127,9 +99,11 @@ int main(int argc, char **argv) {
 		float elapsedMS = (end - start) ;
 		SDL_Delay(fmaxf((16.666f - elapsedMS)/1.0f, 0)) ;
 	}
-
-
+	
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	free(map);
 	atexit(SDL_Quit) ;
-	free(map) ;
+
 	return 0 ;
 }

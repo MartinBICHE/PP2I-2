@@ -12,7 +12,9 @@ Map *init_map(char *name) {
 	FILE *f = fopen(name, "r") ;
     // char buffer[100];
     for (int i = 0 ; i < HEIGHT ; i++) {
-        fgets(res->matrix[i], 49, f) ;
+        if (fgets(res->matrix[i], 49, f) == 0) {
+			printf("String length is null");
+		}
 	}
     fclose(f) ;
 	res->start_x = 4.0*PIX_RECT ;

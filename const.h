@@ -8,7 +8,6 @@
 #define WINWIDTH WIDTH*PIX_RECT
 #define WINHEIGHT HEIGHT*PIX_RECT
 
-
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;
     float start_x ;
