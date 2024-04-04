@@ -8,6 +8,7 @@
 #include "menu.h"
 #include "const.h"
 
+
 // Taille de la fenêtre de chargement
 
 SDL_Window* gLoadingWindow = NULL;
@@ -90,7 +91,7 @@ void drawLoading() {
     SDL_RenderPresent(gLoadingRenderer);
 }
 
-// Fonction pour initialiser SDL et créer la fenêtre de menu en plein écran
+// Fonction pour initialiser SDL et créer la fenêtre de menu
 bool initMenuWindow() {
     // Création de la fenêtre de menu en mode plein écran
     gMenuWindow = SDL_CreateWindow("Menu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, MENU_WINDOW_WIDTH, MENU_WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
@@ -174,6 +175,23 @@ void drawMenu(int image1Width, int image1Height, int image2Width, int image2Heig
     SDL_DestroyTexture(image2Texture);
     SDL_FreeSurface(image2Surface);
 
+    // Charger et dessiner la troisième image en haut à gauche de la fenêtre
+    SDL_Surface* image3Surface = IMG_Load("./asset/background/Foret/bouton-quitter-le-jeu.png");
+    if (image2Surface == NULL) {
+        SDL_Log("Erreur lors du chargement de la deuxième image : %s", SDL_GetError());
+        return;
+    }
+    SDL_Texture* image3Texture = SDL_CreateTextureFromSurface(gMenuRenderer, image3Surface);
+    if (image3Texture == NULL) {
+        SDL_Log("Erreur lors de la création de la texture de la deuxième image : %s", SDL_GetError());
+        SDL_FreeSurface(image3Surface);
+        return;
+    }
+    SDL_Rect image3Rect = {0, 0, image2Width, image2Height};
+    SDL_RenderCopy(gMenuRenderer, image3Texture, NULL, &image3Rect);
+    SDL_DestroyTexture(image3Texture);
+    SDL_FreeSurface(image3Surface);
+
     // Mettre à jour l'affichage
     SDL_RenderPresent(gMenuRenderer);
 }
@@ -220,4 +238,18 @@ void closeSDL_mixer() {
 
     Mix_CloseAudio();
     Mix_Quit();
+}
+
+// Variable globale pour indiquer si la musique est en pause
+bool musicPaused = false;
+
+// Fonction pour mettre en pause ou reprendre la musique
+void toggleMusic() {
+    if (Mix_PausedMusic()) {
+        Mix_ResumeMusic();
+        musicPaused = false;
+    } else {
+        Mix_PauseMusic();
+        musicPaused = true;
+    }
 }

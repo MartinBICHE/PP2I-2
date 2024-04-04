@@ -16,6 +16,11 @@
 #define Image2Height 150
 #define LOADING_WINDOW_WIDTH 600
 #define LOADING_WINDOW_HEIGHT 400
+#define BLUR_AMOUNT 0.5f
+#define ImageRetourMenuWidth 200
+#define ImageRetourMenuHeight 50
+#define ImageQuitterJeuWidth 200
+#define ImageQuitterJeuHeight 50
 
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;

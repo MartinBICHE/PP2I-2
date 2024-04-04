@@ -12,5 +12,6 @@ bool initSDL_mixer();
 bool loadMusic();
 void playMusic();
 void closeSDL_mixer();
+void toggleMusic();
 
 #endif /* MENU_H */

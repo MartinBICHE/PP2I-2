@@ -5,8 +5,6 @@
 #include <SDL2/SDL_image.h>
 #include "const.h"
 
-
-
 Map *init_map(char *name) {
 	Map *res = malloc(sizeof(Map)) ;
 	FILE *f = fopen(name, "r") ;
@@ -137,4 +135,10 @@ int draw_map(SDL_Renderer *renderer, Map *map, char *ImagePath) {
 		}
 	}
 	return 0 ;
+}
+
+// Fonction pour nettoyer et quitter la fenêtre de la carte
+void closeMapWindow(SDL_Window *window, SDL_Renderer *renderer) {
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
 }
