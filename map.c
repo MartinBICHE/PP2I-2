@@ -25,9 +25,9 @@ Map *init_map(char *name) {
 
 
 
-void loadBackgroundTextures(SDL_Renderer *renderer, SDL_Texture *bgTextures[]) {
-    int index = 6;
-	for (int i = 0; i < 6; ++i) {
+void loadBackgroundTextures(SDL_Renderer *renderer, SDL_Texture *bgTextures[], int layer) {
+    int index = layer;
+	for (int i = 0; i < layer; ++i) {
         char imagePath[100];
         snprintf(imagePath, 100, "./asset/background/Foret/plan-%d.png", index-i);
         bgTextures[i] = IMG_LoadTexture(renderer, imagePath);

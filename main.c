@@ -18,7 +18,7 @@
 #include "map.h"
 #include <stdbool.h>
 
-int distance =0;
+int distance = 0;
 SDL_Texture *bgTextures[6];
 
 int main(int argc, char **argv) {
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 	SDL_Event event ;
 	int running = 1 ;
 
-	loadBackgroundTextures(renderer, bgTextures);
+	loadBackgroundTextures(renderer, bgTextures, 5);
 
 	while (running) {
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
 			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError()) ;
 			exit(-1) ;
 		}
-		for (int i = 0; i < 6; ++i) {
+		for (int i = 0; i < 5; ++i) {
             if (SDL_RenderCopy(renderer, bgTextures[i], NULL, NULL)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error rendering background texture %d: %s", i + 1, SDL_GetError());
                 exit(-1);
