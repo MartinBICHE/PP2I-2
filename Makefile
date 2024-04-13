@@ -9,8 +9,8 @@ CFLAGS = -std=gnu11 -Wall -pedantic -O3
 
 #Debug 
 CFLAGS += -g
-CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-LDFLAGS += -fsanitize=address -lm
+CFLAGS += -fno-omit-frame-pointer
+LDFLAGS += -lm
 
 #Libs
 CFLAGS += $(shell pkg-config --cflags sdl2)
