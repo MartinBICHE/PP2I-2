@@ -18,7 +18,8 @@
 #include "map.h"
 #include <stdbool.h>
 
-int distance =0;
+int distance =50;
+int y_position = 100;
 SDL_Texture *bgTextures[6];
 
 int main(int argc, char **argv) {
@@ -115,7 +116,13 @@ int main(int argc, char **argv) {
 		// 	printf("Error drawing the background") ;
 		// 	exit(-1) ;
 		// }
-		if (spriteMovement(renderer, event, &distance, "./asset/spritesheet/ss_mc.png")) {
+		if (detect_collision(map, distance, y_position + GRAVITY)) {
+			y_position = (y_position / PIX_RECT) * PIX_RECT;
+		} else {
+			y_position += GRAVITY;
+		}
+
+		if (spriteMovement(renderer, event, &distance, &y_position, "./asset/spritesheet/ss_mc.png", map)) {
 			printf("Error rendering sprite") ;
 			exit(-1) ;
 		}
