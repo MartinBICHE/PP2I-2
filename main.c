@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
 
 		Uint64 end = SDL_GetTicks();
 		float elapsedMS = (end - start);
-		SDL_Delay(fmaxf((4.444f - elapsedMS)/1.0f, 0));
+		SDL_Delay(fmaxf((8.888f - elapsedMS)/1.0f, 0));
 	}
 	
 	SDL_DestroyRenderer(renderer);
