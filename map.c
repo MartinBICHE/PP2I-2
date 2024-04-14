@@ -99,71 +99,73 @@ void display_tile(SDL_Renderer *renderer, int xoffset, int yoffset, int xpos, in
 int drawMap(SDL_Renderer *renderer, Map *map, char *ImagePath, float x_cam) {
 	for (int i = 0 ; i < HEIGHT ; i++) {
 		for (int j = 0 ; j < WIDTH ; j++) {
-			if (map->matrix[i][j] == '7') {
-				display_tile(renderer,0,2,j,i,ImagePath, x_cam); // Coin superieur gauche
-			}
-			if (map->matrix[i][j] == '4') {
-				display_tile(renderer,0,3,j,i,ImagePath, x_cam); // Mur face gauche
-			}
-			if (map->matrix[i][j] == '1') {
-				display_tile(renderer,0,4,j,i,ImagePath, x_cam); // Coin inferieur gauche
-			}
-			if (map->matrix[i][j] == '9') {
-				display_tile(renderer,4,2,j,i,ImagePath, x_cam); // Coin superieur droit
-			}
-			if (map->matrix[i][j] == '6') {
-				display_tile(renderer,4,3,j,i,ImagePath, x_cam); // Mur face droit 
-			}
-			if (map->matrix[i][j] == '3') {
-				display_tile(renderer,4,4,j,i,ImagePath, x_cam); // Coin inferieur droit
-			}
-			if (map->matrix[i][j] == '8') {
-				if (j%3==0) {
-					display_tile(renderer,1,2,j,i,ImagePath, x_cam);
-				} else if (j%3==1) {
-					display_tile(renderer,2,2,j,i,ImagePath, x_cam);
-				} else {
-					display_tile(renderer,3,2,j,i,ImagePath, x_cam); // Sol
+			if (j*PIX_RECT - x_cam > -PIX_RECT && j*PIX_RECT - x_cam < WINWIDTH) {
+				if (map->matrix[i][j] == '7') {
+					display_tile(renderer,0,2,j,i,ImagePath, x_cam); // Coin superieur gauche
 				}
-			}
-			if (map->matrix[i][j] == '5') {
-				display_tile(renderer,1,3,j,i,ImagePath, x_cam); // Vide
-			}
-			if (map->matrix[i][j] == '2') {
-				if (j%3==0) {
-					display_tile(renderer,1,4,j,i,ImagePath, x_cam);
-				} else if (j%3==1) {
-					display_tile(renderer,2,4,j,i,ImagePath, x_cam);
-				} else {
-					display_tile(renderer,3,4,j,i,ImagePath, x_cam);// Plafond
+				if (map->matrix[i][j] == '4') {
+					display_tile(renderer,0,3,j,i,ImagePath, x_cam); // Mur face gauche
 				}
-			}
-			if (map->matrix[i][j] == 'u') {
-				display_tile(renderer,0,1,j,i,ImagePath, x_cam); // Angle superieur droit
-			}
-			if (map->matrix[i][j] == 'i') {
-				display_tile(renderer,1,1,j,i,ImagePath, x_cam); // Angle inferieur droit
-			}
-			if (map->matrix[i][j] == 'o') {
-				display_tile(renderer,2,1,j,i,ImagePath, x_cam); // Angle inferieur gauche
-			}
-			if (map->matrix[i][j] == 'p') {
-				display_tile(renderer,3,1,j,i,ImagePath, x_cam); // Angle superieur gauche
-			}
-			if (map->matrix[i][j] == 'a') {
-				display_tile(renderer,0,0,j,i,ImagePath, x_cam); // Plateforme extremite droit
-			}
-			if (map->matrix[i][j] == 'z') {
-				if (j%3==0) {
-					display_tile(renderer,1,0,j,i,ImagePath, x_cam);
-				} else if (j%3==1) {
-					display_tile(renderer,2,0,j,i,ImagePath, x_cam);
-				} else {
-					display_tile(renderer,3,0,j,i,ImagePath, x_cam);// Plafond
-				} // Plateforme corps
-			}
-			if (map->matrix[i][j] == 'e') {
-				display_tile(renderer,4,0,j,i,ImagePath, x_cam); // Plateforme extremite gauche
+				if (map->matrix[i][j] == '1') {
+					display_tile(renderer,0,4,j,i,ImagePath, x_cam); // Coin inferieur gauche
+				}
+				if (map->matrix[i][j] == '9') {
+					display_tile(renderer,4,2,j,i,ImagePath, x_cam); // Coin superieur droit
+				}
+				if (map->matrix[i][j] == '6') {
+					display_tile(renderer,4,3,j,i,ImagePath, x_cam); // Mur face droit 
+				}
+				if (map->matrix[i][j] == '3') {
+					display_tile(renderer,4,4,j,i,ImagePath, x_cam); // Coin inferieur droit
+				}
+				if (map->matrix[i][j] == '8') {
+					if (j%3==0) {
+						display_tile(renderer,1,2,j,i,ImagePath, x_cam);
+					} else if (j%3==1) {
+						display_tile(renderer,2,2,j,i,ImagePath, x_cam);
+					} else {
+						display_tile(renderer,3,2,j,i,ImagePath, x_cam); // Sol
+					}
+				}
+				if (map->matrix[i][j] == '5') {
+					display_tile(renderer,1,3,j,i,ImagePath, x_cam); // Vide
+				}
+				if (map->matrix[i][j] == '2') {
+					if (j%3==0) {
+						display_tile(renderer,1,4,j,i,ImagePath, x_cam);
+					} else if (j%3==1) {
+						display_tile(renderer,2,4,j,i,ImagePath, x_cam);
+					} else {
+						display_tile(renderer,3,4,j,i,ImagePath, x_cam);// Plafond
+					}
+				}
+				if (map->matrix[i][j] == 'u') {
+					display_tile(renderer,0,1,j,i,ImagePath, x_cam); // Angle superieur droit
+				}
+				if (map->matrix[i][j] == 'i') {
+					display_tile(renderer,1,1,j,i,ImagePath, x_cam); // Angle inferieur droit
+				}
+				if (map->matrix[i][j] == 'o') {
+					display_tile(renderer,2,1,j,i,ImagePath, x_cam); // Angle inferieur gauche
+				}
+				if (map->matrix[i][j] == 'p') {
+					display_tile(renderer,3,1,j,i,ImagePath, x_cam); // Angle superieur gauche
+				}
+				if (map->matrix[i][j] == 'a') {
+					display_tile(renderer,0,0,j,i,ImagePath, x_cam); // Plateforme extremite droit
+				}
+				if (map->matrix[i][j] == 'z') {
+					if (j%3==0) {
+						display_tile(renderer,1,0,j,i,ImagePath, x_cam);
+					} else if (j%3==1) {
+						display_tile(renderer,2,0,j,i,ImagePath, x_cam);
+					} else {
+						display_tile(renderer,3,0,j,i,ImagePath, x_cam);// Plafond
+					} // Plateforme corps
+				}
+				if (map->matrix[i][j] == 'e') {
+					display_tile(renderer,4,0,j,i,ImagePath, x_cam); // Plateforme extremite gauche
+				}
 			}
 		}
 	}
