@@ -23,81 +23,83 @@ SDL_Texture *bgTextures[6];
 
 int main(int argc, char **argv) {
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError()) ;
-		exit(-1) ;
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError());
+		exit(-1);
 	}
 
 
-	SDL_Window *window ;
-	window = SDL_CreateWindow("SDL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINWIDTH, WINHEIGHT, SDL_WINDOW_SHOWN) ;
+	SDL_Window *window;
+	window = SDL_CreateWindow("SDL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINWIDTH, WINHEIGHT, SDL_WINDOW_SHOWN);
 	if (!window) {
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in window init : %s", SDL_GetError()) ;
-		exit(-1) ;
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in window init : %s", SDL_GetError());
+		exit(-1);
 	}
 
-	SDL_Renderer *renderer ;
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED) ;
+	SDL_Renderer *renderer;
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (!renderer) {
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError()) ;
-		exit(-1) ;
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError());
+		exit(-1);
 	}
 
-	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255} ;
-	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255} ;
+	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
+	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 
-	Map *map =init_map("map1/data.txt") ;
+	Map *map = initMap("map1/data.txt");
+
+	float x_cam = 0; // cam à gauche au début
 	
+	float x_perso = 2; // !!! seulement pour les tests de caméra (à changer) x_perso est en nombre de tiles et pas en pixels
 
 
-	SDL_Event event ;
-	int running = 1 ;
+	SDL_Event event;
+	int running = 1;
 
 	loadBackgroundTextures(renderer, bgTextures, 5);
 
 	while (running) {
 
-		Uint64 start = SDL_GetTicks() ;
+		Uint64 start = SDL_GetTicks();
 
 		if (SDL_PollEvent(&event)) {
 			switch(event.type) {
 			case SDL_QUIT :
-				running = 0 ;
-				break ;
+				running = 0;
+				break;
 			case SDL_KEYUP :
-				break ;
+				break;
 			}
 		}
 
-		if (SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a)) {
-			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError()) ;
-			exit(-1) ;
+		const Uint8 *state = SDL_GetKeyboardState(NULL);
+		if (state[SDL_SCANCODE_A]) x_perso -= 0.08; // !!! seulement pour les tests de caméra (à changer) Q en AZERTY
+		if (state[SDL_SCANCODE_D]) x_perso += 0.08; // !!! seulement pour les tests de caméra (à changer)
+		// printf("x_perso = %f\n", x_perso); // !!! seulement pour les tests de caméra (à changer)
+
+		x_cam = updateCam(x_perso*PIX_RECT, x_cam);
+
+		if (drawBackground(renderer, bgTextures, 5)) {
+			printf("Error drawing the background");
+			exit(-1);
 		}
-		if (SDL_RenderClear(renderer)) {
-			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render clear : %s", SDL_GetError()) ;
-			exit(-1) ;
-		}
-		if (SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a)) {
-			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError()) ;
-			exit(-1) ;
-		}
-		for (int i = 0; i < 5; ++i) {
-            if (SDL_RenderCopy(renderer, bgTextures[i], NULL, NULL)) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error rendering background texture %d: %s", i + 1, SDL_GetError());
-                exit(-1);
-            }
-        }
-		if (draw_map(renderer, map, "./asset/tileset/ground-1.png")) {
-			printf("Error drawing the map") ;
-			exit(-1) ;
+		if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam)) {
+			printf("Error drawing the map");
+			exit(-1);
 		}
 
+		SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
+		SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)
+		SDL_RenderDrawRect(renderer, &rect1); // !!! seulement pour les tests de caméra (à changer)
+		SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
+		SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
+    	SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
 
-		SDL_RenderPresent(renderer) ;
+		SDL_RenderPresent(renderer);
 
-		Uint64 end = SDL_GetTicks() ;
-		float elapsedMS = (end - start) ;
-		SDL_Delay(fmaxf((16.666f - elapsedMS)/1.0f, 0)) ;
+		Uint64 end = SDL_GetTicks();
+		float elapsedMS = (end - start);
+		SDL_Delay(fmaxf((8.888f - elapsedMS)/1.0f, 0));
 	}
 	
 	SDL_DestroyRenderer(renderer);
@@ -105,5 +107,5 @@ int main(int argc, char **argv) {
 	free(map);
 	atexit(SDL_Quit) ;
 
-	return 0 ;
+	return 0;
 }

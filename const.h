@@ -2,11 +2,13 @@
 #define CONST_H
 
 
-#define HEIGHT 8 // i, y
-#define WIDTH 48 // j, x
-#define PIX_RECT 30
-#define WINWIDTH WIDTH*PIX_RECT
-#define WINHEIGHT HEIGHT*PIX_RECT
+#define WINHEIGHT 720 // en pixels
+#define WINWIDTH 1280 // en pixels
+#define HEIGHT 8 // i, y en nombre de tiles
+#define WIDTH 48 // j, x en nombre de tiles
+#define PIX_RECT WINHEIGHT/HEIGHT // en pixels
+#define LEVEL_WIDTH PIX_RECT*WIDTH // en pixels
+
 
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;
@@ -14,13 +16,6 @@ typedef struct _Map {
     float start_y ;
 } Map ;
 
-
-typedef struct _Perso {
-    int x ;
-    int y ;
-    int vx ;
-    int vy ;
-} Perso ;
 
 
 
