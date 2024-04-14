@@ -2,11 +2,12 @@
 #define CONST_H
 
 
-#define WINHEIGHT 720
-#define WINWIDTH 1280
-#define HEIGHT 8 // i, y
-#define WIDTH 48 // j, x
-#define PIX_RECT WINHEIGHT/HEIGHT
+#define WINHEIGHT 720 // en pixels
+#define WINWIDTH 1280 // en pixels
+#define HEIGHT 8 // i, y en nombre de tiles
+#define WIDTH 48 // j, x en nombre de tiles
+#define PIX_RECT WINHEIGHT/HEIGHT // en pixels
+#define LEVEL_WIDTH PIX_RECT*WIDTH // en pixels
 
 
 typedef struct _Map {
@@ -15,13 +16,6 @@ typedef struct _Map {
     float start_y ;
 } Map ;
 
-
-typedef struct _Perso {
-    int x ;
-    int y ;
-    int vx ;
-    int vy ;
-} Perso ;
 
 
 
