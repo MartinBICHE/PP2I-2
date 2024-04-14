@@ -7,6 +7,10 @@
 #define PIX_RECT 30
 #define WINWIDTH WIDTH*PIX_RECT
 #define WINHEIGHT HEIGHT*PIX_RECT
+#define TIERWIDTH WINWIDTH/3
+#define SEMIHEIGHT WINHEIGHT/2
+#define SPRITESIZE 64 // 64x64 taille des sprites de base
+
 
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;
@@ -21,7 +25,5 @@ typedef struct _Perso {
     int vx ;
     int vy ;
 } Perso ;
-
-
 
 #endif

@@ -16,9 +16,9 @@
 #include "const.h"
 #include "main.h"
 #include "map.h"
+#include "fight.h"
 #include <stdbool.h>
 
-int distance = 0;
 SDL_Texture *bgTextures[6];
 
 int main(int argc, char **argv) {
@@ -46,11 +46,14 @@ int main(int argc, char **argv) {
 	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255} ;
 
 	Map *map =init_map("map1/data.txt") ;
-	
+
 
 
 	SDL_Event event ;
 	int running = 1 ;
+
+
+	Perso *playerInFight = {TIERWIDTH/2-SPRITESIZE/2,WINHEIGHT,0,0};
 
 	loadBackgroundTextures(renderer, bgTextures, 5);
 
@@ -88,6 +91,10 @@ int main(int argc, char **argv) {
         }
 		if (draw_map(renderer, map, "./asset/tileset/ground-1.png")) {
 			printf("Error drawing the map") ;
+			exit(-1) ;
+		}
+		if (fightMovement(renderer, event, &playerInFight)) {
+			printf("Error showing the rectangle") ;
 			exit(-1) ;
 		}
 
