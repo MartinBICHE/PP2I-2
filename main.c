@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255} ;
 	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255} ;
 
-	Map *map =init_map("map1/data.txt") ;
+	Map *map = init_map("map1/data.txt") ;
 	
 
 

@@ -10,7 +10,6 @@
 Map *init_map(char *name) {
 	Map *res = malloc(sizeof(Map)) ;
 	FILE *f = fopen(name, "r") ;
-    // char buffer[100];
     for (int i = 0 ; i < HEIGHT ; i++) {
         if (fgets(res->matrix[i], 49, f) == 0) {
 			printf("String length is null");
