@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 
 		x_cam = updateCam(x_perso*PIX_RECT, x_cam);
 
-		if (drawBackground(renderer, bgTextures, 5)) {
+		if (drawBackground(renderer, bgTextures, 5, x_cam)) {
 			printf("Error drawing the background");
 			exit(-1);
 		}
