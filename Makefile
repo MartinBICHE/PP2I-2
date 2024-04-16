@@ -1,16 +1,17 @@
 #Fichiers
 TARGET = demo
-SRCS = main.c map.c display.c time.c #à completer par vos fichiers
+SRCS = main.c map.c display.c time.c perso.c #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
 CC = clang
 CFLAGS = -std=gnu11 -Wall -pedantic -O3
+LDFLAGS = -lm
 
 #Debug 
 CFLAGS += -g
-CFLAGS += -fno-omit-frame-pointer
-LDFLAGS += -lm
+# CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+# LDFLAGS += -fsanitize=address
 
 #Libs
 CFLAGS += $(shell pkg-config --cflags sdl2)
