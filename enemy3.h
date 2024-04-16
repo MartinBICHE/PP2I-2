@@ -17,6 +17,6 @@ struct _Enemy3{
     int speed;
 };
 typedef struct _Enemy3 Enemy3;
-void enemy3_movement(SDL_Renderer *renderer, SDL_Texture *texture, Enemy3 *enemy, float scale);
+void enemy3_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, Enemy3 *enemy, float scale );
 
 #endif

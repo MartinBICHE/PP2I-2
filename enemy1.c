@@ -18,8 +18,13 @@ enum EnemyState {
     ANIMATION_START
 };
 
+/* à utiliser avec: */ 
+/*         enemy1_movement(renderer, texture, &src_rect, &dest_rect, &b); */
+/*     SDL_Rect dest_rect = {460, 230, 64, 0}; */
+/*     SDL_Rect src_rect = {0, 0, 64, 0}; nécessairement le src_rect défini de cette manière */
+
 void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, int *i) {
-    int speed = 3;
+    int speed = 5;
     int interval = 2000;
     static enum EnemyState state = MOVING_UP;
     static Uint32 pauseStart = 0;
@@ -70,4 +75,5 @@ void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src
 
     SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
 }
+
 
