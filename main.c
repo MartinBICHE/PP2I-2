@@ -23,6 +23,9 @@
 
 int distance = 0;
 SDL_Texture *bgTextures[6];
+bool showMenu = true;
+bool parametre = false;
+bool afficherImage = false;
 
 int main(int argc, char **argv) {
     if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -94,10 +97,7 @@ again :
 
     bool retourMenu = false;
     bool startGame = false;
-    SDL_Window *window = NULL;
-    SDL_Renderer *renderer = NULL;
-    SDL_Texture *pauseImage = NULL;
-    int imageWidth, imageHeight;
+    bool prevShowMenu = true;
 
     // Boucle principale du menu
     bool quit = false;
@@ -109,38 +109,45 @@ again :
             } else if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
                 int mouseX = e.button.x;
                 int mouseY = e.button.y;
-                    if (mouseX >= 0 && mouseX <= Image2Width && mouseY >= 0 && mouseY <= Image2Height) {
+                    if (mouseX >= 0 && mouseX <= Image3Width && mouseY >= 0 && mouseY <= Image3Height && showMenu == true) {
                         quit = true; // Fermer toutes les fenêtres
                     } else if (mouseX >= ((MENU_WINDOW_WIDTH - Image1Width) / 2) && mouseX <= ((MENU_WINDOW_WIDTH - Image1Width) / 2) + Image1Width &&
-                                mouseY >= ((MENU_WINDOW_HEIGHT - Image1Height) / 2) && mouseY <= ((MENU_WINDOW_HEIGHT - Image1Height) / 2) + Image1Height) {
+                                mouseY >= ((MENU_WINDOW_HEIGHT - Image1Height) / 2) && mouseY <= ((MENU_WINDOW_HEIGHT - Image1Height) / 2) + Image1Height && showMenu == true) {
                         closeMenuWindow(); // Fermer la fenêtre de menu
                         startGame = true;
                         retourMenu = false;
-                    }
+                        showMenu = true;
+                    } else if (mouseX >= (MENU_WINDOW_WIDTH - Image2Width) && mouseX <= MENU_WINDOW_WIDTH &&
+                        mouseY >= 0 && mouseY <= Image2Height) {
+                        showMenu = false;
+                    } 
+            } else if (e.type == SDL_KEYUP ) {
+                if (e.key.keysym.sym == SDLK_ESCAPE && showMenu == false) {
+                    showMenu = true;
                 }
+            } 
+            
+        }
+        if (prevShowMenu != showMenu) {
+            if (!showMenu) {
+                toggleMusic();
+            } else {
+                toggleMusic();
             }
-        // Dessiner le menu
-        drawMenu(Image1Width, Image1Height, Image2Width, Image2Height);
-
+            prevShowMenu = showMenu;
+        }
+    
+        
+        // Dessiner le menu    
+        drawMenu();    
+        
         // Mettre une pause courte pour éviter une utilisation excessive du processeur
         SDL_Delay(10);
 
         if (startGame) {
 
             // Créer la fenêtre de jeu et le renderer
-            SDL_Window *window;
-            window = SDL_CreateWindow("SDL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINWIDTH, WINHEIGHT, SDL_WINDOW_SHOWN);
-            if (!window) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in window init : %s", SDL_GetError());
-                exit(-1);
-            }
-
-            SDL_Renderer *renderer;
-            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-            if (!renderer) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError());
-                exit(-1);
-            }
+            initPlayWindow();
 
             // Charger les éléments du jeu
             map = init_map("map1/data.txt");
@@ -151,7 +158,7 @@ again :
 
             loadBackgroundTextures(renderer, bgTextures);
             
-            bool afficherImage = false;
+            bool musicToggled = false;
             while (running) {
 
                 Uint64 start = SDL_GetTicks();
@@ -173,12 +180,37 @@ again :
                                 mouseY >= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) && mouseY <= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) + ImageRetourMenuHeight) {
                                 retourMenu = !retourMenu;
                                 toggleMusic();
+                                afficherImage = !afficherImage;
                             }
-                        }   
+                            else if (mouseX >= (WINWIDTH - ImageParametrePauseWidth) && mouseX <= WINWIDTH && 
+                                mouseY >= 0 && mouseY <= ImageParametrePauseHeight) {
+                                parametre = !parametre;
+                                afficherImage = false;
+                            } else if (mouseX >= 0 && mouseX <= ImageRetourArrièreWidth &&
+                                mouseY >= 0 && mouseY <= ImageRetourArrièreHeight && afficherImage == true) {
+                                if (afficherImage == true) {
+                                    afficherImage = !afficherImage;
+                                    toggleMusic();
+                                } else if (parametre = true) {
+                                    parametre = !parametre;
+                                    afficherImage = !afficherImage;
+                                    // Pour l'instant l'image retour arrière ne marche pas 
+                                }
+                            }   
+                        }
                     } else if (e.type == SDL_KEYUP) {
-                        if (e.key.keysym.sym == SDLK_ESCAPE) {
-                            toggleMusic(); // Mettre en pause ou reprendre la musique
+                        if (e.key.keysym.sym == SDLK_ESCAPE && afficherImage == false && parametre == false) {
                             afficherImage = !afficherImage;
+                            toggleMusic();
+                            parametre = false;
+                        }
+                        else if (e.key.keysym.sym == SDLK_ESCAPE && afficherImage == true) {
+                            afficherImage = !afficherImage;
+                            toggleMusic();
+                        }
+                        else if (e.key.keysym.sym == SDLK_ESCAPE && parametre == true) {
+                            parametre = !parametre;
+                            afficherImage=!afficherImage;
                         }
                     }
                 }
@@ -216,35 +248,7 @@ again :
                     exit(-1);
                 }
 
-                if (afficherImage) {
-                    SDL_Surface *image1Surface = IMG_Load("./asset/background/Foret/bouton-retour-menu.png");
-                    if (image1Surface == NULL) {
-                        SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-                    }
-                    SDL_Texture *image1Texture = SDL_CreateTextureFromSurface(renderer, image1Surface);
-                    if (image1Texture == NULL) {
-                        SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-                        SDL_FreeSurface(image1Surface);
-                    }
-                    SDL_Rect image1Rect = {(WINWIDTH - ImageRetourMenuWidth) / 2, (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50, ImageRetourMenuWidth, ImageRetourMenuHeight};
-                    SDL_RenderCopy(renderer, image1Texture, NULL, &image1Rect);
-                    SDL_DestroyTexture(image1Texture);
-                    SDL_FreeSurface(image1Surface);
-
-                    SDL_Surface *image2Surface = IMG_Load("./asset/background/Foret/bouton-quitter-le-jeu.png");
-                    if (image2Surface == NULL) {
-                        SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-                    }
-                    SDL_Texture *image2Texture = SDL_CreateTextureFromSurface(renderer, image2Surface);
-                    if (image1Texture == NULL) {
-                        SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-                        SDL_FreeSurface(image2Surface);
-                    }
-                    SDL_Rect image2Rect = {(WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight};
-                    SDL_RenderCopy(renderer, image2Texture, NULL, &image2Rect);
-                    SDL_DestroyTexture(image2Texture);
-                    SDL_FreeSurface(image2Surface);
-                }
+                drawMap();
 
                 SDL_RenderPresent(renderer);
 

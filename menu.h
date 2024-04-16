@@ -7,11 +7,13 @@ void closeLoadingWindow();
 void drawLoading();
 bool initMenuWindow();
 void closeMenuWindow();
-void drawMenu(int image1Width, int image1Height, int image2Width, int image2Height);
+void drawMenu();
 bool initSDL_mixer();
 bool loadMusic();
 void playMusic();
 void closeSDL_mixer();
 void toggleMusic();
+void drawMap();
+bool initPlayWindow();
 
 #endif /* MENU_H */
