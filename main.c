@@ -17,12 +17,19 @@
 #include "main.h"
 #include "map.h"
 #include "perso.h"
+#include "enemy1.h"
+#include "enemy2.h"
+#include "enemy3.h"
+#include "dialog_box.h"
+#include "display.h"
 #include <stdbool.h>
 
 int distance = 0;
 SDL_Texture *bgTextures[6];
 
+
 int main(int argc, char **argv) {
+
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError());
 		exit(-1);
@@ -111,6 +118,7 @@ int main(int argc, char **argv) {
 		float elapsedMS = (end - start);
 		SDL_Delay(fmaxf((1000*DT - elapsedMS)/1.0f, 0));
 	}
+
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
