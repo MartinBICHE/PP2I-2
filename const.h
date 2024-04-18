@@ -8,9 +8,8 @@
 #define WIDTH 48 // j, x en nombre de tiles
 #define PIX_RECT WINHEIGHT/HEIGHT // en pixels
 #define LEVEL_WIDTH PIX_RECT*WIDTH // en pixels
-
-#define PERSO_WIDTH 60
-#define PERSO_HEIGHT 60
+#define PERSO_WIDTH 0.66666f // en nombre de tiles
+#define PERSO_HEIGHT 1.33333f // en nombre de tiles
 #define ACC 25.5f
 #define DT 1/60.0f
 #define JUMPSPEED 11.0f

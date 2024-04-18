@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
-	Map *map = initMap("map1/data.txt");
+	Map *map = initMap("map1");
 	Perso *perso = create_perso(map);
 
 	float x_cam = 0; // cam à gauche au début
@@ -80,6 +80,7 @@ int main(int argc, char **argv) {
 		if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
 
 		updatePerso(perso, map);
+		// printf("perso->y = %f\n", perso->y);
 		x_cam = updateCam(perso->x*PIX_RECT, x_cam);
 
 		if (drawBackground(renderer, bgTextures, 5, x_cam)) {
