@@ -1,5 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
+#include <SDL2/SDL.h>
+#include "const.h"
 
 Map *initMap(char*);
 float updateCam(float, float);
