@@ -16,8 +16,8 @@ Map *initMap(char *name) {
 		}
 	}
     fclose(f);
-	res->start_x = 4.0*PIX_RECT;
-	res->start_y = 4.0*PIX_RECT;
+	res->start_x = 4.0; // en nombre de tiles
+	res->start_y = 4.0; // en nombre de tiles
 	return res;
 }
 
