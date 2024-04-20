@@ -10,7 +10,6 @@ LDFLAGS = -lm
 
 #Debug 
 CFLAGS += -g
-<<<<<<< HEAD
 CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 LDFLAGS +=  -fsanitize=address -lm
 
