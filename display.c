@@ -5,13 +5,7 @@
 
 /* fonction qui affiche une image qui prend en paramètre le renderer, la position x et y, le scale (pour preserver les proportions initiales) et le chemin de l'image */
 
-void render_sprite(SDL_Renderer *renderer, int x, int y, int scale, const char *image_path){
-    SDL_Surface *surface = IMG_Load(image_path);
-    if (!surface){
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in sprite surface init: %s", IMG_GetError());
-        exit(-1);
-    }
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+void render_sprite(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y, int scale, const char *image_path){
     if (!texture){
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in sprite texture init: %s", SDL_GetError());
         exit(-1);
@@ -20,21 +14,12 @@ void render_sprite(SDL_Renderer *renderer, int x, int y, int scale, const char *
     int access, width, height;
     SDL_QueryTexture(texture, &format, &access, &width, &height);
     SDL_Rect dest_rect = {x, y, scale*width, scale*height};
-    SDL_FreeSurface(surface);
     SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
-    SDL_DestroyTexture(texture);
 }
 
 
 /* fonction qui sert à afficher du texte */
-void print_string(const char *text, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer, int x, int y, int scale){
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
-    if (!surface){
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in font surface init: %s", IMG_GetError());
-        exit(-1);
-    }
-
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+void print_string(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y, int scale){
     if (!texture){
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in font texture init: %s", IMG_GetError());
         exit(-1);
@@ -43,8 +28,6 @@ void print_string(const char *text, TTF_Font *font, SDL_Color color, SDL_Rendere
     SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
     SDL_Rect dest_rect = {x, y, textWidth * scale, textHeight * scale};
     SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
 }
 
 
@@ -97,6 +80,3 @@ void text_in_box(const char *text, TTF_Font *font, SDL_Color color, SDL_Renderer
     free(deb);
     free(word);
 }
-
-
-

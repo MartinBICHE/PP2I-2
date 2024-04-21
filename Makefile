@@ -1,6 +1,6 @@
 #Fichiers
 TARGET = demo
-SRCS = main.c map.c display.c time.c mc.c menu.c #à completer par vos fichiers
+SRCS = main.c map.c display.c time.c mc.c menu.c perso.c #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
@@ -9,6 +9,7 @@ CFLAGS = -std=gnu11 -Wall -pedantic -O3
 
 #Debug 
 CFLAGS += -g
+LDFLAGS += -lm
 CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 LDFLAGS += -fsanitize=address
 
@@ -37,5 +38,6 @@ clean:
 	rm -f $(OBJS) $(TARGET)
 
 run:
+	make
 	./demo
 

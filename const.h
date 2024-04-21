@@ -1,6 +1,5 @@
 #ifndef CONST_H
 #define CONST_H
-
 #include <stdbool.h>
 
 extern bool showMenu;
@@ -18,11 +17,9 @@ extern SDL_Renderer* renderer;
 
 #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2
 #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2
-#define HEIGHT 8 // i, y
-#define WIDTH 48 // j, x
-#define PIX_RECT 30
-#define WINWIDTH WIDTH*PIX_RECT
-#define WINHEIGHT HEIGHT*PIX_RECT
+// #define PIX_RECT 30
+// #define WINWIDTH WIDTH*PIX_RECT
+// #define WINHEIGHT HEIGHT*PIX_RECT
 #define MENU_WINDOW_WIDTH 1400
 #define MENU_WINDOW_HEIGHT 800
 #define Image1Width 200
@@ -51,6 +48,21 @@ extern SDL_Renderer* renderer;
 // #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2;
 // #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2;
 
+
+#define WINHEIGHT 720 // en pixels
+#define WINWIDTH 1280 // en pixels
+#define HEIGHT 8 // i, y en nombre de tiles
+#define WIDTH 48 // j, x en nombre de tiles
+#define PIX_RECT WINHEIGHT/HEIGHT // en pixels
+#define LEVEL_WIDTH PIX_RECT*WIDTH // en pixels
+#define PERSO_WIDTH 0.66666f // en nombre de tiles
+#define PERSO_HEIGHT 1.33333f // en nombre de tiles
+#define ACC 25.5f
+#define DT 1/60.0f
+#define JUMPSPEED 11.0f
+#define MOOVSPEED 7.0f
+
+
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;
     float start_x ;
@@ -58,13 +70,14 @@ typedef struct _Map {
 } Map ;
 
 
-typedef struct _Perso {
-    int x ;
-    int y ;
-    int vx ;
-    int vy ;
-} Perso ;
 
+typedef struct _Perso {
+    float x; // en nombre de tiles
+    float y; // en nombre de tiles
+    float vx; // en nombre de tiles par seconde
+    float vy; // en nombre de tiles par seconde
+    SDL_Rect hitbox;
+} Perso;
 
 
 #endif

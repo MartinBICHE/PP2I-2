@@ -10,16 +10,18 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <SDL2/SDL.h>
 #include <math.h>
 #include <stdbool.h>
 #include "const.h"
-#include "mc.h"
 #include "main.h"
 #include "map.h"
 #include "menu.h"
+#include "perso.h"
+#include "mc.h"
 
 int distance = 0;
 SDL_Texture *bgTextures[6];
@@ -35,8 +37,9 @@ int main(int argc, char **argv) {
 
     const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
     const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
+    const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
-    Map *map = NULL;
+    Map *map = initMap("map1");
 
     SDL_Event event;
     bool running = true;
@@ -72,7 +75,6 @@ int main(int argc, char **argv) {
     // Fermer la fenêtre de chargement
     closeLoadingWindow();
 
-again :
     // Initialiser SDL_mixer
     if (!initSDL_mixer()) {
         SDL_Log("Erreur lors de l'initialisation de SDL_mixer.");
@@ -89,6 +91,7 @@ again :
     // Jouer la musique lorsque le menu s'ouvre
     playMusic();
 
+again :
     // Initialiser la fenêtre de menu
     if (!initMenuWindow()) {
         SDL_Log("Erreur lors de l'initialisation de la fenêtre de menu.");
@@ -120,12 +123,12 @@ again :
                     } else if (mouseX >= (MENU_WINDOW_WIDTH - Image2Width) && mouseX <= MENU_WINDOW_WIDTH &&
                         mouseY >= 0 && mouseY <= Image2Height) {
                         showMenu = false;
-                    } 
+                    }
             } else if (e.type == SDL_KEYUP ) {
                 if (e.key.keysym.sym == SDLK_ESCAPE && showMenu == false) {
                     showMenu = true;
                 }
-            } 
+            }
             
         }
         if (prevShowMenu != showMenu) {
@@ -136,8 +139,7 @@ again :
             }
             prevShowMenu = showMenu;
         }
-    
-        
+
         // Dessiner le menu    
         drawMenu();    
         
@@ -149,14 +151,20 @@ again :
             // Créer la fenêtre de jeu et le renderer
             initPlayWindow();
 
-            // Charger les éléments du jeu
-            map = init_map("map1/data.txt");
             if (!map) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Erreur lors du chargement de la carte.");
                 return -1;
             }
 
-            loadBackgroundTextures(renderer, bgTextures);
+            Perso *perso = create_perso(map);
+
+            float x_cam = 0; // cam à gauche au début
+            
+            float x_perso = 2; // !!! seulement pour les tests de caméra (à changer) x_perso est en nombre de tiles et pas en pixels
+
+            int running = true;
+
+            loadBackgroundTextures(renderer, bgTextures, 5);
             
             bool musicToggled = false;
             while (running) {
@@ -191,10 +199,6 @@ again :
                                 if (afficherImage == true) {
                                     afficherImage = !afficherImage;
                                     toggleMusic();
-                                } else if (parametre = true) {
-                                    parametre = !parametre;
-                                    afficherImage = !afficherImage;
-                                    // Pour l'instant l'image retour arrière ne marche pas 
                                 }
                             }   
                         }
@@ -216,54 +220,61 @@ again :
                 }
 
                 if (retourMenu) {
-                    closeMapWindow(window,renderer);
+                    closeMapWindow(); 
                     goto again;
                 } 
+                
+                perso->vx = 0;
+                const Uint8 *state = SDL_GetKeyboardState(NULL);
+                if (state[SDL_SCANCODE_A]) x_perso -= 0.08; // !!! seulement pour les tests de caméra (à changer) Q en AZERTY
+                if (state[SDL_SCANCODE_D]) x_perso += 0.08; // !!! seulement pour les tests de caméra (à changer)
+                // printf("x_perso = %f\n", x_perso); // !!! seulement pour les tests de caméra (à changer)
 
-                // Effacer l'écran
-                SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-                SDL_RenderClear(renderer);
+                updatePerso(perso, map);
+                x_cam = updateCam(x_perso*PIX_RECT, x_cam);
 
-                if (SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a)) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError());
+                if (drawBackground(renderer, bgTextures, 5, x_cam)) {
+                    printf("Error drawing the background");
                     exit(-1);
                 }
-                if (SDL_RenderClear(renderer)) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render clear : %s", SDL_GetError());
-                    exit(-1);
-                }
-                if (SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a)) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in set render draw color : %s", SDL_GetError());
-                    exit(-1);
-                }
-                for (int i = 0; i < 6; ++i) {
-                    if (SDL_RenderCopy(renderer, bgTextures[i], NULL, NULL)) {
-                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error rendering background texture %d: %s", i + 1, SDL_GetError());
-                        exit(-1);
-                    }
-                }
-
-                if (draw_map(renderer, map, "./asset/tileset/ground-1.png")) {
+                if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam)) {
                     printf("Error drawing the map");
                     exit(-1);
                 }
 
-                drawMap();
+                SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
+                    if (display_perso(renderer, perso, x_cam)) {
+                        printf("Error drawing the perso");
+                        exit(-1);
+                    }
+
+
+                // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
+                // SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)
+                // SDL_RenderDrawRect(renderer, &rect1); // !!! seulement pour les tests de caméra (à changer)
+                // SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
+                // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
+                // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
+
+                drawMapMenu();
 
                 SDL_RenderPresent(renderer);
 
                 Uint64 end = SDL_GetTicks();
                 float elapsedMS = (end - start);
-                SDL_Delay(fmaxf((16.666f - elapsedMS) / 1.0f, 0));
-                
+                SDL_Delay(fmaxf((1000*DT - elapsedMS)/1.0f, 0));
             }
         }
     }
 
     // Nettoyer et quitter SDL_mixer
-    closeSDL_mixer();
-
+    closeSDL_mixer();   
     atexit(SDL_Quit);
     free(map);
     return 0;
+	
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+
 }
+
