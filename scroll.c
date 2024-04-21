@@ -28,7 +28,7 @@ void scroll_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src
     int textLength = strlen(text);
     int delay = 90;
     static Uint32 delayTimer = 0;
-    const int pad = 20;
+    const int pad = 40;
     /* dst_rectText->x = dst_rect->x + pad; */
     /* dst_rectText->y = dst_rect->y + pad; */
     SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
@@ -37,7 +37,7 @@ void scroll_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src
 
     switch (state){
         case MOVING_DOWN:
-            if (dst_rect->h <= 200){
+            if (dst_rect->h <= 300){
                 dst_rect->h += speed;
                 src_rect->h += speed;
             }else{

@@ -23,6 +23,7 @@
 #include "dialog_box.h"
 #include "display.h"
 #include "scroll.h"
+#include "checkpoints.h"
 #include <stdbool.h>
 
 int distance = 0;
@@ -53,15 +54,42 @@ int main(int argc, char **argv) {
     TTF_Init();
     TTF_Font *font1 = TTF_OpenFont("DisposableDroidBB.ttf", 20);
     TTF_Font *font2 = TTF_OpenFont("DisposableDroidBB_bld.ttf", 20);
-    TTF_Font *font3 = TTF_OpenFont("chancur.ttf", 16);
+    TTF_Font *font3 = TTF_OpenFont("ChopinScript.ttf", 23);
+        SDL_Rect dst_rect1 = {460, 480, 64, 0};
+    SDL_Rect src_rect1 = {0, 0, 64, 0}; 
 
 
-	// const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
+        SDL_Surface *surfacePapirus = IMG_Load("scroll.png");
+    SDL_Texture *texturePapirus = SDL_CreateTextureFromSurface(renderer, surfacePapirus);
+    SDL_Rect dst_rectScroll = {460, 280, 250, 10};
+    SDL_Rect src_rectScroll = {0, 0, 250, 10}; 
+    const char *text = "Hello darkness my old friend, i've come to talk with you again";
+
+
+    Perso *perso3 = malloc(sizeof(Perso));
+    perso3->x = 45;
+    perso3->y = 3;
+    perso3->vx = 0;
+    perso3->vy = 0;
+    /* savePosition("temp.sav", perso3); */
+    CheckpointList *checkpointList = malloc(sizeof(CheckpointList));
+    initCheckpointList(checkpointList);
+    addCheckpoint(checkpointList, 46);
+    addCheckpoint(checkpointList, 30);
+    addCheckpoint(checkpointList, 20);
+    addCheckpoint(checkpointList, 10);
+
+
+
+
+
+	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
 	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
 	Map *map = initMap("map1/data.txt");
 	Perso *perso = create_perso(map);
+    loadPosition("temp.sav", perso);
 
 	float x_cam = 0; // cam à gauche au début
 
@@ -94,6 +122,7 @@ int main(int argc, char **argv) {
 
 		updatePerso(perso, map);
 		x_cam = updateCam(perso->x*PIX_RECT, x_cam);
+        checkCheckpoint(checkpointList, perso, "temp.sav");
 
 		if (drawBackground(renderer, bgTextures, 5, x_cam)) {
 			printf("Error drawing the background");
@@ -122,6 +151,8 @@ int main(int argc, char **argv) {
         /* enemy1_movement(renderer, texture, &src_rect1, &dst_rect1, &c); */
         /* render_text(renderer, font1, text, 0, 0, BLACK, &dst_rect1, texturePapirus, font2); */
 
+        scroll_movement(renderer, texturePapirus, &src_rectScroll, &dst_rectScroll, font3, text, BLACK);
+
 		SDL_RenderPresent(renderer);
 
 		Uint64 end = SDL_GetTicks();
@@ -137,6 +168,8 @@ int main(int argc, char **argv) {
 	SDL_DestroyWindow(window);
 	free(map);
 	atexit(SDL_Quit) ;
+    free(checkpointList->xPositions);
+    free(checkpointList);
     TTF_Quit();
 
 	return 0;

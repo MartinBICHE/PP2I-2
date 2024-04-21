@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #ifndef CONST_H
 #define CONST_H
 

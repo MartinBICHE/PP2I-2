@@ -1,6 +1,6 @@
 #Fichiers
 TARGET = demo
-SRCS = main.c map.c display.c time.c enemy1.c enemy2.c  enemy3.c perso.c dialog_box.c scroll.c  dialog_box.c #à completer par vos fichiers
+SRCS = main.c map.c display.c time.c enemy1.c enemy2.c  enemy3.c perso.c dialog_box.c scroll.c  dialog_box.c checkpoints.c #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
@@ -31,7 +31,7 @@ $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET) temp.sav
 
 run:
 	make
