@@ -1,126 +1,42 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
+#include "dialog_box.h"
 
-/* fonction qui affiche une image qui prend en paramètre le renderer, la position x et y, le scale (pour preserver les proportions initiales) et le chemin de l'image */
 
-void render_sprite(SDL_Renderer *renderer, int x, int y, int scale, const char *image_path){
-    SDL_Surface *surface = IMG_Load(image_path);
-    if (!surface){
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in sprite surface init: %s", IMG_GetError());
+/* Exemple d'utilisation, à utiliser impérativement avec TTF_RenderText_Blended_Wrapped  et à mettre pour le texte "            puis début du texte"*/
+/* SDL_Texture *textureBox = SDL_CreateTextureFromSurface(renderer, surfaceBox); */
+/* SDL_Texture *textureBoxName = SDL_CreateTextureFromSurface(renderer, surfaceBoxName); */
+/* SDL_Surface *surfaceBox = IMG_Load("papirus.png"); */
+/* SDL_Surface *surfaceBoxName = IMG_Load("transparent.png"); */
+/* SDL_Surface *textSurface = TTF_RenderText_Blended_Wrapped(font1, text, BLACK, 200); */
+/* SDL_Surface *textSurfaceName = TTF_RenderText_Blended_Wrapped(font2, textName, BLACK, 200); */
+/* SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface); */
+/* SDL_Texture *textTextureName = SDL_CreateTextureFromSurface(renderer, textSurfaceName); */
+/* render_box(renderer, textureBox, textTexture, 10, 10); */
+/* render_box(renderer, textureBoxName, textTextureName, 10, 10); */
+/* TTF_Font *font1 = TTF_OpenFont("DisposableDroidBB.ttf", 20); */
+/* TTF_Font *font2 = TTF_OpenFont("DisposableDroidBB_bld.ttf", 20); */
+
+
+void render_box(SDL_Renderer *renderer, SDL_Texture *boxTexture, SDL_Texture *textTexture, int x, int y){
+    const int pad = 20;
+    if (!boxTexture){
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in sprite texture init: %s", SDL_GetError());
         exit(-1);
     }
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    if (!texture){
+    if (!textTexture){
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in sprite texture init: %s", SDL_GetError());
         exit(-1);
     }
     Uint32 format;
-    int access, width, height;
-    SDL_QueryTexture(texture, &format, &access, &width, &height);
-    SDL_Rect dest_rect = {x, y, scale*width, scale*height};
-    SDL_FreeSurface(surface);
-    SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
-    SDL_DestroyTexture(texture);
+    int access, textWidth, textHeight;
+    SDL_QueryTexture(textTexture, &format, &access, &textWidth, &textHeight);
+    SDL_Rect dstRectBox = {x, y, textWidth + 2*pad, textHeight + 2*pad};
+    SDL_Rect dstRectText = {x + pad, y + pad , textWidth, textHeight};
+    SDL_RenderCopy(renderer, boxTexture, NULL, &dstRectBox);
+    SDL_RenderCopy(renderer, textTexture, NULL, &dstRectText);
+
+
+
+
 }
-
-
-/* fonction qui prend le temps en milisecondes, (format de SDL_GetTicks()) et qui le convertit dans un chaîne s:m:h */
-
-char *show_time(Uint32 miliseconds){
-    int seconds = (miliseconds / 1000) % 60;
-    int minutes = (miliseconds / (1000 * 60) % 60);
-    int hours = (miliseconds / (1000 * 60 * 60) % 24);
-    /* printf("seconds: %d, minutes: %d, hours: %d\n", seconds, minutes, hours); */
-    char seconds_str[10];
-    sprintf(seconds_str, "%d", seconds);
-    char minutes_str[10];
-    sprintf(minutes_str, "%d", minutes);
-    char hours_str[10];
-    sprintf(hours_str, "%d", hours);
-    char *result = malloc(strlen(seconds_str) + strlen(minutes_str) + strlen(hours_str) + 5 );
-    strcpy(result, seconds_str);
-    strcat(result, ":");
-    strcat(result, minutes_str);
-    strcat(result, ":");
-    strcat(result, hours_str);
-    return result;
-}
-
-
-/* fonction qui sert à afficher du texte */
-void print_string(const char *text, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer, int x, int y, int scale){
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
-    if (!surface){
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in font surface init: %s", IMG_GetError());
-        exit(-1);
-    }
-
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    if (!texture){
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in font texture init: %s", IMG_GetError());
-        exit(-1);
-    }
-    int textWidth, textHeight;
-    SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
-    SDL_Rect dest_rect = {x, y, textWidth * scale, textHeight * scale};
-    SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
-}
-
-
-/* ça donne une seg fault pour l'instant mais c'est censée découper le texte pour ne pas dépasser les dimensions de la boite (par exemple) */
-
-char *strdup(const char *c)
-{
-    char *dup = malloc(strlen(c) + 1);
-
-    if (dup != NULL)
-       strcpy(dup, c);
-
-    return dup;
-}
-
-void text_in_box(const char *text, TTF_Font *font, SDL_Color color, SDL_Renderer *renderer, int x, int y, int scale, int maxWidth) {
-
-    int currentX = x;
-    int currentY = y;
-
-    char *text_copy = strdup(text);
-    char *deb = text_copy;
-    
-    char *word = strtok((char *)text_copy, " ");
-    while (word != NULL) {
-        SDL_Surface *surface = TTF_RenderText_Blended(font, word, color);
-        if (surface == NULL) {
-            puts("Error in surface init");
-            exit(-1);
-        }
-
-        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-        SDL_FreeSurface(surface);
-        if (texture == NULL) {
-            puts("Error in texture init");
-            exit(-1);
-        }
-
-        int textWidth, textHeight;
-        SDL_QueryTexture(texture, NULL, NULL, &textWidth, &textHeight);
-
-        if (currentX + textWidth * scale > maxWidth) {
-            currentX = x;
-            currentY += textHeight * scale ;
-        }
-        SDL_Rect dstRect = {currentX, currentY, textWidth * scale, textHeight * scale};
-        SDL_RenderCopy(renderer, texture, NULL, &dstRect);
-        currentX += textWidth * scale + 30;
-        SDL_DestroyTexture(texture);
-        word = strtok(NULL, " ");
-    }
-    free(text_copy);
-    free(word);
-}
-
-

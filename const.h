@@ -62,13 +62,19 @@ extern SDL_Renderer* renderer;
 #define JUMPSPEED 11.0f
 #define MOOVSPEED 7.0f
 
+#define PERSO_WIDTH 60
+#define PERSO_HEIGHT 60
+#define ACC 25.5f
+#define DT 1/60.0f
+#define JUMPSPEED 11.0f
+#define MOOVSPEED 7.0f
+
 
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;
     float start_x ;
     float start_y ;
 } Map ;
-
 
 
 typedef struct _Perso {
@@ -78,6 +84,5 @@ typedef struct _Perso {
     float vy; // en nombre de tiles par seconde
     SDL_Rect hitbox;
 } Perso;
-
 
 #endif

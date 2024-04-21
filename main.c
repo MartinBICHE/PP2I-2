@@ -18,16 +18,23 @@
 #include <stdbool.h>
 #include "const.h"
 #include "main.h"
-#include "map.h"
 #include "menu.h"
+#include "map.h"
 #include "perso.h"
 #include "mc.h"
+#include "enemy1.h"
+#include "enemy2.h"
+#include "enemy3.h"
+#include "dialog_box.h"
+#include "display.h"
+
 
 int distance = 0;
 SDL_Texture *bgTextures[6];
 bool showMenu = true;
 bool parametre = false;
 bool afficherImage = false;
+
 
 int main(int argc, char **argv) {
     if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -216,22 +223,23 @@ again :
                             parametre = !parametre;
                             afficherImage=!afficherImage;
                         }
-                    }
+                    } else if (e.key.keysym.sym == SDLK_SPACE && afficherImage == false) {
+					    jump(perso, map);
+				}
                 }
 
                 if (retourMenu) {
                     closeMapWindow(); 
                     goto again;
                 } 
-                
+
                 perso->vx = 0;
                 const Uint8 *state = SDL_GetKeyboardState(NULL);
-                if (state[SDL_SCANCODE_A]) x_perso -= 0.08; // !!! seulement pour les tests de caméra (à changer) Q en AZERTY
-                if (state[SDL_SCANCODE_D]) x_perso += 0.08; // !!! seulement pour les tests de caméra (à changer)
-                // printf("x_perso = %f\n", x_perso); // !!! seulement pour les tests de caméra (à changer)
+                if (state[SDL_SCANCODE_A] && afficherImage == false) perso->vx -= MOOVSPEED;
+                if (state[SDL_SCANCODE_D] && afficherImage == false) perso->vx += MOOVSPEED;
 
                 updatePerso(perso, map);
-                x_cam = updateCam(x_perso*PIX_RECT, x_cam);
+                x_cam = updateCam(perso->x*PIX_RECT, x_cam);
 
                 if (drawBackground(renderer, bgTextures, 5, x_cam)) {
                     printf("Error drawing the background");
@@ -243,11 +251,12 @@ again :
                 }
 
                 SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
-                    if (display_perso(renderer, perso, x_cam)) {
-                        printf("Error drawing the perso");
-                        exit(-1);
-                    }
+                if (display_perso(renderer, perso, x_cam)) {
+                    printf("Error drawing the perso");
+                    exit(-1);
+                }
 
+                drawMapMenu();
 
                 // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
                 // SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)
@@ -256,7 +265,6 @@ again :
                 // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
                 // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
-                drawMapMenu();
 
                 SDL_RenderPresent(renderer);
 
@@ -275,6 +283,5 @@ again :
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
-
 }
 

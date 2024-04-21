@@ -1,7 +1,5 @@
 #ifndef PERSO_H
 #define PERSO_H
-#include <SDL2/SDL.h>
-#include "const.h"
 
 Perso *create_perso(Map*);
 int display_perso(SDL_Renderer*, Perso*, float);

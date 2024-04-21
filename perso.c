@@ -14,14 +14,19 @@ Perso *create_perso(Map *map) {
     res->y = map->start_y;
     res->vx = 0;
     res->vy = 0;
-    res->hitbox = (SDL_Rect){.x = (res->x - PERSO_WIDTH/2.0f)*PIX_RECT, .y = (res->y - PERSO_HEIGHT/2.0f)*PIX_RECT, .w = PERSO_WIDTH*PIX_RECT, .h = PERSO_HEIGHT*PIX_RECT};
+    res->hitbox = (SDL_Rect){.x = res->x*PIX_RECT - PERSO_WIDTH/2, .y = res->y*PIX_RECT - PERSO_HEIGHT/2, .w = PERSO_WIDTH, .h = PERSO_HEIGHT};
     return res;
 }
 
 
 int display_perso(SDL_Renderer *renderer, Perso *perso, float x_cam) {
-    SDL_Rect rect1 = {.x = perso->hitbox.x - x_cam, .y = perso->hitbox.y, .w = perso->hitbox.w, .h = perso->hitbox.h};
+    SDL_Rect rect1 = {.x = perso->x*PIX_RECT - 30 - x_cam, .y = perso->y*PIX_RECT - 30, .w = 60, .h = 60};
     if (SDL_RenderDrawRect(renderer, &rect1)){
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in draw rect : %s", SDL_GetError());
+		exit(-1);
+    }
+    SDL_Rect rect2 = {.x = perso->x*PIX_RECT - 28 - x_cam, .y = perso->y*PIX_RECT - 28, .w = 56, .h = 56};
+    if (SDL_RenderDrawRect(renderer, &rect2)){
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in draw rect : %s", SDL_GetError());
 		exit(-1);
     }
@@ -126,28 +131,28 @@ float min(float a, float b) {
 
 
 void updatePerso(Perso *perso, Map *map) {
+    perso->hitbox = (SDL_Rect){.x = perso->x*PIX_RECT - PERSO_WIDTH/2, .y = perso->y*PIX_RECT - PERSO_HEIGHT/2, .w = PERSO_WIDTH, .h = PERSO_HEIGHT};
     int i = floor(perso->y);
     int j = floor(perso->x);
     perso->vy += ACC*DT;
     if (hitbox_bottom(perso, map)) {
         perso->vy = min(perso->vy, 0.0f);
-        perso->y = i+1 - PERSO_HEIGHT/2.0f;
+        perso->y = i+1 - 0.32f;
     }
     if (hitbox_top(perso, map)) {
         perso->vy = max(perso->vy, 0.0f);
-        perso->y = i + PERSO_HEIGHT/2.0f;
+        perso->y = i + 0.33f;
     }
     if (hitbox_left(perso, map)) {
         perso->vx = max(perso->vx, 0.0f);
-        perso->x = j + PERSO_WIDTH/2.0f;
+        perso->x = j + 0.33f;
     }
     if (hitbox_right(perso, map)) {
         perso->vx = min(perso->vx, 0.0f);
-        perso->x = j+1 - PERSO_WIDTH/2.0f;
+        perso->x = j+1 - 0.32f;
     }
     perso->y += perso->vy*DT;
     perso->x += perso->vx*DT;
-    perso->hitbox = (SDL_Rect){.x = (perso->x - PERSO_WIDTH/2.0f)*PIX_RECT, .y = (perso->y - PERSO_HEIGHT/2.0f)*PIX_RECT, .w = PERSO_WIDTH*PIX_RECT, .h = PERSO_HEIGHT*PIX_RECT};
 }
 
 
