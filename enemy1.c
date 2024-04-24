@@ -1,5 +1,6 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
@@ -8,7 +9,7 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include "const.h"
-#include "main.h"
+/* #include "main.h" */
 
 enum EnemyState {
     MOVING_UP,
@@ -24,7 +25,7 @@ enum EnemyState {
 /*     SDL_Rect src_rect = {0, 0, 64, 0}; nécessairement le src_rect défini de cette manière */
 
 void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, int *i) {
-    int speed = 5;
+    int speed = 3;
     int interval = 2000;
     static enum EnemyState state = MOVING_UP;
     static Uint32 pauseStart = 0;
@@ -75,5 +76,73 @@ void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src
 
     SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
 }
+void enemy1_movement_2(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, int *i) {
+    int speed = 64;
+    int interval = 1000;
+    int intervalPause = 1000;
+    static Uint32 pauseStartBits = 0;
+    static enum EnemyState state = MOVING_UP;
+    Uint32 ticks = SDL_GetTicks();
+    Uint32 sprite = (ticks/500) % 10;
+    static Uint32 pauseStart = 0;
+
+    switch(state){
+        case MOVING_UP:
+            if (SDL_GetTicks() - pauseStartBits >= interval){
+                if (dst_rect->h <= 128){
+                    src_rect->h += speed;
+                    src_rect->y -= speed;
+                    dst_rect->h += speed;
+                    dst_rect->y -= speed;
+                    pauseStartBits = SDL_GetTicks();
+                }else{
+                    state = ANIMATION_START;
+                }
+            }
+                break;
+        case ANIMATION_START:
+            src_rect->x += 64;
+            *i = (*i+1);
+            src_rect->x = sprite * 64;
+
+            if (sprite == 9){
+                state = PAUSE_TOP;
+                pauseStart = SDL_GetTicks();
+            }
+            break;
+        case PAUSE_TOP:
+            if (SDL_GetTicks() - pauseStart >= interval){
+                state = MOVING_DOWN;
+            }
+            break;
+        case MOVING_DOWN:
+            if (SDL_GetTicks() - pauseStartBits >= interval){
+                printf("dst_rect->h %d", dst_rect->h);
+                if (dst_rect->h >= 2*64){
+                    src_rect->h -= speed;
+                    src_rect->y += speed;
+                    dst_rect->h -= speed;
+                    dst_rect->y += speed;
+                    pauseStartBits = SDL_GetTicks();
+                }else{
+                    state = PAUSE_BOTTOM;
+                    pauseStart = SDL_GetTicks();
+                }
+            }
+                break;
+            case PAUSE_BOTTOM:
+                if (SDL_GetTicks() - pauseStart >= interval){
+                    state = MOVING_UP;
+                }
+                break;
+
+        
+
+    } 
+
+    SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
+}
+
+
 
 

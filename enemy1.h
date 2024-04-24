@@ -6,5 +6,6 @@
 #include <SDL2/SDL_ttf.h>
 
 void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, int *i);
+void enemy1_movement_2(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, int *i);
 
 #endif
