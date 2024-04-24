@@ -4,8 +4,10 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
+#include <SDL2/SDL_image.h>
 #include "const.h"
 #include "perso.h"
+#include "enemy2.h"
 
 
 Perso *create_perso(Map *map) {
@@ -129,9 +131,22 @@ float min(float a, float b) {
     else return a;
 }
 
-
-void updatePerso(Perso *perso, Map *map) {
+// Modification de la signature et du contenu de la fonction pour inclure la détection de collision avec les ennemis
+void updatePerso(Perso *perso, Map *map, Enemy2 *enemies, int numEnemies) { // Attention, il faudrait un tableau d'ennemis
     perso->hitbox = (SDL_Rect){.x = perso->x*PIX_RECT - PERSO_WIDTH/2, .y = perso->y*PIX_RECT - PERSO_HEIGHT/2, .w = PERSO_WIDTH, .h = PERSO_HEIGHT};
+    // Vérifier la collision avec chaque ennemi
+    for (int i = 0; i < numEnemies; i++) {
+        if (checkCollision(perso, &enemies[i])) {
+            perso->health -= damage; // damage à définir
+            // Vérifier si le personnage est mort
+            if (perso->health <= 0) {
+                // Actions à effectuer lorsque le personnage est mort
+                resetPersoPosition(perso, map); // Réinitialiser la position du personnage
+                // Possibilité d'ajouter d'autres actions, comme un changement de l'allure du personnage en fonction des dégâts
+                // et le déclenchement d'un son particulier ou d'une musique spécifique indiquant la mort du personnage
+            }
+        }
+    }
     int i = floor(perso->y);
     int j = floor(perso->x);
     perso->vy += ACC*DT;
@@ -153,6 +168,14 @@ void updatePerso(Perso *perso, Map *map) {
     }
     perso->y += perso->vy*DT;
     perso->x += perso->vx*DT;
+}
+
+void resetPersoPosition(Perso *perso, Map *map) {
+    // Réinitialiser la position du personnage à sa position de départ
+    perso->x = map->start_x;
+    perso->y = mzp->start_y;
+    perso->vx = 0;
+    perso->vy = 0;
 }
 
 

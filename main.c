@@ -22,6 +22,7 @@
 #include "enemy3.h"
 #include "dialog_box.h"
 #include "display.h"
+#include "enemy_interactions.h"
 #include <stdbool.h>
 
 int distance = 0;
@@ -78,6 +79,12 @@ int main(int argc, char **argv) {
 				if (event.key.keysym.sym == SDLK_SPACE) {
 					jump(perso, map);
 				}
+				// Vérifier si la touche Entrée est pressée
+				// Bloc de code ci-dessous à décommenter quand les ennemis seront ajoutés au code principal
+				/* if (event.key.keysym.sym == SDLK_RETURN) {
+					// Gérer l'attaque du personnage
+					handleCharacterAttack(perso, enemy); // enemy à définir quand les ennemis seront ajoutés au code principal
+				} */
 			}
 		}
 
@@ -86,7 +93,7 @@ int main(int argc, char **argv) {
 		if (state[SDL_SCANCODE_A]) perso->vx -= MOOVSPEED;
 		if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
 
-		updatePerso(perso, map);
+		updatePerso(perso, map, enemies, numEnemies); // Attention, cette ligne empêche le code de s'exécuter normalement car il faudra définir un tableau d'ennemis
 		x_cam = updateCam(perso->x*PIX_RECT, x_cam);
 
 		if (drawBackground(renderer, bgTextures, 5, x_cam)) {

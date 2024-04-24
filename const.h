@@ -15,6 +15,7 @@
 #define DT 1/60.0f
 #define JUMPSPEED 11.0f
 #define MOOVSPEED 7.0f
+#define ANIMATION_FRAME_RATE 12
 
 
 typedef struct _Map {
@@ -30,6 +31,7 @@ typedef struct _Perso {
     float vx; // en nombre de tiles par seconde
     float vy; // en nombre de tiles par seconde
     SDL_Rect hitbox;
+    int health; // Le type peut changer, à voir comment la santé sera définie
 } Perso;
 
 
