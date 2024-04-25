@@ -16,8 +16,8 @@ Map *initMap(char *name) {
 		}
 	}
     fclose(f);
-	res->start_x = 4.0*PIX_RECT;
-	res->start_y = 4.0*PIX_RECT;
+	res->start_x = 4.0; // en nombre de tiles
+	res->start_y = 4.0; // en nombre de tiles
 	return res;
 }
 
@@ -53,11 +53,21 @@ void loadBackgroundTextures(SDL_Renderer *renderer, SDL_Texture *bgTextures[], i
 }
 
 
-int drawBackground(SDL_Renderer *renderer, SDL_Texture *bgTextures[], int layer) {
+int drawBackground(SDL_Renderer *renderer, SDL_Texture *bgTextures[], int layer, float x_cam) {
 	for (int i = 0; i < layer; ++i) {
-		if (SDL_RenderCopy(renderer, bgTextures[i], NULL, NULL)) {
-			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error rendering background texture %d: %s", i + 1, SDL_GetError());
-			exit(-1);
+		float parallax = (float)i / (layer - 1);
+		int textureWidth;
+        SDL_QueryTexture(bgTextures[i], NULL, NULL, &textureWidth, NULL);
+		int repeats = (WINWIDTH / textureWidth) + 2;
+		for (int j = 0; j < repeats; ++j) {
+			int x_position = j * textureWidth - parallax * x_cam;
+            if (x_position + textureWidth < 0 || x_position > WINWIDTH) continue;
+			SDL_Rect bgRect = {.x = j * textureWidth - parallax * x_cam, .y = 0, .w = textureWidth, .h = WINHEIGHT};
+			SDL_RendererFlip flip = (j % 2 == 0) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+			if (SDL_RenderCopyEx(renderer, bgTextures[i], NULL, &bgRect, 0.0, NULL, flip)) {
+				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error rendering background texture %d: %s", i + 1, SDL_GetError());
+				exit(-1);
+			}
 		}
 	}
 	return 0;
