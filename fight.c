@@ -5,37 +5,9 @@
 #include <SDL2/SDL_image.h>
 #include "const.h"
 
-int showRectangle(SDL_Renderer* renderer) {
-    int screenWidth = 0;
-    int screenHeight = 0;
-    SDL_GetRendererOutputSize(renderer, &screenWidth, &screenHeight);
-    int tierWidth = screenWidth / 3;
-    int semiHeight = screenHeight / 2;
-
-    SDL_Rect rect;
-    rect.x = tierWidth;
-    rect.y = 0;
-    rect.w = tierWidth;
-    rect.h = semiHeight;
-
-
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
-    SDL_RenderFillRect(renderer, &rect);
-
-    SDL_RenderPresent(renderer);
-
-    SDL_Delay(1000);
-
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    return 0;
-}
-
-
 int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
     static int offset = 0;
     static int line = 0;
-
 
     static SDL_Texture *spriteTexture = NULL;
     if (!spriteTexture) {
@@ -57,7 +29,6 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in query texture: %s", SDL_GetError());
         exit(-1);
     }
-
 
     int spriteHeight = spriteFullHeight / 4; 
     int spriteWidth = spriteFullWidth / 12;
@@ -86,16 +57,16 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
                         line = 0;
                         offset++;
                         offset %= 12;
-                        if ( player->y < WINHEIGHT-SEMIHEIGHT) {
-                            player->y += SEMIHEIGHT;
+                        if ( player->y < WINHEIGHT-QUARTERHEIGHT) {
+                            player->y += 2*QUARTERHEIGHT;
                         }
                         break;
                     case SDLK_UP:
                         line = 0; 
                         offset++;
                         offset %= 12;
-                        if (player->y > SEMIHEIGHT/2) {
-                            player->y -= SEMIHEIGHT;
+                        if (player->y > QUARTERHEIGHT/2) {
+                            player->y -= 2*QUARTERHEIGHT;
                         }
                         break;
                     default:
@@ -115,7 +86,34 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
         exit(-1);
     }
     SDL_RenderPresent(renderer);
+
     return 0;
 }
 
 
+
+int showRectangle(SDL_Renderer* renderer, int x, int y, int w, int h) {
+    int screenWidth = 0;
+    int screenHeight = 0;
+    SDL_GetRendererOutputSize(renderer, &screenWidth, &screenHeight);
+    int tierWidth = screenWidth / 3;
+    int semiHeight = screenHeight / 2;
+
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
+
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+    SDL_RenderFillRect(renderer, &rect);
+
+    SDL_Rect destRect = { .x = x, .y = y, .w = w, .h = h};
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(renderer, &destRect);
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    return 0;
+}
