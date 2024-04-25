@@ -45,7 +45,9 @@ int main(int argc, char **argv) {
 	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
 	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 
-	Perso *playerInFight = {TIERWIDTH/2-SPRITESIZE/2,-520,0,0};
+	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
+	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
+	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
 	Map *map = initMap("map1/data.txt");
 
 	float x_cam = 0; // cam à gauche au début
@@ -86,9 +88,9 @@ int main(int argc, char **argv) {
 			printf("Error drawing the map");
 			exit(-1);
 		}
-		if (fightMovement(renderer, event, &playerInFight)) {
-			printf("Error showing the rectangle") ;
-			exit(-1) ;
+		if (fightMovement(renderer, event, playerInFight)) {
+			printf("Error drawing the player");
+			exit(-1);
 		}
 
 		SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)

@@ -8,7 +8,7 @@
 #define PIX_RECT WINHEIGHT/HEIGHT // en pixels
 #define LEVEL_WIDTH PIX_RECT*WIDTH // en pixels
 #define TIERWIDTH WINWIDTH/3
-#define SEMIHEIGHT WINHEIGHT/2
+#define QUARTERHEIGHT WINHEIGHT/4
 #define SPRITESIZE 64 // 64x64 taille des sprites de base
 
 typedef struct _Map {
