@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "const.h"
+#include "map.h"
 
 
 
@@ -180,4 +181,26 @@ int drawMap(SDL_Renderer *renderer, Map *map, char *ImagePath, float x_cam) {
 		}
 	}
 	return 0 ;
+}
+
+int detect_collision(Map *map, int x, int y) {
+	y += 60;
+	int i = y / PIX_RECT;
+	int j = x / PIX_RECT;
+	if (map->matrix[i][j] != '-') {
+		return 1;
+	}
+	return 0;
+}
+
+int detect_wall_collision(Map *map, int x, int y) {
+	// Convertir les coordonnées du personnage en indices de la matrice de la carte
+	int i = y / PIX_RECT;
+	int j = x / PIX_RECT;
+
+	// Vérifier si le personnage est en collision avec un mur
+	if (map->matrix[i][j] == '4' || map->matrix[i][j] == '6' || (map->matrix[i][j] == '7' || map->matrix[i][j] == '9')) {
+		return 1; // Collision avec un mur détectée
+	}
+	return 0; // Pas de collision avec un mur
 }

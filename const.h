@@ -2,6 +2,7 @@
 #define CONST_H
 
 
+<<<<<<< HEAD
 #define WINHEIGHT 720 // en pixels
 #define WINWIDTH 1280 // en pixels
 #define HEIGHT 8 // i, y en nombre de tiles
@@ -16,6 +17,12 @@
 #define JUMPSPEED 11.0f
 #define MOOVSPEED 7.0f
 #define ANIMATION_FRAME_RATE 12
+#define HEIGHT 8 // i, y
+#define WIDTH 48 // j, x
+#define PIX_RECT 30
+#define GRAVITY 10
+#define WINWIDTH WIDTH*PIX_RECT
+#define WINHEIGHT HEIGHT*PIX_RECT
 
 
 typedef struct _Map {

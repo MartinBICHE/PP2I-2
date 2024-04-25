@@ -25,7 +25,9 @@
 #include "enemy_interactions.h"
 #include <stdbool.h>
 
-int distance = 0;
+
+int distance =50;
+int y_position = 100;
 SDL_Texture *bgTextures[6];
 
 
@@ -105,10 +107,44 @@ int main(int argc, char **argv) {
 			exit(-1);
 		}
 
+
 		SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
 		if (display_perso(renderer, perso, x_cam)) {
 			printf("Error drawing the perso");
 			exit(-1);
+		// if (displayBackground(renderer,"./asset/background/Foret/plan-6.png")) {
+		// 	printf("Error drawing the background") ;
+		// 	exit(-1) ;
+		// }
+		// if (displayBackground(renderer,"./asset/background/Foret/plan-5.png")) {
+		// 	printf("Error drawing the background") ;
+		// 	exit(-1) ;
+		// }
+		// if (displayBackground(renderer,"./asset/background/Foret/plan-4.png")) {
+		// 	printf("Error drawing the background") ;
+		// 	exit(-1) ;
+		// }
+		// if (displayBackground(renderer,"./asset/background/Foret/plan-3.png")) {
+		// 	printf("Error drawing the background") ;
+		// 	exit(-1) ;
+		// }
+		// if (displayBackground(renderer,"./asset/background/Foret/plan-2.png")) {
+		// 	printf("Error drawing the background") ;
+		// 	exit(-1) ;
+		// }
+		// if (displayBackground(renderer,"./asset/background/Foret/plan-1.png")) {
+		// 	printf("Error drawing the background") ;
+		// 	exit(-1) ;
+		// }
+		if (detect_collision(map, distance, y_position + GRAVITY)) {
+			y_position = (y_position / PIX_RECT) * PIX_RECT;
+		} else {
+			y_position += GRAVITY;
+		}
+
+		if (spriteMovement(renderer, event, &distance, &y_position, "./asset/spritesheet/ss_mc.png", map)) {
+			printf("Error rendering sprite") ;
+			exit(-1) ;
 		}
 
 		// SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
