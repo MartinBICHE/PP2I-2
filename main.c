@@ -16,6 +16,7 @@
 #include "const.h"
 #include "main.h"
 #include "map.h"
+#include "fight.h"
 #include "perso.h"
 #include "enemy1.h"
 #include "enemy2.h"
@@ -24,7 +25,6 @@
 #include "display.h"
 #include <stdbool.h>
 
-int distance = 0;
 SDL_Texture *bgTextures[6];
 
 
@@ -54,11 +54,13 @@ int main(int argc, char **argv) {
 	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
+	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
+	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
+	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
 	Map *map = initMap("map1/data.txt");
 	Perso *perso = create_perso(map);
 
 	float x_cam = 0; // cam à gauche au début
-
 
 	SDL_Event event;
 	int running = 1;
@@ -97,7 +99,6 @@ int main(int argc, char **argv) {
 			printf("Error drawing the map");
 			exit(-1);
 		}
-
 		SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
 		if (display_perso(renderer, perso, x_cam)) {
 			printf("Error drawing the perso");
