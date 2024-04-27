@@ -20,6 +20,7 @@
 #include "main.h"
 #include "menu.h"
 #include "map.h"
+#include "fight.h"
 #include "perso.h"
 #include "mc.h"
 #include "enemy1.h"
@@ -29,7 +30,6 @@
 #include "display.h"
 
 
-int distance = 0;
 SDL_Texture *bgTextures[6];
 bool showMenu = true;
 bool parametre = false;
@@ -70,8 +70,16 @@ int main(int argc, char **argv) {
             }
         }
 
+
         // Dessiner le motif de chargement
         drawLoading();
+
+        // Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
+        // playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
+        // playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
+        // Map *map = initMap("map1/data.txt");
+        // Perso *perso = create_perso(map);
+
 
         // Si le temps écoulé est supérieur à 10000 ms (3 secondes), le chargement est complet
         if (SDL_GetTicks() - startTime >= 2000) {

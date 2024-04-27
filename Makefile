@@ -1,6 +1,6 @@
 #Fichiers
 TARGET = demo
-SRCS = main.c map.c menu.c display.c time.c enemy1.c enemy2.c  enemy3.c  perso.c dialog_box.c #à completer par vos fichiers
+SRCS = main.c map.c menu.c display.c time.c enemy1.c enemy2.c  enemy3.c  perso.c dialog_box.c fight.c #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
