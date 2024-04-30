@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "const.h"
+#include "fight.h"
 
 int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
     static int offset = 0;
@@ -38,33 +39,21 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
             case SDL_KEYDOWN:
                 switch (event.key.keysym.sym) {
                     case SDLK_RIGHT:
-                        line = 0;
-                        offset++;
-                        offset %= 12;
                         if ( player->x <= WINWIDTH-TIERWIDTH) {
                             player->x += TIERWIDTH;
                         }
                         break;
                     case SDLK_LEFT:
-                        line = 0; 
-                        offset++;
-                        offset %= 12;
                         if (player->x > TIERWIDTH) {
                             player->x -= TIERWIDTH;
                         }
                         break;
                     case SDLK_DOWN:
-                        line = 0;
-                        offset++;
-                        offset %= 12;
                         if ( player->y < WINHEIGHT-QUARTERHEIGHT) {
                             player->y += 2*QUARTERHEIGHT;
                         }
                         break;
                     case SDLK_UP:
-                        line = 0; 
-                        offset++;
-                        offset %= 12;
                         if (player->y > QUARTERHEIGHT/2) {
                             player->y -= 2*QUARTERHEIGHT;
                         }
@@ -91,13 +80,10 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
 }
 
 
-
 int showRectangle(SDL_Renderer* renderer, int x, int y, int w, int h) {
     int screenWidth = 0;
     int screenHeight = 0;
     SDL_GetRendererOutputSize(renderer, &screenWidth, &screenHeight);
-    int tierWidth = screenWidth / 3;
-    int semiHeight = screenHeight / 2;
 
     SDL_Rect rect;
     rect.x = x;

@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
+#include "display.h"
 
 /* fonction qui affiche une image qui prend en paramètre le renderer, la position x et y, le scale (pour preserver les proportions initiales) et le chemin de l'image */
 
