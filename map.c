@@ -199,3 +199,12 @@ int drawMap(SDL_Renderer *renderer, Map *map, char *ImagePath, float x_cam) {
 	}
 	return 0 ;
 }
+
+
+void destroyMap(Map *map) {
+	for (int i = 0; i < map->height; i++) {
+		free(map->matrix[i]);
+	}
+	free(map->matrix);
+	free(map);
+}

@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
-	free(map);
+	destroyMap(map);
 	free(perso);
 	atexit(SDL_Quit) ;
 
