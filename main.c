@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
 	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
 	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
-	Map *map = initMap("map2");
+	Map *map = initMap("map1");
 	Perso *perso = create_perso(map);
 
 	SDL_Event event;
@@ -85,8 +85,8 @@ int main(int argc, char **argv) {
 
 		perso->vx = 0;
 		const Uint8 *state = SDL_GetKeyboardState(NULL);
-		if (state[SDL_SCANCODE_A]) perso->vx -= MOVSPEED;
-		if (state[SDL_SCANCODE_D]) perso->vx += MOVSPEED;
+		if (state[SDL_SCANCODE_A]) perso->vx -= MOOVSPEED;
+		if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
 
 		updatePerso(perso, map);
 		updateCam(perso, map);
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
 			printf("Error drawing the background");
 			exit(-1);
 		}
-		if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam, tileTextures)) {
+		if (drawMap(renderer, map, "./asset/tileset/ground-1.png", tileTextures)) {
 			printf("Error drawing the map");
 			exit(-1);
 		}

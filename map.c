@@ -22,6 +22,7 @@ Map *initMap(char *name) {
 		printf("Error in metadata reading");
 	}
 	res->pix_rect = WINHEIGHT/res->height;
+	printf("pix_rect = %d\n", res->pix_rect);
 
 	FILE *fdata = fopen(str_data, "r");
 	res->matrix = malloc(res->height*sizeof(char*));
@@ -108,7 +109,8 @@ void loadTileTextures(SDL_Renderer *renderer, SDL_Texture **tileTexture, char *t
 	SDL_FreeSurface(tileSurface);
 }
 
-void display_tile(SDL_Renderer *renderer, int xoffset, int yoffset, int xpos, int ypos , float x_cam, SDL_Texture *tileTexture) {
+
+void display_tile(SDL_Renderer *renderer, int xoffset, int yoffset, int xpos, int ypos , Map *map, SDL_Texture *tileTexture) {
 	int tilesetWidth, tilesetHeight;
 	if (SDL_QueryTexture(tileTexture,NULL, NULL, &tilesetWidth, &tilesetHeight)) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in query tile texture: %s", SDL_GetError());
@@ -119,7 +121,7 @@ void display_tile(SDL_Renderer *renderer, int xoffset, int yoffset, int xpos, in
 	int tileHeight = tilesetHeight / 5;
 
 	SDL_Rect tileRect = {.x = xoffset*tileWidth, .y = yoffset*tileHeight, .w = tileWidth, .h = tileHeight};
-	SDL_Rect destRect = {.x = xpos*PIX_RECT - x_cam, .y = ypos*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+	SDL_Rect destRect = {.x = xpos*map->pix_rect - map->x_cam, .y = ypos*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
 
 	if (SDL_RenderCopy(renderer, tileTexture, &tileRect, &destRect)) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
@@ -128,75 +130,75 @@ void display_tile(SDL_Renderer *renderer, int xoffset, int yoffset, int xpos, in
 
 // Fonction d'affichage de la map
 
-int drawMap(SDL_Renderer *renderer, Map *map, char *ImagePath, float x_cam, SDL_Texture *tileTexture) {
-	for (int i = 0 ; i < HEIGHT ; i++) {
-		for (int j = 0 ; j < WIDTH ; j++) {
-			if (j*PIX_RECT - x_cam > -PIX_RECT && j*PIX_RECT - x_cam < WINWIDTH) {
+int drawMap(SDL_Renderer *renderer, Map *map, char *ImagePath, SDL_Texture *tileTexture) {
+	for (int i = 0 ; i < map->height ; i++) {
+		for (int j = 0 ; j < map->width ; j++) {
+			if (j*map->pix_rect - map->x_cam > -map->pix_rect && j*map->pix_rect - map->x_cam < WINWIDTH) {
 				if (map->matrix[i][j] == '7') {
-					display_tile(renderer,0,2,j,i, x_cam, tileTexture); // Coin superieur gauche
+					display_tile(renderer,0,2,j,i, map, tileTexture); // Coin superieur gauche
 				}
 				if (map->matrix[i][j] == '4') {
-					display_tile(renderer,0,3,j,i, x_cam, tileTexture); // Mur face gauche
+					display_tile(renderer,0,3,j,i, map, tileTexture); // Mur face gauche
 				}
 				if (map->matrix[i][j] == '1') {
-					display_tile(renderer,0,4,j,i, x_cam, tileTexture); // Coin inferieur gauche
+					display_tile(renderer,0,4,j,i, map, tileTexture); // Coin inferieur gauche
 				}
 				if (map->matrix[i][j] == '9') {
-					display_tile(renderer,4,2,j,i, x_cam, tileTexture); // Coin superieur droit
+					display_tile(renderer,4,2,j,i, map, tileTexture); // Coin superieur droit
 				}
 				if (map->matrix[i][j] == '6') {
-					display_tile(renderer,4,3,j,i, x_cam, tileTexture); // Mur face droit 
+					display_tile(renderer,4,3,j,i, map, tileTexture); // Mur face droit 
 				}
 				if (map->matrix[i][j] == '3') {
-					display_tile(renderer,4,4,j,i, x_cam, tileTexture); // Coin inferieur droit
+					display_tile(renderer,4,4,j,i, map, tileTexture); // Coin inferieur droit
 				}
 				if (map->matrix[i][j] == '8') {
 					if (j%3==0) {
-						display_tile(renderer,1,2,j,i, x_cam, tileTexture);
+						display_tile(renderer,1,2,j,i, map, tileTexture);
 					} else if (j%3==1) {
-						display_tile(renderer,2,2,j,i, x_cam, tileTexture);
+						display_tile(renderer,2,2,j,i, map, tileTexture);
 					} else {
-						display_tile(renderer,3,2,j,i, x_cam, tileTexture); // Sol
+						display_tile(renderer,3,2,j,i, map, tileTexture); // Sol
 					}
 				}
 				if (map->matrix[i][j] == '5') {
-					display_tile(renderer,1,3,j,i, x_cam, tileTexture); // Vide
+					display_tile(renderer,1,3,j,i, map, tileTexture); // Vide
 				}
 				if (map->matrix[i][j] == '2') {
 					if (j%3==0) {
-						display_tile(renderer,1,4,j,i, x_cam, tileTexture);
+						display_tile(renderer,1,4,j,i, map, tileTexture);
 					} else if (j%3==1) {
-						display_tile(renderer,2,4,j,i, x_cam, tileTexture);
+						display_tile(renderer,2,4,j,i, map, tileTexture);
 					} else {
-						display_tile(renderer,3,4,j,i, x_cam, tileTexture);// Plafond
+						display_tile(renderer,3,4,j,i, map, tileTexture);// Plafond
 					}
 				}
 				if (map->matrix[i][j] == 'u') {
-					display_tile(renderer,0,1,j,i, x_cam, tileTexture); // Angle superieur droit
+					display_tile(renderer,0,1,j,i, map, tileTexture); // Angle superieur droit
 				}
 				if (map->matrix[i][j] == 'i') {
-					display_tile(renderer,1,1,j,i, x_cam, tileTexture); // Angle inferieur droit
+					display_tile(renderer,1,1,j,i, map, tileTexture); // Angle inferieur droit
 				}
 				if (map->matrix[i][j] == 'o') {
-					display_tile(renderer,2,1,j,i, x_cam, tileTexture); // Angle inferieur gauche
+					display_tile(renderer,2,1,j,i, map, tileTexture); // Angle inferieur gauche
 				}
 				if (map->matrix[i][j] == 'p') {
-					display_tile(renderer,3,1,j,i, x_cam, tileTexture); // Angle superieur gauche
+					display_tile(renderer,3,1,j,i, map, tileTexture); // Angle superieur gauche
 				}
 				if (map->matrix[i][j] == 'a') {
-					display_tile(renderer,0,0,j,i, x_cam, tileTexture); // Plateforme extremite droit
+					display_tile(renderer,0,0,j,i, map, tileTexture); // Plateforme extremite droit
 				}
 				if (map->matrix[i][j] == 'z') {
 					if (j%3==0) {
-						display_tile(renderer,1,0,j,i, x_cam, tileTexture);
+						display_tile(renderer,1,0,j,i, map, tileTexture);
 					} else if (j%3==1) {
-						display_tile(renderer,2,0,j,i, x_cam, tileTexture);
+						display_tile(renderer,2,0,j,i, map, tileTexture);
 					} else {
-						display_tile(renderer,3,0,j,i, x_cam, tileTexture);// Plafond
+						display_tile(renderer,3,0,j,i, map, tileTexture);// Plafond
 					} // Plateforme corps
 				}
 				if (map->matrix[i][j] == 'e') {
-					display_tile(renderer,4,0,j,i, x_cam, tileTexture); // Plateforme extremite gauche
+					display_tile(renderer,4,0,j,i, map, tileTexture); // Plateforme extremite gauche
 				}
 			}
 		}
