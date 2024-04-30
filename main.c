@@ -26,6 +26,7 @@
 #include <stdbool.h>
 
 SDL_Texture *bgTextures[6];
+SDL_Texture *tileTextures;
 
 
 int main(int argc, char **argv) {
@@ -66,6 +67,7 @@ int main(int argc, char **argv) {
 	int running = 1;
 
 	loadBackgroundTextures(renderer, bgTextures, 5);
+	loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
 
 	while (running) {
 
@@ -85,8 +87,8 @@ int main(int argc, char **argv) {
 
 		perso->vx = 0;
 		const Uint8 *state = SDL_GetKeyboardState(NULL);
-		if (state[SDL_SCANCODE_A]) perso->vx -= MOOVSPEED;
-		if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
+		if (state[SDL_SCANCODE_A]) perso->vx -= MOVSPEED;
+		if (state[SDL_SCANCODE_D]) perso->vx += MOVSPEED;
 
 		updatePerso(perso, map);
 		x_cam = updateCam(perso->x*PIX_RECT, x_cam);
@@ -95,10 +97,14 @@ int main(int argc, char **argv) {
 			printf("Error drawing the background");
 			exit(-1);
 		}
-		if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam)) {
+		if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam, tileTextures)) {
 			printf("Error drawing the map");
 			exit(-1);
 		}
+		// if (fightMovement(renderer, event, playerInFight)) {
+		// 	printf("Error drawing the fight");
+		// 	exit(-1);
+		// }
 		SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
 		if (display_perso(renderer, perso, x_cam)) {
 			printf("Error drawing the perso");
@@ -123,6 +129,7 @@ int main(int argc, char **argv) {
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	SDL_DestroyTexture(tileTextures);
 	free(map);
 	atexit(SDL_Quit) ;
 

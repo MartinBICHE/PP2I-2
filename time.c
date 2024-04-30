@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include "time.h"
 
 char *show_time(Uint32 miliseconds){
     int seconds = (miliseconds / 1000) % 60;

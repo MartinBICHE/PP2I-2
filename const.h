@@ -15,7 +15,7 @@
 #define ACC 25.5f
 #define DT 1/60.0f
 #define JUMPSPEED 11.0f
-#define MOOVSPEED 7.0f
+#define MOVSPEED 7.0f
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;
     float start_x ;
