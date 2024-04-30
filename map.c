@@ -22,12 +22,11 @@ Map *initMap(char *name) {
 		printf("Error in metadata reading");
 	}
 	res->pix_rect = WINHEIGHT/res->height;
-	printf("pix_rect = %d\n", res->pix_rect);
 
 	FILE *fdata = fopen(str_data, "r");
 	res->matrix = malloc(res->height*sizeof(char*));
     for (int i = 0; i < res->height; i++) {
-		res->matrix[i] = malloc(res->width*sizeof(char));
+		res->matrix[i] = malloc(res->width*sizeof(char) + 1);
         if (fgets(res->matrix[i], res->width + 1, fdata) == 0) {
 			printf("String length is null");
 		}
@@ -52,8 +51,8 @@ void updateCam(Perso *perso, Map *map) {
 	if (map->x_cam < 0) {
 		map->x_cam = 0;
 	}
-	if (map->x_cam > map->width - WINWIDTH) {
-		map->x_cam = map->width - WINWIDTH;
+	if (map->x_cam > map->width*map->pix_rect - WINWIDTH) {
+		map->x_cam = map->width*map->pix_rect - WINWIDTH;
 	}
 }
 
@@ -78,7 +77,7 @@ int drawBackground(SDL_Renderer *renderer, SDL_Texture *bgTextures[], int layer,
 		float parallax = (float)i / (layer - 1);
 		int textureWidth;
         SDL_QueryTexture(bgTextures[i], NULL, NULL, &textureWidth, NULL);
-		int repeats = (WINWIDTH / textureWidth) + 2;
+		int repeats = (WINWIDTH / textureWidth) + 3;
 		for (int j = 0; j < repeats; ++j) {
 			int x_position = j * textureWidth - parallax * map->x_cam;
             if (x_position + textureWidth < 0 || x_position > WINWIDTH) continue;

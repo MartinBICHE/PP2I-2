@@ -24,7 +24,7 @@ typedef struct _Map {
     int start_y; // en nombre de tiles
     int end_x; // en nombre de tiles
     int end_y; // en nombre de tiles
-    float x_cam;
+    float x_cam; // en pixels
 } Map ;
 
 

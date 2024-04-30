@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
 	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
 	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
-	Map *map = initMap("map1");
+	Map *map = initMap("map2");
 	Perso *perso = create_perso(map);
 
 	SDL_Event event;
