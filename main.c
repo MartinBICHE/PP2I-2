@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "pendule.h"
+#include "textures.h"
+#include "fonts.h"
 
 int distance = 0;
 SDL_Texture *bgTextures[6];
@@ -37,30 +39,29 @@ int main(int argc, char **argv) {
   SDL_Renderer *renderer;
   initSDL(&window, &renderer);
 
-  TTF_Font *font1 = TTF_OpenFont("DisposableDroidBB.ttf", 20);
-  TTF_Font *font2 = TTF_OpenFont("DisposableDroidBB_bld.ttf", 20);
-  TTF_Font *font3 = TTF_OpenFont("ChopinScript.ttf", 23);
+  TTF_Font *font1 = TTF_OpenFont("asset/Fonts/DisposableDroidBB.ttf", 20);
+  TTF_Font *font2 = TTF_OpenFont("asset/Fonts/DisposableDroidBB_bld.ttf", 20);
+  TTF_Font *font3 = TTF_OpenFont("asset/Fonts/ChopinScript.ttf", 23);
   SDL_Rect dst_rect1 = {100, 480, 64, 64};
   SDL_Rect src_rect1 = {0, 0, 64, 64};
   SDL_Rect dst_rect2 = {160, 300, 64, 64};
   SDL_Rect src_rect2 = {0, 0, 64, 64};
 
-  SDL_Surface *surfaceScroll = IMG_Load("scroll.png");
-  SDL_Surface *surfacePapirus = IMG_Load("papirus.png");
-  SDL_Surface *surfaceEnnemy1 = IMG_Load("ennemy1.png");
+  SDL_Surface *surfaceScroll = IMG_Load("asset/spritesheet/scroll.png");
+  SDL_Surface *surfacePapirusA = IMG_Load("asset/spritesheet/papirus.png");
   SDL_Surface *surfaceEnnemy3 = IMG_Load("ennemy3.png");
   SDL_Surface *surfacePendule = IMG_Load("pendule.png");
 
-  SDL_Texture *textureScroll =
-      SDL_CreateTextureFromSurface(renderer, surfaceScroll);
-  SDL_Texture *texturePapirus =
-      SDL_CreateTextureFromSurface(renderer, surfacePapirus);
-  SDL_Texture *texturePendule =
-      SDL_CreateTextureFromSurface(renderer, surfacePendule);
-  SDL_Texture *textureEnnemy1 = SDL_CreateTextureFromSurface(renderer, surfaceEnnemy1);
+  /* SDL_Texture *textureScroll = */
+  /*     SDL_CreateTextureFromSurface(renderer, surfaceScroll); */
+  if (textureScroll == NULL){
+      puts("lksdfjslfkjslfkjflkfjslfjlmkjfsl");
+  }
+  SDL_Texture *texturePapirusA =
+      SDL_CreateTextureFromSurface(renderer, surfacePapirusA);
+  /* SDL_Texture *texturePendule = */
+  /*     SDL_CreateTextureFromSurface(renderer, surfacePendule); */
   SDL_Texture *textureEnnemy3 = SDL_CreateTextureFromSurface(renderer, surfaceEnnemy3);
-  SDL_Texture *textureEnnemy2 =
-      SDL_CreateTextureFromSurface(renderer, surfaceEnnemy1);
   SDL_Rect dst_rectScroll = {460, 280, 250, 10};
   SDL_Rect src_rectScroll = {0, 0, 250, 10};
   SDL_Rect dst_rectScroll2 = {30, 280, 250, 10};
@@ -97,13 +98,14 @@ int main(int argc, char **argv) {
   initEnemy1(180, 460, &enemyState3);
 
 
-  initPapirus(&dst_rectR, 100, 100);
+  /* initPapirus(&dst_rectR, 100, 100); */
 
   ScrollStateData scrollStateDatar;
   initScroll(&scrollStateDatar, 100, 100);
 
   ScrollStateData scrollStateDataA;
   initScroll(&scrollStateDataA, 200, 200);
+
 
   Enemy3 enemy3;
   enemy3.xPosition = dst_rect1.x;
@@ -187,6 +189,10 @@ int main(int argc, char **argv) {
   PenduleData penduleDataR;
   initPendule(&penduleDataR, texturePendule);
 
+
+  DialogBoxData dialogBoxData;
+  initPapirus(&dialogBoxData, 100, 100);
+
   Map *map = initMap("map1/data.txt");
   Perso *perso = create_perso(map);
   /* loadPosition("temp.sav", perso); */
@@ -200,6 +206,7 @@ int main(int argc, char **argv) {
 
   loadBackgroundTextures(renderer, bgTextures, 5);
 
+  loadFonts();
   while (running) {
 
     Uint64 start = SDL_GetTicks();
@@ -255,23 +262,24 @@ int main(int argc, char **argv) {
     // caméra (à changer)
 
 
-    /* enemy1_movement(renderer, textureEnnemy2, &enemyState2); */
+    /* enemy1_movement(renderer, textureEnemy1, &enemyState2); */
     /* enemy1_movement(renderer, textureEnnemy2, &enemyState3); */
     /* enemy1_movement_4(renderer, textureEnnemy2, &src_rectT, &dst_rectT, &enemyState3); */
     /* enemy3_movement(renderer, textureEnnemy3, &src_rect1, &dst_rect1, &enemy3); */
 
-    /* enemy3_movement(renderer, textureEnnemy3, &enemy35); */
+    /* enemy3_movement(renderer, textureEnemy3, &enemy35); */
     /* enemy3_movement(renderer, textureEnnemy3, &enemy36); */
     /* enemy3_movement(renderer, textureEnnemy3, &src_rect6, &dst_rect6, &enemy36); */
 
 
     /* render_text(renderer, font1, text, BLACK, &dst_rect1, texturePapirus, font2); */
-    /* render_text(renderer, font1, text2, BLACK, &dst_rect2, texturePapirus, font2); */
-    /* render_text(renderer, font1, text, BLACK, &dst_rectR, texturePapirus, font2); */
+    /* render_text_2(renderer, font1, text, 100, 100, BLACK, &dst_rect1, texturePapirus, font2); */
+    /* render_text(renderer, fontDialogBox, text, BLACK, &dialogBoxData, texturePapirus, fontDialogBoxBold); */
+    /* render_text_2(renderer, font1,text, 200, 200, BLACK, &dst_rectR, texturePapirus, font2); */
 
-    /* scroll_movement(renderer, textureScroll, &src_rectScroll,  &dst_rectScroll, font3, text2, BLACK); */
-    scroll_movement_2(renderer, textureScroll, font3, text, BLACK, &scrollStateDatar);
-    scroll_movement_2(renderer, textureScroll, font3, text2, BLACK, &scrollStateDataA);
+    /* scroll_movement(renderer, textureScroll, &src_rectScroll,  &dst_rectScroll, fontScroll, text2, BLACK); */
+    /* scroll_movement_2(renderer, textureScroll, font3, text, BLACK, &scrollStateDatar); */
+    /* scroll_movement_2(renderer, textureScroll, font3, text2, BLACK, &scrollStateDataA); */
     /* render_sprite_2(renderer, x_pen+160, y_pen+10, 3, "bubble.png"); */
     /* render_sprite_2(renderer, x_pen+260, y_pen+90, 3, "bubble.png"); */
     /* pendule_mouvement(renderer, textureScroll, amplitude, period, x_pen, y_pen, &penduleData ); */
@@ -289,9 +297,7 @@ int main(int argc, char **argv) {
   TTF_CloseFont(font1);
   TTF_CloseFont(font2);
   TTF_CloseFont(font3);
-  SDL_FreeSurface(surfaceEnnemy1);
   SDL_FreeSurface(surfaceScroll);
-  SDL_DestroyTexture(textureEnnemy1);
   SDL_DestroyTexture(textureScroll);
   free(perso3);
   destroy_perso(perso);

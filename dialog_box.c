@@ -7,10 +7,10 @@
 
 /* s'utilise avec: */
 
-/* render_text(renderer, font1, text, BLACK, &dst_rect(à initialiser avec init), texturePapirus, font2); */
+/* render_text(renderer, font1, text, BLACK, &dst_rect(à initialiser avec init),
+ * texturePapirus, font2); */
 /* SDL_Rect dst_rect; */
 /* initPapirus(&dst_rect, xPos(à définir), yPos(à définir)); */
-
 
 int first_word_length(const char *str) {
   int length = 0;
@@ -21,13 +21,12 @@ int first_word_length(const char *str) {
   return length;
 }
 
-
 char *getFirstWord(const char *str) {
   int len = strlen(str);
 
   char *first_word = (char *)malloc(len + 1);
   if (first_word == NULL) {
-    return NULL; 
+    return NULL;
   }
 
   int i;
@@ -44,6 +43,23 @@ char *getFirstWord(const char *str) {
   first_word[word_len] = '\0';
 
   return first_word;
+}
+char *remove_first_word(const char *str) {
+    int word_length = 0;
+    while (*str != '\0' && *str != ' ') {
+        word_length++;
+        str++;
+    }
+
+    char *result = (char *)malloc(strlen(str) - word_length + 1);
+    if (result == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(1);
+    }
+    
+    strcpy(result, str + word_length);
+
+    return result;
 }
 
 char *replaceFirstWordWithSpaces(const char *str) {
@@ -72,15 +88,15 @@ char *replaceFirstWordWithSpaces(const char *str) {
 }
 
 void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
-                  SDL_Color color, SDL_Rect *dst_rect,
+                 SDL_Color color, DialogBoxData *dialogBoxData,
                  SDL_Texture *boxTexture, TTF_Font *fontBold) {
-  static int currentCharIndex = 0;
+  /* static int currentCharIndex = 0; */
   int textLength = strlen(text);
   int delay = 90;
-  static Uint32 delayTimer = 0;
+  /* static Uint32 delayTimer = 0; */
   const int pad = 20;
   int lenName = first_word_length(text);
-  static int counter = 0;
+  /* static int counter = 0; */
 
   SDL_Surface *surfaceText =
       TTF_RenderText_Blended_Wrapped(font, text, color, 200);
@@ -90,24 +106,25 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
   int accessInit, textWidthInit, textHeightInit;
   SDL_QueryTexture(textureText, &formatInit, &accessInit, &textWidthInit,
                    &textHeightInit);
-  SDL_Rect dstRectBox = {dst_rect->x - pad, dst_rect->y - pad,
+  SDL_Rect dstRectBox = {dialogBoxData->dst_rect.x - pad,
+                         dialogBoxData->dst_rect.y - pad,
                          textWidthInit + 2 * pad, textHeightInit + 2 * pad};
   SDL_RenderCopy(renderer, boxTexture, NULL, &dstRectBox);
   SDL_FreeSurface(surfaceText);
   SDL_DestroyTexture(textureText);
 
-  if (currentCharIndex < textLength) {
-    char currentText[currentCharIndex + 2];
+  if (dialogBoxData->currentCharIndex < textLength) {
+    char currentText[dialogBoxData->currentCharIndex + 2];
     TTF_Font *currentFont;
-    if (counter <= lenName) {
+    if (dialogBoxData->counter <= lenName) {
       currentFont = fontBold;
-      strncpy(currentText, text, currentCharIndex + 1);
-      currentText[currentCharIndex + 1] = '\0';
+      strncpy(currentText, text, dialogBoxData->currentCharIndex + 1);
+      currentText[dialogBoxData->currentCharIndex + 1] = '\0';
     } else {
       char *textWithSpaces = replaceFirstWordWithSpaces(text);
-      strncpy(currentText, textWithSpaces, currentCharIndex + 1);
+      strncpy(currentText, textWithSpaces, dialogBoxData->currentCharIndex + 1);
       free(textWithSpaces);
-      currentText[currentCharIndex + 1] = '\0';
+      currentText[dialogBoxData->currentCharIndex + 1] = '\0';
       currentFont = font;
       char *firstWord = getFirstWord(text);
       SDL_Surface *surfaceName =
@@ -118,9 +135,9 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
       Uint32 format;
       int access, textWidth, textHeight;
       SDL_QueryTexture(texture, &format, &access, &textWidth, &textHeight);
-      dst_rect->h = textHeight;
-      dst_rect->w = textWidth;
-      SDL_RenderCopy(renderer, texture, NULL, dst_rect);
+      dialogBoxData->dst_rect.h = textHeight;
+      dialogBoxData->dst_rect.w = textWidth;
+      SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect);
     }
     SDL_Surface *surface =
         TTF_RenderText_Blended_Wrapped(currentFont, currentText, color, 200);
@@ -129,14 +146,14 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
     Uint32 format;
     int access, textWidth, textHeight;
     SDL_QueryTexture(texture, &format, &access, &textWidth, &textHeight);
-    dst_rect->h = textHeight;
-    dst_rect->w = textWidth;
-    SDL_RenderCopy(renderer, texture, NULL, dst_rect);
+    dialogBoxData->dst_rect.h = textHeight;
+    dialogBoxData->dst_rect.w = textWidth;
+    SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect);
     SDL_DestroyTexture(texture);
-    if (SDL_GetTicks() - delayTimer >= delay) {
-      currentCharIndex++;
-      delayTimer = SDL_GetTicks();
-      counter++;
+    if (SDL_GetTicks() - dialogBoxData->delayTimer >= delay) {
+      dialogBoxData->currentCharIndex++;
+      dialogBoxData->delayTimer = SDL_GetTicks();
+      dialogBoxData->counter++;
     }
 
   } else {
@@ -161,26 +178,28 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
     int accessFirstWord, textWidthFirstWord, textHeightFirstWord;
     SDL_QueryTexture(textureFirstWord, &formatFirstWord, &accessFirstWord,
                      &textWidthFirstWord, &textHeightFirstWord);
-    dst_rectFirstWord.x = dst_rect->x;
-    dst_rectFirstWord.y = dst_rect->y;
-    dst_rect->h = textHeight;
-    dst_rect->w = textWidth;
+    dst_rectFirstWord.x = dialogBoxData->dst_rect.x;
+    dst_rectFirstWord.y = dialogBoxData->dst_rect.y;
+    dialogBoxData->dst_rect.h = textHeight;
+    dialogBoxData->dst_rect.w = textWidth;
     dst_rectFirstWord.h = textHeightFirstWord;
     dst_rectFirstWord.w = textWidthFirstWord;
-    SDL_RenderCopy(renderer, texture, NULL, dst_rect);
+    SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect);
     SDL_RenderCopy(renderer, textureFirstWord, NULL, &dst_rectFirstWord);
     SDL_DestroyTexture(texture);
     SDL_DestroyTexture(textureFirstWord);
   }
 }
 
-void initPapirus(SDL_Rect *dst_rect, int x, int y){
+void initPapirus(DialogBoxData *dialogBoxData, int x, int y) {
 
-    dst_rect->x = x;
-    dst_rect->y = y;
-    dst_rect->w = 0;
-    dst_rect->h = 0;
-
+  dialogBoxData->dst_rect.x = x;
+  dialogBoxData->dst_rect.y = y;
+  dialogBoxData->dst_rect.w = 64;
+  dialogBoxData->dst_rect.h = 64;
+  dialogBoxData->currentCharIndex = 0;
+  dialogBoxData->delayTimer = 0;
+  dialogBoxData->counter = 0;
 }
 
 

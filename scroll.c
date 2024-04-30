@@ -109,6 +109,7 @@ void scroll_movement(SDL_Renderer *renderer, SDL_Texture *texture,
     }
   }
 }
+
 void scroll_movement_2(SDL_Renderer *renderer, SDL_Texture *texture,
                        TTF_Font *font, const char *text, SDL_Color color,
                        ScrollStateData *scrollStateData) {

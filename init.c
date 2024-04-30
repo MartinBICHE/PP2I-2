@@ -3,6 +3,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
 #include "const.h"
+#include "textures.h"
 
 
 void initSDL(SDL_Window **window, SDL_Renderer **renderer){
@@ -23,6 +24,8 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 		exit(-1);
 	}
     TTF_Init();
+
+    loadTextures(*renderer);
 
 }
 

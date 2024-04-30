@@ -7,10 +7,20 @@
 #include "const.h"
 
 
+struct _DialogBoxData{
+    int currentCharIndex;
+    Uint32 delayTimer;
+    int counter;
+    SDL_Rect dst_rect;
+};
+typedef struct _DialogBoxData DialogBoxData;
+
 char *remove_first_word(const char *str);
-void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Color color, SDL_Rect *dst_rect, SDL_Texture *boxTexture, TTF_Font *fontBold);
 
+void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
+                  SDL_Color color, DialogBoxData *dialogBoxData, 
+                 SDL_Texture *boxTexture, TTF_Font *fontBold);
 
-void initPapirus(SDL_Rect *dst_rect, int x, int y);
+void initPapirus(DialogBoxData *dialogBoxData, int x, int y);
 
 #endif
