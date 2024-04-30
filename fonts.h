@@ -8,4 +8,5 @@ extern TTF_Font* fontDialogBoxBold;
 extern TTF_Font* fontScroll;
 
 int loadFonts();
+int freeFonts();
 #endif

@@ -206,7 +206,7 @@ int main(int argc, char **argv) {
 
   loadBackgroundTextures(renderer, bgTextures, 5);
 
-  loadFonts();
+  /* loadFonts(); */
   while (running) {
 
     Uint64 start = SDL_GetTicks();
@@ -293,24 +293,12 @@ int main(int argc, char **argv) {
     SDL_Delay(fmaxf((1000 * DT - elapsedMS) / 1.0f, 0));
   }
 
-  SDL_DestroyRenderer(renderer);
   TTF_CloseFont(font1);
   TTF_CloseFont(font2);
   TTF_CloseFont(font3);
-  SDL_FreeSurface(surfaceScroll);
-  SDL_DestroyTexture(textureScroll);
-  free(perso3);
-  destroy_perso(perso);
-  SDL_DestroyWindow(window);
-  free(map);
+  quitSDL(&renderer, &window, perso, map);
   atexit(SDL_Quit);
   free(checkpointList->xPositions);
   free(checkpointList);
-  /* free(dst_rectF); */
-  /* free(dst_rectF2); */
-  /* free(src_rectF); */
-  /* free(src_rectF2); */
-  TTF_Quit();
-
   return 0;
 }

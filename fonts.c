@@ -22,3 +22,14 @@ int loadFonts(){
     return 0;
 }
 
+int freeFonts(){
+
+    TTF_CloseFont(fontDialogBox);
+    TTF_CloseFont(fontDialogBoxBold);
+    TTF_CloseFont(fontScroll);
+    fontDialogBox = NULL;
+    fontDialogBoxBold = NULL;
+    fontScroll = NULL;
+    return 0;
+}
+

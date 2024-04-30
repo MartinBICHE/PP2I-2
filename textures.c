@@ -45,3 +45,19 @@ int loadTextures(SDL_Renderer *renderer){
 
     return 0;
 }
+
+int freeTextures(){
+
+    SDL_DestroyTexture(textureEnemy1);
+    SDL_DestroyTexture(textureEnemy3);
+    SDL_DestroyTexture(textureScroll);
+    SDL_DestroyTexture(texturePapirus);
+    SDL_DestroyTexture(texturePendule);
+
+    textureEnemy1 = NULL;
+    textureEnemy3 = NULL;
+    texturePendule = NULL;
+    texturePapirus = NULL;
+    textureScroll = NULL;
+    return 0;
+}

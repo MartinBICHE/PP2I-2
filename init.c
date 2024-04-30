@@ -3,7 +3,9 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
 #include "const.h"
+#include "perso.h"
 #include "textures.h"
+#include "fonts.h"
 
 
 void initSDL(SDL_Window **window, SDL_Renderer **renderer){
@@ -26,10 +28,16 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
     TTF_Init();
 
     loadTextures(*renderer);
+    loadFonts();
 
 }
 
-void quitSDL(SDL_Renderer **renderer, SDL_Window **window){
-    /* à écrire */
-
+void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map){
+    SDL_DestroyRenderer(*renderer);
+    freeTextures();
+    freeFonts();
+    TTF_Quit();
+    destroy_perso(perso);
+    SDL_DestroyWindow(*window);
+    free(map);
 }

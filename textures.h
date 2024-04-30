@@ -10,6 +10,7 @@ extern SDL_Texture *texturePendule;
 
 int loadTextures(SDL_Renderer *renderer);
 
+int freeTextures();
 
 
 #endif
