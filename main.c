@@ -28,6 +28,7 @@
 #include "pendule.h"
 #include "textures.h"
 #include "fonts.h"
+#include "health.h"
 
 int distance = 0;
 SDL_Texture *bgTextures[6];
@@ -87,6 +88,7 @@ int main(int argc, char **argv) {
   enemyState1.state = MOVING_UP;
   enemyState1.pauseStartBits = 0;
   enemyState1.pauseStart = 0;
+  SDL_Rect dst_rectH = {100, 100, 128, 128};
 
   SDL_Rect dst_rectT;
   SDL_Rect src_rectT;
@@ -285,6 +287,9 @@ int main(int argc, char **argv) {
     /* pendule_mouvement(renderer, textureScroll, amplitude, period, x_pen, y_pen, &penduleData ); */
     /* pendule_mouvement(renderer, texturePendule, 100, 100, &penduleDataI); */
     /* pendule_mouvement(renderer, texturePendule, 400, 400, &penduleDataR); */
+    /* SDL_RenderCopy(renderer, textureHealth0, NULL, &dst_rectH); */
+    renderStatusHealth(renderer, perso);   
+
 
     SDL_RenderPresent(renderer);
 
