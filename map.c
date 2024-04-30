@@ -14,35 +14,46 @@ Map *initMap(char *name) {
 	strcat(str_data, "/data.txt");
 	strcat(str_metadata, "/metadata.txt");
 	Map *res = malloc(sizeof(Map));
-	FILE *f = fopen(str_data, "r");
-    for (int i = 0 ; i < HEIGHT ; i++) {
-        if (fgets(res->matrix[i], 49, f) == 0) {
+	res->x_cam = 0;
+
+	int n_cp; // Nombre de checkpoints (pas encore utilisé)
+	FILE *fmetadata = fopen(str_metadata, "r");
+	if (fscanf(fmetadata, "%d %d %d %d %d %d %d", &res->height, &res->width, &res->start_x, &res->start_y, &res->end_x, &res->end_y, &n_cp) == 0) {
+		printf("Error in metadata reading");
+	}
+	res->pix_rect = WINHEIGHT/res->height;
+
+	FILE *fdata = fopen(str_data, "r");
+	res->matrix = malloc(res->height*sizeof(char*));
+    for (int i = 0; i < res->height; i++) {
+		res->matrix[i] = malloc(res->width*sizeof(char));
+        if (fgets(res->matrix[i], res->width + 1, fdata) == 0) {
 			printf("String length is null");
 		}
 	}
-    fclose(f);
-	res->start_x = 4.0f; // en nombre de tiles
-	res->start_y = 4.0f; // en nombre de tiles
+
+	fclose(fmetadata);
+    fclose(fdata);
 	free(str_data);
 	free(str_metadata);
 	return res;
 }
 
 
-float updateCam(float x_perso, float x_cam) {
-	if (x_perso - x_cam > 0.6*WINWIDTH) {
-		x_cam = x_perso - 0.6*WINWIDTH;
+void updateCam(Perso *perso, Map *map) {
+	float x_perso = perso->x * map->pix_rect;
+	if (x_perso - map->x_cam > 0.6*WINWIDTH) {
+		map->x_cam = x_perso - 0.6*WINWIDTH;
 	}
-	if (x_perso - x_cam < 0.4*WINWIDTH) {
-		x_cam = x_perso - 0.4*WINWIDTH;
+	if (x_perso - map->x_cam < 0.4*WINWIDTH) {
+		map->x_cam = x_perso - 0.4*WINWIDTH;
 	}
-	if (x_cam < 0) {
-		x_cam = 0;
+	if (map->x_cam < 0) {
+		map->x_cam = 0;
 	}
-	if (x_cam > LEVEL_WIDTH - WINWIDTH) {
-		x_cam = LEVEL_WIDTH - WINWIDTH;
+	if (map->x_cam > map->width - WINWIDTH) {
+		map->x_cam = map->width - WINWIDTH;
 	}
-	return x_cam;
 }
 
 
@@ -60,16 +71,16 @@ void loadBackgroundTextures(SDL_Renderer *renderer, SDL_Texture *bgTextures[], i
 }
 
 
-int drawBackground(SDL_Renderer *renderer, SDL_Texture *bgTextures[], int layer, float x_cam) {
+int drawBackground(SDL_Renderer *renderer, SDL_Texture *bgTextures[], int layer, Map *map) {
 	for (int i = 0; i < layer; ++i) {
 		float parallax = (float)i / (layer - 1);
 		int textureWidth;
         SDL_QueryTexture(bgTextures[i], NULL, NULL, &textureWidth, NULL);
 		int repeats = (WINWIDTH / textureWidth) + 2;
 		for (int j = 0; j < repeats; ++j) {
-			int x_position = j * textureWidth - parallax * x_cam;
+			int x_position = j * textureWidth - parallax * map->x_cam;
             if (x_position + textureWidth < 0 || x_position > WINWIDTH) continue;
-			SDL_Rect bgRect = {.x = j * textureWidth - parallax * x_cam, .y = 0, .w = textureWidth, .h = WINHEIGHT};
+			SDL_Rect bgRect = {.x = j * textureWidth - parallax * map->x_cam, .y = 0, .w = textureWidth, .h = WINHEIGHT};
 			SDL_RendererFlip flip = (j % 2 == 0) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
 			if (SDL_RenderCopyEx(renderer, bgTextures[i], NULL, &bgRect, 0.0, NULL, flip)) {
 				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error rendering background texture %d: %s", i + 1, SDL_GetError());

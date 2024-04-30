@@ -57,10 +57,8 @@ int main(int argc, char **argv) {
 	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
 	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
 	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
-	Map *map = initMap("map1");
+	Map *map = initMap("map2");
 	Perso *perso = create_perso(map);
-
-	float x_cam = 0; // cam à gauche au début
 
 	SDL_Event event;
 	int running = 1;
@@ -89,10 +87,9 @@ int main(int argc, char **argv) {
 		if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
 
 		updatePerso(perso, map);
-		// printf("perso->y = %f\n", perso->y);
-		x_cam = updateCam(perso->x*PIX_RECT, x_cam);
+		updateCam(perso, map);
 
-		if (drawBackground(renderer, bgTextures, 5, x_cam)) {
+		if (drawBackground(renderer, bgTextures, 5, map)) {
 			printf("Error drawing the background");
 			exit(-1);
 		}
@@ -101,7 +98,7 @@ int main(int argc, char **argv) {
 			exit(-1);
 		}
 		SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
-		if (display_perso(renderer, perso, x_cam)) {
+		if (display_perso(renderer, perso, map)) {
 			printf("Error drawing the perso");
 			exit(-1);
 		}

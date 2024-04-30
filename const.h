@@ -4,10 +4,6 @@
 
 #define WINHEIGHT 720 // en pixels
 #define WINWIDTH 1280 // en pixels
-#define HEIGHT 8 // i, y en nombre de tiles
-#define WIDTH 48 // j, x en nombre de tiles
-#define PIX_RECT WINHEIGHT/HEIGHT // en pixels
-#define LEVEL_WIDTH PIX_RECT*WIDTH // en pixels
 #define TIERWIDTH WINWIDTH/3
 #define QUARTERHEIGHT WINHEIGHT/4
 #define SPRITESIZE 64 // 64x64 taille des sprites de base
@@ -20,9 +16,15 @@
 
 
 typedef struct _Map {
-    char matrix[HEIGHT][WIDTH] ;
-    float start_x ;
-    float start_y ;
+    char** matrix;
+    int height; // en nombre de tiles
+    int width; // en nombre de tiles
+    int pix_rect; // en pixels
+    int start_x; // en nombre de tiles
+    int start_y; // en nombre de tiles
+    int end_x; // en nombre de tiles
+    int end_y; // en nombre de tiles
+    float x_cam;
 } Map ;
 
 

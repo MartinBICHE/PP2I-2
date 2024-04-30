@@ -14,13 +14,13 @@ Perso *create_perso(Map *map) {
     res->y = map->start_y;
     res->vx = 0;
     res->vy = 0;
-    res->hitbox = (SDL_Rect){.x = (res->x - PERSO_WIDTH/2.0f)*PIX_RECT, .y = (res->y - PERSO_HEIGHT/2.0f)*PIX_RECT, .w = PERSO_WIDTH*PIX_RECT, .h = PERSO_HEIGHT*PIX_RECT};
+    res->hitbox = (SDL_Rect){.x = (res->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (res->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
     return res;
 }
 
 
-int display_perso(SDL_Renderer *renderer, Perso *perso, float x_cam) {
-    SDL_Rect rect1 = {.x = perso->hitbox.x - x_cam, .y = perso->hitbox.y, .w = perso->hitbox.w, .h = perso->hitbox.h};
+int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map) {
+    SDL_Rect rect1 = {.x = perso->hitbox.x - map->x_cam, .y = perso->hitbox.y, .w = perso->hitbox.w, .h = perso->hitbox.h};
     if (SDL_RenderDrawRect(renderer, &rect1)){
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in draw rect : %s", SDL_GetError());
 		exit(-1);
@@ -35,15 +35,15 @@ int hitbox_bottom(Perso *perso, Map *map) {
     int i = perso->y + 1;
     int j = perso->x;
     if (map->matrix[i][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
     }
     if (map->matrix[i][j-1] != '-') {
-        SDL_Rect rect = {.x = (j-1)*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = (j-1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
     }
     if (map->matrix[i][j+1] != '-') {
-        SDL_Rect rect = {.x = (j+1)*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = (j+1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
     }
     return 0;
@@ -56,15 +56,15 @@ int hitbox_top(Perso *perso, Map *map) {
     int i = perso->y - 1;
     int j = perso->x;
     if (map->matrix[i][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbt, &rect, &res)) return 1;
     }
     if (map->matrix[i][j-1] != '-') {
-        SDL_Rect rect = {.x = (j-1)*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = (j-1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbt, &rect, &res)) return 1;
     }
     if (map->matrix[i][j+1] != '-') {
-        SDL_Rect rect = {.x = (j+1)*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = (j+1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbt, &rect, &res)) return 1;
     }
     return 0;
@@ -77,15 +77,15 @@ int hitbox_left(Perso *perso, Map *map) {
     int i = perso->y;
     int j = perso->x - 1;
     if (map->matrix[i][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbl, &rect, &res)) return 1;
     }
     if (map->matrix[i-1][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = (i-1)*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = (i-1)*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbl, &rect, &res)) return 1;
     }
     if (map->matrix[i+1][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = (i+1)*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = (i+1)*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbl, &rect, &res)) return 1;
     }
     return 0;
@@ -98,15 +98,15 @@ int hitbox_right(Perso *perso, Map *map) {
     int i = perso->y;
     int j = perso->x + 1;
     if (map->matrix[i][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = i*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbr, &rect, &res)) return 1;
     }
     if (map->matrix[i-1][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = (i-1)*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = (i-1)*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbr, &rect, &res)) return 1;
     }
     if (map->matrix[i+1][j] != '-') {
-        SDL_Rect rect = {.x = j*PIX_RECT, .y = (i+1)*PIX_RECT, .w = PIX_RECT, .h = PIX_RECT};
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = (i+1)*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbr, &rect, &res)) return 1;
     }
     return 0;
@@ -147,7 +147,7 @@ void updatePerso(Perso *perso, Map *map) {
     }
     perso->y += perso->vy*DT;
     perso->x += perso->vx*DT;
-    perso->hitbox = (SDL_Rect){.x = (perso->x - PERSO_WIDTH/2.0f)*PIX_RECT, .y = (perso->y - PERSO_HEIGHT/2.0f)*PIX_RECT, .w = PERSO_WIDTH*PIX_RECT, .h = PERSO_HEIGHT*PIX_RECT};
+    perso->hitbox = (SDL_Rect){.x = (perso->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (perso->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
 }
 
 
@@ -155,9 +155,4 @@ void jump(Perso *perso, Map *map) {
     if (hitbox_bottom(perso, map)) {
         perso->vy = -JUMPSPEED;
     }
-}
-
-
-void destroy_perso(Perso *perso) {
-    free(perso);
 }
