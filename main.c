@@ -76,10 +76,6 @@ int main(int argc, char **argv) {
 			case SDL_QUIT :
 				running = 0;
 				break;
-			case SDL_KEYDOWN :
-				if (event.key.keysym.sym == SDLK_SPACE) {
-					jump(perso, map);
-				}
 			}
 		}
 
@@ -87,6 +83,7 @@ int main(int argc, char **argv) {
 		const Uint8 *state = SDL_GetKeyboardState(NULL);
 		if (state[SDL_SCANCODE_A]) perso->vx -= MOOVSPEED;
 		if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
+		if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
 
 		updatePerso(perso, map);
 		updateCam(perso, map);

@@ -15,6 +15,7 @@ Perso *create_perso(Map *map) {
     res->vx = 0;
     res->vy = 0;
     res->hitbox = (SDL_Rect){.x = (res->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (res->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
+    res->jumped = 0;
     return res;
 }
 
@@ -132,6 +133,7 @@ void updatePerso(Perso *perso, Map *map) {
     if (hitbox_bottom(perso, map)) {
         perso->vy = min(perso->vy, 0.0f);
         perso->y = i+1 - PERSO_HEIGHT/2.0f;
+        perso->jumped = 0;
     }
     if (hitbox_top(perso, map)) {
         perso->vy = max(perso->vy, 0.0f);
@@ -152,7 +154,8 @@ void updatePerso(Perso *perso, Map *map) {
 
 
 void jump(Perso *perso, Map *map) {
-    if (hitbox_bottom(perso, map)) {
+    if (perso->jumped == 0) {
         perso->vy = -JUMPSPEED;
     }
+    perso->jumped = 1;
 }
