@@ -18,6 +18,9 @@ extern SDL_Texture* textureHealth7;
 extern SDL_Texture* textureHealth8;
 extern SDL_Texture* textureHealth9;
 
+extern SDL_Texture* textureFleche;
+extern SDL_Texture* textureBat;
+
 extern SDL_Texture *healthTextures[10];
 
 int loadTextures(SDL_Renderer *renderer);

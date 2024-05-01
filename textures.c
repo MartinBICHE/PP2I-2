@@ -20,8 +20,11 @@ SDL_Texture* textureHealth6 = NULL;
 SDL_Texture* textureHealth7 = NULL;
 SDL_Texture* textureHealth8 = NULL;
 SDL_Texture* textureHealth9 = NULL;
+SDL_Texture* textureFleche = NULL;
+SDL_Texture* textureBat = NULL;
 
 SDL_Texture *healthTextures[10];
+
 
 
 
@@ -44,6 +47,8 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_Surface *surfaceHealth7 = IMG_Load("asset/spritesheet/health7.png");
     SDL_Surface *surfaceHealth8 = IMG_Load("asset/spritesheet/health8.png");
     SDL_Surface *surfaceHealth9 = IMG_Load("asset/spritesheet/health9.png");
+    SDL_Surface *surfaceFleche = IMG_Load("asset/spritesheet/fleche.png");
+    SDL_Surface *surfaceBat = IMG_Load("asset/spritesheet/bat.png");
     if (!surfaceEnemy1 || !surfacePapirus || !surfaceScroll || !surfaceEnemy3 || !surfacePendule ){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init surfaceEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
 		exit(-1);
@@ -65,6 +70,8 @@ int loadTextures(SDL_Renderer *renderer){
     textureHealth7 = SDL_CreateTextureFromSurface(renderer, surfaceHealth7);
     textureHealth8 = SDL_CreateTextureFromSurface(renderer, surfaceHealth8);
     textureHealth9 = SDL_CreateTextureFromSurface(renderer, surfaceHealth9);
+    textureFleche = SDL_CreateTextureFromSurface(renderer, surfaceFleche);
+    textureBat = SDL_CreateTextureFromSurface(renderer, surfaceBat);
 
     if (!textureEnemy1 || !texturePapirus || !textureScroll || !textureEnemy3 || !texturePendule){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init textureEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
@@ -99,6 +106,8 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_FreeSurface(surfaceHealth7);
     SDL_FreeSurface(surfaceHealth8);
     SDL_FreeSurface(surfaceHealth9);
+    SDL_FreeSurface(surfaceFleche);
+    SDL_FreeSurface(surfaceBat);
 
     return 0;
 }
@@ -122,6 +131,8 @@ int freeTextures(){
     SDL_DestroyTexture(textureHealth7);
     SDL_DestroyTexture(textureHealth8);
     SDL_DestroyTexture(textureHealth9);
+    SDL_DestroyTexture(textureBat);
+    SDL_DestroyTexture(textureFleche);
 
     textureEnemy1 = NULL;
     textureEnemy3 = NULL;
@@ -139,6 +150,8 @@ int freeTextures(){
     textureHealth7 = NULL;
     textureHealth8 = NULL;
     textureHealth9 = NULL;
+    textureFleche = NULL;
+    textureBat = NULL;
 
     return 0;
 }

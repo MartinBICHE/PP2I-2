@@ -29,6 +29,8 @@
 #include "textures.h"
 #include "fonts.h"
 #include "health.h"
+#include "enemyFleche.h"
+#include "enemyBat.h"
 
 int distance = 0;
 SDL_Texture *bgTextures[6];
@@ -47,6 +49,12 @@ int main(int argc, char **argv) {
 
   Map *map = initMap("map1/data.txt");
   Perso *perso = create_perso(map);
+
+  /* EnemyBatData enemyBatData; */
+  /* initEnemyBat(&enemyBatData, 0, 100); */
+
+  
+
 
 
 
@@ -103,6 +111,7 @@ int main(int argc, char **argv) {
       exit(-1);
     }
 
+    /* enemyBat_mouvement(renderer, textureBat, &enemyBatData); */
     SDL_RenderPresent(renderer);
 
     Uint64 end = SDL_GetTicks();
