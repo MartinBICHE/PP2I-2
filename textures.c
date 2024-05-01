@@ -88,7 +88,6 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_FreeSurface(surfacePapirus);
     SDL_FreeSurface(surfaceScroll);
     SDL_FreeSurface(surfacePendule);
-    SDL_FreeSurface(surfacePendule);
 
     SDL_FreeSurface(surfaceHealth0);
     SDL_FreeSurface(surfaceHealth1);

@@ -6,11 +6,10 @@
 #include <string.h>
 
 /* s'utilise avec: */
-
-/* render_text(renderer, font1, text, BLACK, &dst_rect(à initialiser avec init),
- * texturePapirus, font2); */
-/* SDL_Rect dst_rect; */
-/* initPapirus(&dst_rect, xPos(à définir), yPos(à définir)); */
+/* DialogBoxData dialogBoxData; */
+/* initPapirus(&dialogBoxData, xPos(à définir), yPos(à définir)); */
+/* const char *text = text(à définir); */
+/* render_text(renderer, fontDialogBox, text, BLACK, &dialogBoxData, texturePapirus, fontDialogBoxBold); */
 
 int first_word_length(const char *str) {
   int length = 0;
@@ -90,13 +89,10 @@ char *replaceFirstWordWithSpaces(const char *str) {
 void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
                  SDL_Color color, DialogBoxData *dialogBoxData,
                  SDL_Texture *boxTexture, TTF_Font *fontBold) {
-  /* static int currentCharIndex = 0; */
   int textLength = strlen(text);
   int delay = 90;
-  /* static Uint32 delayTimer = 0; */
   const int pad = 20;
   int lenName = first_word_length(text);
-  /* static int counter = 0; */
 
   SDL_Surface *surfaceText =
       TTF_RenderText_Blended_Wrapped(font, text, color, 200);
