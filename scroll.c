@@ -11,16 +11,18 @@
 #include <SDL2/SDL_video.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "textures.h"
+#include "fonts.h"
 
 
 /* s'utilise avec: */ 
 /* ScrollStateData scrollStateData; */
 /*   initScroll(&scrollStateData, xPos(à définir), yPos(à définir)); */
 /* const char *text = "texte(à définir)"; */
-/* scroll_movement(renderer, textureScroll, fontScroll, text, BLACK, &scrollStateData); */
+/* scroll_movement(renderer, text, BLACK, &scrollStateData); */
 
-void scroll_movement(SDL_Renderer *renderer, SDL_Texture *texture,
-                       TTF_Font *font, const char *text, SDL_Color color,
+void scroll_movement(SDL_Renderer *renderer, 
+                       const char *text, SDL_Color color,
                        ScrollStateData *scrollStateData) {
   int speed = 1;
   int interval = 6000;
@@ -28,14 +30,14 @@ void scroll_movement(SDL_Renderer *renderer, SDL_Texture *texture,
   int delay = 90;
   const int pad = 40;
   SDL_Surface *surfaceText =
-      TTF_RenderText_Blended_Wrapped(font, text, color, scrollStateData->dst_rect.w - 50);
+      TTF_RenderText_Blended_Wrapped(fontScroll, text, color, scrollStateData->dst_rect.w - 50);
   SDL_Texture *textureText =
       SDL_CreateTextureFromSurface(renderer, surfaceText);
   SDL_FreeSurface(surfaceText);
   Uint32 format;
   int access, textWidth, textHeight;
   SDL_QueryTexture(textureText, &format, &access, &textWidth, &textHeight);
-  SDL_RenderCopy(renderer, texture, &scrollStateData->src_rect, &scrollStateData->dst_rect);
+  SDL_RenderCopy(renderer, textureScroll, &scrollStateData->src_rect, &scrollStateData->dst_rect);
   SDL_Rect dst_rectText = {scrollStateData->dst_rect.x + pad, scrollStateData->dst_rect.y + pad, 5, 5};
   int padText = 100;
 
@@ -55,7 +57,7 @@ void scroll_movement(SDL_Renderer *renderer, SDL_Texture *texture,
       strncpy(currentText, text, scrollStateData->currentCharIndex + 1);
       currentText[scrollStateData->currentCharIndex + 1] = '\0';
       SDL_Surface *surfaceText = TTF_RenderText_Blended_Wrapped(
-          font, currentText, color, scrollStateData->dst_rect.w - 50);
+          fontScroll, currentText, color, scrollStateData->dst_rect.w - 50);
       SDL_Texture *textureText =
           SDL_CreateTextureFromSurface(renderer, surfaceText);
       SDL_FreeSurface(surfaceText);
@@ -78,7 +80,7 @@ void scroll_movement(SDL_Renderer *renderer, SDL_Texture *texture,
     break;
   case SCROLL_SECOND_PAUSE:
     SDL_Surface *surfaceText =
-        TTF_RenderText_Blended_Wrapped(font, text, color, scrollStateData->dst_rect.w - 50);
+        TTF_RenderText_Blended_Wrapped(fontScroll, text, color, scrollStateData->dst_rect.w - 50);
     SDL_Texture *textureText =
         SDL_CreateTextureFromSurface(renderer, surfaceText);
     SDL_FreeSurface(surfaceText);

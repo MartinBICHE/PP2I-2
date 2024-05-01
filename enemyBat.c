@@ -3,20 +3,53 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_timer.h>
 
-void enemyBat_mouvement(SDL_Renderer *renderer, SDL_Texture *texture,
-                        EnemyBatData *enemyBatData) {
-    Uint32 ticks = SDL_GetTicks();
-    Uint32 sprite = (ticks / 100) % 6;
-  /* int interval = 1000; */
-    enemyBatData->src_rect.x = sprite * 32;
-    enemyBatData->dst_rect.x += 2 ;
+/* s'utilise avec: */
+/*   EnemyBatData enemyBatData; */
+/*   initEnemyBat(&enemyBatData, xPos(à définir), yPos(à définir), xMax(à définir)); */
+/* enemyBat_mouvement(renderer, &enemyBatData); */
 
-    SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &enemyBatData->dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData) {
+    int interval = 130;
+    int speed = 20;
+    if (enemyBatData->state == BAT_MOVING_RIGHT){
+            SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &enemyBatData->dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+    }
+    if (enemyBatData->state == BAT_MOVING_LEFT){
+        SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &enemyBatData->dst_rect);
+    }
+
+    switch(enemyBatData->state){
+        case BAT_MOVING_RIGHT:
+            if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
+                enemyBatData->dst_rect.x += speed;
+                enemyBatData->src_rect.x += 32;
+                enemyBatData->pauseStartBits = SDL_GetTicks();
+            }
+            if (enemyBatData->src_rect.x == 160){
+                enemyBatData->src_rect.x = 0;
+            }
+            if (enemyBatData->dst_rect.x == enemyBatData->xMax){
+                enemyBatData->state = BAT_MOVING_LEFT;
+            }
+        case BAT_MOVING_LEFT:
+        if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
+            enemyBatData->dst_rect.x -= speed;
+            enemyBatData->src_rect.x += 32;
+            enemyBatData->pauseStartBits = SDL_GetTicks();
+        }
+        if (enemyBatData->src_rect.x == 160){
+            enemyBatData->src_rect.x = 0;
+        }
+        if (enemyBatData->dst_rect.x == enemyBatData->xMin){
+            enemyBatData->state = BAT_MOVING_RIGHT;
+        }
+    }
 }
 
 
-void initEnemyBat(EnemyBatData *enemyBatData, int x, int y){
+void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax){
 
     enemyBatData->src_rect.x = 0;
     enemyBatData->src_rect.y = 0;
@@ -29,4 +62,7 @@ void initEnemyBat(EnemyBatData *enemyBatData, int x, int y){
     enemyBatData->dst_rect.h = 64*3;
 
     enemyBatData->pauseStartBits = 0;
+    enemyBatData->state = BAT_MOVING_RIGHT;
+    enemyBatData->xMax = xMax;
+    enemyBatData->xMin = x;
 }

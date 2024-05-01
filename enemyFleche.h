@@ -22,7 +22,7 @@ struct _EnemyFlecheData{
 
 };
 typedef struct _EnemyFlecheData EnemyFlecheData;
-void enemyFleche_mouvement(SDL_Renderer *renderer, SDL_Texture *texture, EnemyFlecheData *enemyFlecheData);
+void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData);
 void initEnemyFleche(EnemyFlecheData *enemyFlecheData, int x, int y);
 
 #endif

@@ -4,11 +4,11 @@
 #include "enemyFleche.h"
 #include "textures.h"
 
-    /* enemyFleche_mouvement(renderer, textureFleche, &enemyFlecheData); */
+    /* enemyFleche_mouvement(renderer, &enemyFlecheData); */
   /* EnemyFlecheData enemyFlecheData; */
   /* initEnemyFleche(&enemyFlecheData, x(à définir), y(à définir)); */
 
-void enemyFleche_mouvement(SDL_Renderer *renderer, SDL_Texture *texture, EnemyFlecheData *enemyFlecheData){
+void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData){
     int interval = 400;
     int pauseInterval = 2000;
 

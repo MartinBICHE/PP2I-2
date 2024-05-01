@@ -16,4 +16,4 @@ struct _PenduleData{
 typedef struct _PenduleData PenduleData;
 
 void initPendule(PenduleData *penduleData, SDL_Texture *texture);
-void pendule_mouvement(SDL_Renderer *renderer, SDL_Texture *texture, int xInit, int yInit, PenduleData *penduleData);
+void pendule_mouvement(SDL_Renderer *renderer, int xInit, int yInit, PenduleData *penduleData);

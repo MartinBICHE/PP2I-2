@@ -4,12 +4,14 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_ttf.h>
 #include <string.h>
+#include "fonts.h"
+#include "textures.h"
 
 /* s'utilise avec: */
 /* DialogBoxData dialogBoxData; */
 /* initPapirus(&dialogBoxData, xPos(à définir), yPos(à définir)); */
 /* const char *text = text(à définir); */
-/* render_text(renderer, fontDialogBox, text, BLACK, &dialogBoxData, texturePapirus, fontDialogBoxBold); */
+/* render_text(renderer, text, BLACK, &dialogBoxData); */
 
 int first_word_length(const char *str) {
   int length = 0;
@@ -86,16 +88,15 @@ char *replaceFirstWordWithSpaces(const char *str) {
   return result;
 }
 
-void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
-                 SDL_Color color, DialogBoxData *dialogBoxData,
-                 SDL_Texture *boxTexture, TTF_Font *fontBold) {
+void render_text(SDL_Renderer *renderer, const char *text,
+                 SDL_Color color, DialogBoxData *dialogBoxData){
   int textLength = strlen(text);
   int delay = 90;
   const int pad = 20;
   int lenName = first_word_length(text);
 
   SDL_Surface *surfaceText =
-      TTF_RenderText_Blended_Wrapped(font, text, color, 200);
+      TTF_RenderText_Blended_Wrapped(fontDialogBox, text, color, 200);
   SDL_Texture *textureText =
       SDL_CreateTextureFromSurface(renderer, surfaceText);
   Uint32 formatInit;
@@ -105,7 +106,7 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
   SDL_Rect dstRectBox = {dialogBoxData->dst_rect.x - pad,
                          dialogBoxData->dst_rect.y - pad,
                          textWidthInit + 2 * pad, textHeightInit + 2 * pad};
-  SDL_RenderCopy(renderer, boxTexture, NULL, &dstRectBox);
+  SDL_RenderCopy(renderer, texturePapirus, NULL, &dstRectBox);
   SDL_FreeSurface(surfaceText);
   SDL_DestroyTexture(textureText);
 
@@ -113,7 +114,7 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
     char currentText[dialogBoxData->currentCharIndex + 2];
     TTF_Font *currentFont;
     if (dialogBoxData->counter <= lenName) {
-      currentFont = fontBold;
+      currentFont = fontDialogBoxBold;
       strncpy(currentText, text, dialogBoxData->currentCharIndex + 1);
       currentText[dialogBoxData->currentCharIndex + 1] = '\0';
     } else {
@@ -121,10 +122,10 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
       strncpy(currentText, textWithSpaces, dialogBoxData->currentCharIndex + 1);
       free(textWithSpaces);
       currentText[dialogBoxData->currentCharIndex + 1] = '\0';
-      currentFont = font;
+      currentFont = fontDialogBox;
       char *firstWord = getFirstWord(text);
       SDL_Surface *surfaceName =
-          TTF_RenderText_Blended_Wrapped(fontBold, firstWord, color, 200);
+          TTF_RenderText_Blended_Wrapped(fontDialogBoxBold, firstWord, color, 200);
       free(firstWord);
       SDL_Texture *texture =
           SDL_CreateTextureFromSurface(renderer, surfaceName);
@@ -155,12 +156,12 @@ void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
   } else {
     char *textWithSpaces = replaceFirstWordWithSpaces(text);
     SDL_Surface *surface =
-        TTF_RenderText_Blended_Wrapped(font, textWithSpaces, color, 200);
+        TTF_RenderText_Blended_Wrapped(fontDialogBox, textWithSpaces, color, 200);
     free(textWithSpaces);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     char *firstWord = getFirstWord(text);
     SDL_Surface *surfaceFirstWord =
-        TTF_RenderText_Blended(fontBold, firstWord, color);
+        TTF_RenderText_Blended(fontDialogBoxBold, firstWord, color);
     free(firstWord);
     SDL_Texture *textureFirstWord =
         SDL_CreateTextureFromSurface(renderer, surfaceFirstWord);

@@ -10,16 +10,17 @@
 #include <SDL2/SDL.h>
 #include "const.h"
 #include "enemy1.h"
+#include "textures.h"
 
 /* s'utilise avec : */
-/* enemy1_movement(renderer, textureEnnemy1, &enemyState) */
+/* enemy1_movement(renderer, &enemyState) */
 /* et */ 
 /* EnemyStateData enemyState; */
 /* initEnemy1(xPos(à définir), yPost(à définir), &enemyState); */
 
 
 
-void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, EnemyStateData *enemyStateData){
+void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData){
     int speed = 64;
     int interval = 1000;
     Uint32 ticks = SDL_GetTicks();
@@ -73,7 +74,7 @@ void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, EnemyStateDat
                 }
                 break;
     } 
-    SDL_RenderCopy(renderer, texture, &enemyStateData->src_rect, &enemyStateData->dst_rect);
+    SDL_RenderCopy(renderer, textureEnemy1, &enemyStateData->src_rect, &enemyStateData->dst_rect);
 
 }
 

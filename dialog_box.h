@@ -17,9 +17,8 @@ typedef struct _DialogBoxData DialogBoxData;
 
 char *remove_first_word(const char *str);
 
-void render_text(SDL_Renderer *renderer, TTF_Font *font, const char *text,
-                  SDL_Color color, DialogBoxData *dialogBoxData, 
-                 SDL_Texture *boxTexture, TTF_Font *fontBold);
+void render_text(SDL_Renderer *renderer, const char *text,
+                 SDL_Color color, DialogBoxData *dialogBoxData);
 
 void initPapirus(DialogBoxData *dialogBoxData, int x, int y);
 

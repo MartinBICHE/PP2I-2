@@ -25,6 +25,6 @@ struct _EnemyStateData{
 
 typedef struct _EnemyStateData EnemyStateData;
 
-void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, EnemyStateData *enemyStateData);
+void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData);
 void initEnemy1(int x, int y, EnemyStateData *enemyStateData);
 #endif

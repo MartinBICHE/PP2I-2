@@ -5,20 +5,21 @@
 #include <stdio.h>
 #include "pendule.h"
 #include <math.h>
+#include "textures.h"
 
 /* pour l'utiliser: */
 
-/* pendule_mouvement(renderer, texturePendule, xPos(à mettre une valeur), yPos(à mettre une valeur)), &penduleData(à initialiser avec la fonction init)) */
+/* pendule_mouvement(renderer, xPos(à mettre une valeur), yPos(à mettre une valeur)), &penduleData(à initialiser avec la fonction init)) */
 /* PenduleData penduleData; */
 /* initPendule(&penduleData, texturePendule) */
 
-void pendule_mouvement(SDL_Renderer *renderer, SDL_Texture *texture, int xInit, int yInit, PenduleData *penduleData){
+void pendule_mouvement(SDL_Renderer *renderer, int xInit, int yInit, PenduleData *penduleData){
     float angle = penduleData->amplitude * cos(2 * PI * penduleData->time / penduleData->period + PI);
     penduleData->x = 30*penduleData->amplitude * sin(angle) + xInit;
     penduleData->y = -30*penduleData->amplitude * cos(angle) + yInit;
     penduleData->time += 0.05;
     SDL_Rect dest_rect = {penduleData->x, penduleData->y, penduleData->scale*penduleData->textureWidth, penduleData->scale*penduleData->textureHeight};
-    SDL_RenderCopy(renderer, texture, NULL, &dest_rect);
+    SDL_RenderCopy(renderer, texturePendule, NULL, &dest_rect);
 }
 
 
