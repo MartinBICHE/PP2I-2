@@ -2,7 +2,6 @@
 #define PERSO_H
 #include "map.h"
 
-
 Perso *create_perso(Map*);
 int display_perso(SDL_Renderer*, Perso*, float);
 int hitbox_bottom(Perso*, Map*);
