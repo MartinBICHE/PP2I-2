@@ -9,8 +9,9 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include "const.h"
-#include "enemy1.h"
 #include "textures.h"
+#include "main.h"
+#include "enemy1.h"
 
 /* s'utilise avec : */
 /* enemy1_movement(renderer, &enemyState) */
