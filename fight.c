@@ -3,8 +3,8 @@
 #include <string.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <time.h>
 #include "const.h"
-#include "fight.h"
 
 int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
     static int offset = 0;
@@ -34,38 +34,35 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
     int spriteHeight = spriteFullHeight / 4; 
     int spriteWidth = spriteFullWidth / 12;
 
-    if (SDL_PollEvent(&event)) {
-        switch(event.type) {
-            case SDL_KEYDOWN:
-                switch (event.key.keysym.sym) {
-                    case SDLK_RIGHT:
-                        if ( player->x <= WINWIDTH-TIERWIDTH) {
-                            player->x += TIERWIDTH;
-                        }
-                        break;
-                    case SDLK_LEFT:
-                        if (player->x > TIERWIDTH) {
-                            player->x -= TIERWIDTH;
-                        }
-                        break;
-                    case SDLK_DOWN:
-                        if ( player->y < WINHEIGHT-QUARTERHEIGHT) {
-                            player->y += 2*QUARTERHEIGHT;
-                        }
-                        break;
-                    case SDLK_UP:
-                        if (player->y > QUARTERHEIGHT/2) {
-                            player->y -= 2*QUARTERHEIGHT;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            default:
-                break;
+    const int INPUT_DELAY_MS = 3; 
+    const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
+    static clock_t lastInputTime = 0;
+    clock_t currentTime = clock();
+
+    if ((double)(currentTime - lastInputTime) / CLOCKS_PER_SEC * 1000 >= INPUT_DELAY_MS) {
+        lastInputTime = currentTime;
+        if (keyboardState[SDL_SCANCODE_UP]) {
+            if (player->y >  QUARTERHEIGHT) {
+                player->y -= 1.5 * QUARTERHEIGHT;
+            }
+        }
+        if (keyboardState[SDL_SCANCODE_DOWN]) {
+            if ( player->y < WINHEIGHT - 1.5 * QUARTERHEIGHT - SPRITESIZE) {
+                player->y += 1.5 * QUARTERHEIGHT;
+            }
+        }
+        if (keyboardState[SDL_SCANCODE_LEFT]) {
+            if (player->x > TIERWIDTH) {
+                player->x -= TIERWIDTH;
+            }
+        }
+        if (keyboardState[SDL_SCANCODE_RIGHT]) {
+            if ( player->x <= WINWIDTH-TIERWIDTH) {
+                player->x += TIERWIDTH;
+            }
         }
     }
+
 
     SDL_Rect spriteRect = {.x = offset * spriteWidth, .y = line * spriteHeight, .w = spriteWidth, .h = spriteHeight};
     SDL_Rect destRect = { .x = player->x, .y = player->y, .w = spriteWidth, .h = spriteHeight};
@@ -78,6 +75,7 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
 
     return 0;
 }
+
 
 
 int showRectangle(SDL_Renderer* renderer, int x, int y, int w, int h) {

@@ -1,55 +1,62 @@
-#include "main.h"
-#include "checkpoints.h"
-#include "const.h"
-#include "dialog_box.h"
-#include "enemy1.h"
-#include "enemy2.h"
-#include "enemy3.h"
-#include "init.h"
-#include "map.h"
-#include "perso.h"
-#include "scroll.h"
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
-#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_log.h>
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
-#include <math.h>
-#include <stdbool.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pendule.h"
-#include "textures.h"
-#include "fonts.h"
-#include "health.h"
-#include "enemyFleche.h"
-#include "enemyBat.h"
+#include <SDL2/SDL.h>
+#include "const.h"
+#include "main.h"
+#include "map.h"
 #include "fight.h"
+#include "perso.h"
+#include "enemy1.h"
+#include "enemy2.h"
+#include "enemy3.h"
+#include "dialog_box.h"
+#include <stdbool.h>
 
 SDL_Texture *bgTextures[6];
 SDL_Texture *tileTextures;
 
+
 int main(int argc, char **argv) {
 
-  SDL_Window *window; SDL_Renderer *renderer;
-  initSDL(&window, &renderer);
+	if (SDL_Init(SDL_INIT_EVERYTHING)) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError());
+		exit(-1);
+	}
 
 
+	SDL_Window *window;
+	window = SDL_CreateWindow("SDL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINWIDTH, WINHEIGHT, SDL_WINDOW_SHOWN);
+	if (!window) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in window init : %s", SDL_GetError());
+		exit(-1);
+	}
+
+	SDL_Renderer *renderer;
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	if (!renderer) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError());
+		exit(-1);
+	}
 
 	// const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
 	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
 	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
-	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
-	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
+	playerInFight->y = QUARTERHEIGHT;
+	playerInFight->x = TIERWIDTH/2;
 	Map *map = initMap("map1/data.txt");
 	Perso *perso = create_perso(map);
 
@@ -111,18 +118,19 @@ int main(int argc, char **argv) {
     	// SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
 
-  float x_cam = 0; // cam à gauche au début
+		SDL_RenderPresent(renderer);
 
-  SDL_Event event;
-  int running = 1;
-    SDL_RenderPresent(renderer);
+		Uint64 end = SDL_GetTicks();
+		float elapsedMS = (end - start);
+		SDL_Delay(fmaxf((1000*DT - elapsedMS)/1.0f, 0));
+	}
 
-    Uint64 end = SDL_GetTicks();
-    float elapsedMS = (end - start);
-    SDL_Delay(fmaxf((1000 * DT - elapsedMS) / 1.0f, 0));
-  }
+	free(playerInFight);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_DestroyTexture(tileTextures);
+	free(map);
+	atexit(SDL_Quit) ;
 
-  quitSDL(&renderer, &window, perso, map);
-  atexit(SDL_Quit);
-  return 0;
+	return 0;
 }
