@@ -100,10 +100,10 @@ int main(int argc, char **argv) {
 			printf("Error drawing the map");
 			exit(-1);
 		}
-		if (fightMovement(renderer, event, playerInFight)) {
-			printf("Error drawing the fight");
-			exit(-1);
-		}
+		// if (fightMovement(renderer, event, playerInFight)) {
+		// 	printf("Error drawing the fight");
+		// 	exit(-1);
+		// }
 		SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
 		if (display_perso(renderer, perso, x_cam)) {
 			printf("Error drawing the perso");
