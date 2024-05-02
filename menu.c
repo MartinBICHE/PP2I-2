@@ -1,6 +1,8 @@
 #include "menu.h"
 
 // Initialisation de toutes les variables
+SDL_Window* window;
+SDL_Renderer* renderer;
 Mix_Music* gMusic = NULL;
 bool musicPaused = false;
 int spriteIndex = 0;

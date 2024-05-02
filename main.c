@@ -1,35 +1,48 @@
+#include "main.h"
+#include "checkpoints.h"
+#include "const.h"
+#include "dialog_box.h"
+#include "enemy1.h"
+#include "enemy2.h"
+#include "enemy3.h"
+#include "init.h"
+#include "map.h"
+#include "perso.h"
+#include "scroll.h"
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_keycode.h>
 #include <SDL2/SDL_log.h>
 #include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 #include <math.h>
 #include <stdbool.h>
-#include "const.h"
-#include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "menu.h"
-#include "map.h"
 #include "fight.h"
 #include "perso.h"
 #include "mc.h"
 #include "enemy1.h"
 #include "enemy2.h"
 #include "enemy3.h"
-#include "dialog_box.h"
 #include "display.h"
+#include "pendule.h"
+#include "textures.h"
+#include "fonts.h"
+#include "health.h"
+#include "enemyFleche.h"
+#include "enemyBat.h"
 
-
+SDL_Window* window = NULL;
+SDL_Renderer* renderer = NULL;
 SDL_Texture *bgTextures[6];
 bool showMenu = true;
 bool parametre = false;
@@ -294,8 +307,6 @@ again :
 	SDL_DestroyWindow(window);
 	SDL_DestroyTexture(tileTextures);
 	free(map);
-	atexit(SDL_Quit) ;
-
-	return 0;
+	atexit(SDL_Quit);
+    return 0;
 }
-

@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #ifndef CONST_H
 #define CONST_H
 #include <stdbool.h>
@@ -6,8 +7,8 @@ extern bool showMenu;
 extern bool afficherImage;
 extern bool parametre;
 
-extern SDL_Window* window = NULL;
-extern SDL_Renderer* renderer = NULL;
+extern SDL_Window* window;
+extern SDL_Renderer* renderer;
 
 #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2
 #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2
@@ -70,6 +71,7 @@ typedef struct _Perso {
     float y; // en nombre de tiles
     float vx; // en nombre de tiles par seconde
     float vy; // en nombre de tiles par seconde
+    int health; //je l'ai rajouté
     SDL_Rect hitbox;
 } Perso;
 
