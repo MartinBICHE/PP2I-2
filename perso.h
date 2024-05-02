@@ -1,5 +1,6 @@
 #ifndef PERSO_H
 #define PERSO_H
+#include "map.h"
 
 
 Perso *create_perso(Map*);
