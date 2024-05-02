@@ -6,14 +6,8 @@ extern bool showMenu;
 extern bool afficherImage;
 extern bool parametre;
 
-extern SDL_Window* gLoadingWindow;
-extern SDL_Renderer* gLoadingRenderer;
-
-extern SDL_Window* gMenuWindow;
-extern SDL_Renderer* gMenuRenderer;
-
-extern SDL_Window* window;
-extern SDL_Renderer* renderer;
+extern SDL_Window* window = NULL;
+extern SDL_Renderer* renderer = NULL;
 
 #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2
 #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2
@@ -63,7 +57,7 @@ extern SDL_Renderer* renderer;
 #define ACC 25.5f
 #define DT 1/60.0f
 #define JUMPSPEED 11.0f
-#define MOOVSPEED 7.0f
+#define MOVSPEED 7.0f
 typedef struct _Map {
     char matrix[HEIGHT][WIDTH] ;
     float start_x ;

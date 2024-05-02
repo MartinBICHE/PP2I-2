@@ -9,6 +9,7 @@
 #include <SDL2/SDL.h>
 #include "const.h"
 #include "main.h"
+#include "enemy1.h"
 
 enum EnemyState {
     MOVING_UP,

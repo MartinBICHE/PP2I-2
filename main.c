@@ -34,7 +34,7 @@ SDL_Texture *bgTextures[6];
 bool showMenu = true;
 bool parametre = false;
 bool afficherImage = false;
-
+SDL_Texture *tileTextures;
 
 int main(int argc, char **argv) {
     if (SDL_Init(SDL_INIT_EVERYTHING)) {
@@ -180,7 +180,8 @@ again :
             int running = true;
 
             loadBackgroundTextures(renderer, bgTextures, 5);
-            
+            loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
+
             bool musicToggled = false;
             while (running) {
 
@@ -243,8 +244,8 @@ again :
 
                 perso->vx = 0;
                 const Uint8 *state = SDL_GetKeyboardState(NULL);
-                if (state[SDL_SCANCODE_A] && afficherImage == false) perso->vx -= MOOVSPEED;
-                if (state[SDL_SCANCODE_D] && afficherImage == false) perso->vx += MOOVSPEED;
+                if (state[SDL_SCANCODE_A] && afficherImage == false) perso->vx -= MOVSPEED;
+                if (state[SDL_SCANCODE_D] && afficherImage == false) perso->vx += MOVSPEED;
 
                 updatePerso(perso, map);
                 x_cam = updateCam(perso->x*PIX_RECT, x_cam);
@@ -253,7 +254,7 @@ again :
                     printf("Error drawing the background");
                     exit(-1);
                 }
-                if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam)) {
+                if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam,tileTextures)) {
                     printf("Error drawing the map");
                     exit(-1);
                 }
@@ -291,5 +292,10 @@ again :
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+	SDL_DestroyTexture(tileTextures);
+	free(map);
+	atexit(SDL_Quit) ;
+
+	return 0;
 }
 
