@@ -15,14 +15,15 @@ Perso *create_perso(Map *map) {
     res->vx = 0;
     res->vy = 0;
     res->hitbox = (SDL_Rect){.x = (res->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (res->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
-    res->jumped = 0;
+    res->jumps = 2;
+    res->jump_delay = 25;
     return res;
 }
 
 
 int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map) {
     SDL_Rect rect1 = {.x = perso->hitbox.x - map->x_cam, .y = perso->hitbox.y, .w = perso->hitbox.w, .h = perso->hitbox.h};
-    if (SDL_RenderDrawRect(renderer, &rect1)){
+    if (SDL_RenderDrawRect(renderer, &rect1)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in draw rect : %s", SDL_GetError());
 		exit(-1);
     }
@@ -127,13 +128,13 @@ float min(float a, float b) {
 
 
 void updatePerso(Perso *perso, Map *map) {
+    perso->jump_delay = max(perso->jump_delay - 1, 0);
     int i = floor(perso->y);
     int j = floor(perso->x);
     perso->vy += ACC*DT;
     if (hitbox_bottom(perso, map)) {
         perso->vy = min(perso->vy, 0.0f);
         perso->y = i+1 - PERSO_HEIGHT/2.0f;
-        perso->jumped = 0;
     }
     if (hitbox_top(perso, map)) {
         perso->vy = max(perso->vy, 0.0f);
@@ -150,12 +151,17 @@ void updatePerso(Perso *perso, Map *map) {
     perso->y += perso->vy*DT;
     perso->x += perso->vx*DT;
     perso->hitbox = (SDL_Rect){.x = (perso->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (perso->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
+    if (hitbox_bottom(perso, map)) {
+        perso->jumps = 2;
+    }
+
 }
 
 
 void jump(Perso *perso, Map *map) {
-    if (perso->jumped == 0) {
+    if (perso->jumps > 0 && perso->jump_delay == 0) {
         perso->vy = -JUMPSPEED;
+        perso->jumps -= 1;
+        perso->jump_delay = 25;
     }
-    perso->jumped = 1;
 }

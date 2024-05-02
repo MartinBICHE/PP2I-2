@@ -34,7 +34,8 @@ typedef struct _Perso {
     float vx; // en nombre de tiles par seconde
     float vy; // en nombre de tiles par seconde
     SDL_Rect hitbox;
-    int jumped;
+    int jumps; // nombre de sauts restants
+    int jump_delay; // délai entre les sauts (15 frames)
 } Perso;
 
 

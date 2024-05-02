@@ -83,8 +83,8 @@ int main(int argc, char **argv) {
 		const Uint8 *state = SDL_GetKeyboardState(NULL);
 		if (state[SDL_SCANCODE_A]) perso->vx -= MOOVSPEED;
 		if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
-		if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
 
+		if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
 		updatePerso(perso, map);
 		updateCam(perso, map);
 
