@@ -12,8 +12,10 @@ struct _PenduleData{
     int scale;
     float period;
     float amplitude;
+    int xInit;
+    int yInit;
 };
 typedef struct _PenduleData PenduleData;
 
-void initPendule(PenduleData *penduleData, SDL_Texture *texture);
-void pendule_mouvement(SDL_Renderer *renderer, int xInit, int yInit, PenduleData *penduleData);
+void initPendule(PenduleData *penduleData, SDL_Texture *texture, int xInit, int yInit);
+void pendule_mouvement(SDL_Renderer *renderer, PenduleData *penduleData);

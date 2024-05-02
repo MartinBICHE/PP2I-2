@@ -37,8 +37,7 @@ SDL_Texture *bgTextures[6];
 
 int main(int argc, char **argv) {
 
-  SDL_Window *window;
-  SDL_Renderer *renderer;
+  SDL_Window *window; SDL_Renderer *renderer;
   initSDL(&window, &renderer);
 
 
@@ -49,11 +48,6 @@ int main(int argc, char **argv) {
 
   Map *map = initMap("map1/data.txt");
   Perso *perso = create_perso(map);
-
-  EnemyBatData enemyBatData;
-  initEnemyBat(&enemyBatData, 0, 100, 700);
-
-
 
 
   float x_cam = 0; // cam à gauche au début
@@ -105,8 +99,6 @@ int main(int argc, char **argv) {
       exit(-1);
     }
 
-
-    enemyBat_mouvement(renderer, &enemyBatData);
     SDL_RenderPresent(renderer);
 
     Uint64 end = SDL_GetTicks();
