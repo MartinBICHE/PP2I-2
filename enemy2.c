@@ -11,7 +11,8 @@
 #include "main.h"
 #include "enemy2.h"
 #include "map.h"
-#include "display.h"
+
+/* Pour l'instant celui-là on ne va pas l'utiliser donc c'est pour cela il n'y a pas d'init et les fonctions associées */
 
     /* enemy2_movement_1(renderer, textureEnemy, &dest_rect2, &src_rect2, enemy4, 1, map, &list_mov_right); */
     /* SDL_Rect dest_rect2 = {PIX_RECT, 130, 64, 64}; */
@@ -29,6 +30,7 @@
     /* enemy4->collision_max_x = WIDTH*PIX_RECT; */
     /* enemy4->collision_min_x = 1*PIX_RECT; */
     /* enemy4->yInitialPosition = 4; */
+
 
 
 MoveList *newMoveList(MoveData data){

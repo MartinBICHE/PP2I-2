@@ -15,6 +15,7 @@ Perso *create_perso(Map *map) {
     res->vx = 0;
     res->vy = 0;
     res->hitbox = (SDL_Rect){.x = res->x*PIX_RECT - PERSO_WIDTH/2, .y = res->y*PIX_RECT - PERSO_HEIGHT/2, .w = PERSO_WIDTH, .h = PERSO_HEIGHT};
+    res->health = 9;
     return res;
 }
 
