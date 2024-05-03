@@ -10,15 +10,11 @@
 #include <math.h>
 #include "const.h"
 
-// Fonctions qui permettent de remettre le renderer à 0 
-void closeLoadingWindow();
-void closeMenuWindow();
-void closeMapWindow();
-
-// Fonctions qui permettent de dessiner les boutons 
-void drawLoading();
+// Fonctions qui permettent de dessiner
 void drawMenu();
 void drawMapMenu();
+void renderSprite();
+void renderImage(const char* imagePath, int x, int y, int width, int height);
 
 // Fonctions qui touchent à la musique 
 bool initSDL_mixer();
@@ -27,10 +23,7 @@ void playMusic();
 void toggleMusic();
 void closeSDL_mixer();
 
-// Fonctions qui permettent de changer la taille et le renderer de la fenêtre
-bool initLoadingWindow();
-bool initMenuWindow();
-bool initPlayWindow();
-void resizeWindow(SDL_Window*,int,int);
+void interactionMenu();
+void interactionPauseJeu();
 
 #endif /* MENU_H */

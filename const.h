@@ -6,6 +6,13 @@
 extern bool showMenu;
 extern bool afficherImage;
 extern bool parametre;
+extern bool retourMenu;
+extern bool startGame;
+extern bool prevShowMenu;
+extern bool musicToggled;
+extern bool quit;
+extern bool running;
+extern SDL_Event e;
 
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
@@ -15,16 +22,16 @@ extern SDL_Renderer* renderer;
 // #define PIX_RECT 30
 // #define WINWIDTH WIDTH*PIX_RECT
 // #define WINHEIGHT HEIGHT*PIX_RECT
-#define MENU_WINDOW_WIDTH 1400
-#define MENU_WINDOW_HEIGHT 800
+// #define MENU_WINDOW_WIDTH 1400
+// #define MENU_WINDOW_HEIGHT 800
 #define Image1Width 200
 #define Image1Height 150
 #define Image2Width 200
 #define Image2Height 150
 #define Image3Width 200
 #define Image3Height 150
-#define LOADING_WINDOW_WIDTH 600
-#define LOADING_WINDOW_HEIGHT 400
+// #define LOADING_WINDOW_WIDTH 600
+// #define LOADING_WINDOW_HEIGHT 400
 #define BLUR_AMOUNT 0.5f
 #define ImageRetourMenuWidth 200
 #define ImageRetourMenuHeight 50
