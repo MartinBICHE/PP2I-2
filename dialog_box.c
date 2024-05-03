@@ -134,6 +134,8 @@ void render_text(SDL_Renderer *renderer, const char *text,
       SDL_QueryTexture(texture, &format, &access, &textWidth, &textHeight);
       dialogBoxData->dst_rect.h = textHeight;
       dialogBoxData->dst_rect.w = textWidth;
+      SDL_FreeSurface(surfaceName);
+      SDL_DestroyTexture(texture);
       SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect);
     }
     SDL_Surface *surface =

@@ -1,16 +1,37 @@
 #ifndef MENU_H
 #define MENU_H
 
-// Déclaration des fonctions pour le menu
-bool initLoadingWindow();
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_render.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
+#include "const.h"
+
+// Fonctions qui permettent de remettre le renderer à 0 
 void closeLoadingWindow();
-void drawLoading();
-bool initMenuWindow();
 void closeMenuWindow();
-void drawMenu(int image1Width, int image1Height, int image2Width, int image2Height);
+void closeMapWindow();
+
+// Fonctions qui permettent de dessiner les boutons 
+void drawLoading(SDL_Renderer*);
+void drawMenu();
+void drawMapMenu();
+
+// Fonctions qui touchent à la musique 
 bool initSDL_mixer();
 bool loadMusic();
 void playMusic();
+void toggleMusic();
 void closeSDL_mixer();
+
+// Fonctions qui permettent de changer la taille et le renderer de la fenêtre
+bool initLoadingWindow();
+bool initMenuWindow();
+bool initPlayWindow();
+void resizeWindow(SDL_Window*,int,int);
 
 #endif /* MENU_H */
