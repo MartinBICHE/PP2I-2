@@ -1,86 +1,80 @@
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <math.h>
 #include "menu.h"
+#include "const.h"
 
-// Initialisation de toutes les variables
+// Taille de la fenêtre de chargement
+
+SDL_Window* gLoadingWindow = NULL;
+SDL_Renderer* gLoadingRenderer = NULL;
+
+SDL_Window* gMenuWindow = NULL;
+SDL_Renderer* gMenuRenderer = NULL;
+
+// Déclaration de la musique
 Mix_Music* gMusic = NULL;
-bool musicPaused = false;
-int spriteIndex = 0;
-int spriteScrollDelay = 300;
 
-// Fonction qui permet le redimensionnement de la fenêtre
-void resizeWindow(SDL_Window* window, int width, int height) {
-    SDL_SetWindowSize(window, width, height);
-}
-
-///////////////////////////////
-//// Fenêtre de chargement ////
-///////////////////////////////
-
-// Fonction qui permet d'initaliser SDL, la fenêtre et le renderer
+// Fonction pour initialiser SDL et créer la fenêtre de chargement
 bool initLoadingWindow() {
     // Initialisation de SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_Log("Erreur lors de l'initialisation de SDL : %s", SDL_GetError());
         return false;
     }
-    // Création de la fenêtre
-    window = SDL_CreateWindow("Fenêtre de chargement", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, LOADING_WINDOW_WIDTH, LOADING_WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == NULL) {
+
+    // Création de la fenêtre de chargement
+    gLoadingWindow = SDL_CreateWindow("Fenêtre de chargement", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, LOADING_WINDOW_WIDTH, LOADING_WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    if (gLoadingWindow == NULL) {
         SDL_Log("Erreur lors de la création de la fenêtre de chargement : %s", SDL_GetError());
         return false;
     }
-    // Création du renderer
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL) {
-        SDL_Log("Erreur lors de la création du renderer de la fenêtre de jeu : %s", SDL_GetError());
+
+    // Création du renderer de la fenêtre de chargement
+    gLoadingRenderer = SDL_CreateRenderer(gLoadingWindow, -1, SDL_RENDERER_ACCELERATED);
+    if (gLoadingRenderer == NULL) {
+        SDL_Log("Erreur lors de la création du renderer de la fenêtre de chargement : %s", SDL_GetError());
         return false;
     }
+
     return true;
 }
 
-// Fonction qui supprime le renderer de la fenêtre de chargement 
+// Fonction pour nettoyer et quitter SDL
 void closeLoadingWindow() {
-    SDL_DestroyRenderer(renderer);
-    renderer = NULL;
+    SDL_DestroyRenderer(gLoadingRenderer);
+    SDL_DestroyWindow(gLoadingWindow);
+    gLoadingWindow = NULL;
+    gLoadingRenderer = NULL;
+
+    SDL_Quit();
 }
 
-// Fonction qui dessine le renderer de la fenêtre de chargement
-void drawLoading(SDL_Renderer *renderer) {
+// Fonction pour dessiner le motif de chargement (un cercle avec des nuances de transparence)
+void drawLoading() {
     static int angle = 0;
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(gLoadingRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(gLoadingRenderer);
 
-    // Charger et dessiner l'arrière-plan
-    SDL_Surface *spriteSurface = IMG_Load("asset/UI/BackgroundMenu.png");
-    if (!spriteSurface) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in sprite surface init: %s",IMG_GetError());
+    // Dessiner l'arrière-plan
+    SDL_Surface* backgroundSurface = IMG_Load("./asset/background/Foret/menu-1.png");
+    if (backgroundSurface == NULL) {
+        SDL_Log("Erreur lors du chargement de l'image : %s", SDL_GetError());
+        return;
     }
-    SDL_Texture *spriteTexture = SDL_CreateTextureFromSurface(renderer, spriteSurface);
-    if (!spriteTexture) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in spritetexture init: %s",SDL_GetError());
+    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(gLoadingRenderer, backgroundSurface);
+    if (backgroundTexture == NULL) {
+        SDL_Log("Erreur lors de la création de la texture : %s", SDL_GetError());
+        SDL_FreeSurface(backgroundSurface);
+        return;
     }
-    SDL_FreeSurface(spriteSurface);
-
-    // Obtenez les dimensions réelles de l'image chargée
-    int imageWidth, imageHeight;
-    SDL_QueryTexture(spriteTexture, NULL, NULL, &imageWidth, &imageHeight);
-
-    // Calculez les dimensions d'un sprite unique en fonction du nombre de sprites et de la taille de l'image
-    int spriteWidth = imageWidth / NUM_SPRITES;
-    int spriteHeight = imageHeight;
-
-    // Calculez la région de l'image à afficher pour le sprite actuel
-    SDL_Rect spriteRect = {.x = spriteWidth, .y = 0, .w = spriteWidth, .h = spriteHeight};
-
-    // Calculez la région de la fenêtre où dessiner le sprite
-    SDL_Rect destRect = {.x = 0, .y = 0, .w = LOADING_WINDOW_WIDTH, .h = LOADING_WINDOW_HEIGHT};
-
-    // Afficher le sprite actuel
-    if (SDL_RenderCopy(renderer, spriteTexture, &spriteRect, &destRect)){
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in render copy: %s",SDL_GetError());
-    }
-
-    // Libérez la texture une fois qu'elle n'est plus nécessaire
-    SDL_DestroyTexture(spriteTexture);
+    SDL_RenderCopy(gLoadingRenderer, backgroundTexture, NULL, NULL);
+    SDL_DestroyTexture(backgroundTexture);
+    SDL_FreeSurface(backgroundSurface);
 
     // Dessiner le cercle avec des nuances de transparence
     int centerX = LOADING_WINDOW_WIDTH / 2;
@@ -88,214 +82,134 @@ void drawLoading(SDL_Renderer *renderer) {
     int radius = 30;
     int thickness = 3;
     for (int alpha = 255; alpha > 0; alpha -= 20) {
-        SDL_SetRenderDrawColor(renderer, 0x80, 0x80, 0x80, alpha);
-        SDL_RenderDrawLine(renderer, centerX + (radius - thickness / 2) * cos(angle * M_PI / 180.0), centerY + (radius - thickness / 2) * sin(angle * M_PI / 180.0), centerX + (radius + thickness / 2) * cos((angle + 10) * M_PI / 180.0), centerY + (radius + thickness / 2) * sin((angle + 10) * M_PI / 180.0));
+        SDL_SetRenderDrawColor(gLoadingRenderer, 0x80, 0x80, 0x80, alpha);
+        SDL_RenderDrawLine(gLoadingRenderer, centerX + (radius - thickness / 2) * cos(angle * M_PI / 180.0), centerY + (radius - thickness / 2) * sin(angle * M_PI / 180.0), centerX + (radius + thickness / 2) * cos((angle + 10) * M_PI / 180.0), centerY + (radius + thickness / 2) * sin((angle + 10) * M_PI / 180.0));
         angle += 3;
     }
 
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(gLoadingRenderer);
 }
 
-/////////////////////////
-//// Fenêtre de menu ////
-/////////////////////////
-
-// Fonction qui change la taille de la fenêtre et qui réinitialise le renderer à cette nouvelle fenêtre
+// Fonction pour initialiser SDL et créer la fenêtre de menu en plein écran
 bool initMenuWindow() {
-    resizeWindow(window, MENU_WINDOW_WIDTH, MENU_WINDOW_HEIGHT);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL) {
+    // Création de la fenêtre de menu en mode plein écran
+    gMenuWindow = SDL_CreateWindow("Menu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, MENU_WINDOW_WIDTH, MENU_WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+    if (gMenuWindow == NULL) {
+        SDL_Log("Erreur lors de la création de la fenêtre de menu : %s", SDL_GetError());
+        return false;
+    }
+
+    // Création du renderer de la fenêtre de menu
+    gMenuRenderer = SDL_CreateRenderer(gMenuWindow, -1, SDL_RENDERER_ACCELERATED);
+    if (gMenuRenderer == NULL) {
         SDL_Log("Erreur lors de la création du renderer de la fenêtre de menu : %s", SDL_GetError());
         return false;
     }
+
     return true;
 }
 
-// Fonction qui supprime le renderer de la fenêtre de menu
+// Fonction pour nettoyer et quitter SDL
 void closeMenuWindow() {
-    SDL_DestroyRenderer(renderer);
-    renderer = NULL;
+    SDL_DestroyRenderer(gMenuRenderer);
+    SDL_DestroyWindow(gMenuWindow);
+    gMenuWindow = NULL;
+    gMenuRenderer = NULL;
 }
 
-// Fonction qui dessine le renderer de la fenêtre de menu
-void drawMenu() {
-    if (showMenu == true){
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderClear(renderer);
+// Fonction pour dessiner le menu avec un arrière-plan et des images cliquables
+void drawMenu(int image1Width, int image1Height, int image2Width, int image2Height) {
+    // Effacer l'écran
+    SDL_SetRenderDrawColor(gMenuRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(gMenuRenderer);
 
-        static Uint32 lastScrollTime = 0; // Variable pour stocker le temps de la dernière incrémentation
-        Uint32 currentTime = SDL_GetTicks(); // Obtenir le temps actuel en millisecondes
-
-        // Charger et dessiner l'arrière-plan
-        SDL_Surface *spriteSurface = IMG_Load("asset/UI/BackgroundMenu.png");
-        if (!spriteSurface) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in sprite surface init: %s",SDL_GetError());
-        }
-        SDL_Texture *spriteTexture = SDL_CreateTextureFromSurface(renderer, spriteSurface);
-        if (!spriteTexture) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in spritetexture init: %s",SDL_GetError());
-        }
-        SDL_FreeSurface(spriteSurface);
-
-        // Obtenez les dimensions réelles de l'image chargée
-        int imageWidth, imageHeight;
-        SDL_QueryTexture(spriteTexture, NULL, NULL, &imageWidth, &imageHeight);
-
-        // Calculez les dimensions d'un sprite unique en fonction du nombre de sprites et de la taille de l'image
-        int spriteWidth = imageWidth / NUM_SPRITES;
-        int spriteHeight = imageHeight;
-
-        // Calculez la région de l'image à afficher pour le sprite actuel
-        SDL_Rect spriteRect = {.x = spriteIndex * spriteWidth, .y = 0, .w = spriteWidth, .h = spriteHeight};
-        
-        if (currentTime - lastScrollTime >= spriteScrollDelay) {
-            // Incrémenter spriteIndex
-            if (spriteIndex == 7) {
-                spriteIndex = 0;
-            } else {
-                spriteIndex++;
-            }
-            lastScrollTime = currentTime; // Mettre à jour le temps de la dernière incrémentation
-        }
-
-        // Calculez la région de la fenêtre où dessiner le sprite
-        SDL_Rect destRect = {.x = 0, .y = 0, .w = MENU_WINDOW_WIDTH, .h = MENU_WINDOW_HEIGHT};
-
-        // Afficher le sprite actuel
-        if (SDL_RenderCopy(renderer, spriteTexture, &spriteRect, &destRect)){
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in render copy: %s",SDL_GetError());
-        }
-
-        // Libérez la texture une fois qu'elle n'est plus nécessaire
-        SDL_DestroyTexture(spriteTexture);
-
-        // Charger et dessiner le bouton play
-        SDL_Surface* image1Surface = IMG_Load("./asset/UI/play.png");
-        if (image1Surface == NULL) {
-            SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-            return;
-        }
-        SDL_Texture* image1Texture = SDL_CreateTextureFromSurface(renderer, image1Surface);
-        // Ce qui est commenté affiche une erreur sans faire crache le jeu et je ne comprends pas l'erreur
-        if (image1Texture == NULL) {
-            SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-            SDL_FreeSurface(image1Surface);
-            return;
-        }
-        SDL_Rect image1Rect = {(MENU_WINDOW_WIDTH / 2 - Image1Width / 2),(MENU_WINDOW_HEIGHT / 2 - Image1Height / 2), Image1Width, Image1Height};
-        SDL_RenderCopy(renderer, image1Texture, NULL, &image1Rect);
-        SDL_DestroyTexture(image1Texture);
-        SDL_FreeSurface(image1Surface);
-
-        // Charger et dessiner le bouton paramètre
-        SDL_Surface* image2Surface = IMG_Load("./asset/UI/option.png");
-        if (image2Surface == NULL) {
-            SDL_Log("Erreur lors du chargement de la deuxième image : %s", SDL_GetError());
-            return;
-        }
-        SDL_Texture* image2Texture = SDL_CreateTextureFromSurface(renderer, image2Surface);
-        if (image2Texture == NULL) {
-            SDL_Log("Erreur lors de la création de la texture de la deuxième image : %s", SDL_GetError());
-            SDL_FreeSurface(image2Surface);
-            return;
-        }
-        SDL_Rect image2Rect = {MENU_WINDOW_WIDTH - Image2Width, 0, Image2Width, Image2Height};
-        SDL_RenderCopy(renderer, image2Texture, NULL, &image2Rect);
-        SDL_DestroyTexture(image2Texture);
-        SDL_FreeSurface(image2Surface);
-
-        // Charger et dessiner le boutton quitter le jeu
-        SDL_Surface* image3Surface = IMG_Load("./asset/background/Foret/bouton-quitter-le-jeu.png");
-        if (image2Surface == NULL) {
-            SDL_Log("Erreur lors du chargement de la deuxième image : %s", SDL_GetError());
-            return;
-        }
-        SDL_Texture* image3Texture = SDL_CreateTextureFromSurface(renderer, image3Surface);
-        if (image3Texture == NULL) {
-            SDL_Log("Erreur lors de la création de la texture de la deuxième image : %s", SDL_GetError());
-            SDL_FreeSurface(image3Surface);
-            return;
-        }
-
-        SDL_Rect image3Rect = {0, 0, Image3Width, Image3Height};
-        SDL_RenderCopy(renderer, image3Texture, NULL, &image3Rect);
-        SDL_DestroyTexture(image3Texture);
-        SDL_FreeSurface(image3Surface);
-        SDL_RenderPresent(renderer);
-    } else {
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        SDL_RenderClear(renderer);
-
-        // Charger et dessiner l'arrière-plan
-        SDL_Surface *spriteSurface = IMG_Load("asset/UI/BackgroundMenu.png");
-        if (!spriteSurface) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in sprite surface init: %s",SDL_GetError());
-        }
-        SDL_Texture *spriteTexture = SDL_CreateTextureFromSurface(renderer, spriteSurface);
-        if (!spriteTexture) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in spritetexture init: %s",SDL_GetError());
-        }
-        SDL_FreeSurface(spriteSurface);
-
-        // Obtenez les dimensions réelles de l'image chargée
-        int imageWidth, imageHeight;
-        SDL_QueryTexture(spriteTexture, NULL, NULL, &imageWidth, &imageHeight);
-
-        // Calculez les dimensions d'un sprite unique en fonction du nombre de sprites et de la taille de l'image
-        int spriteWidth = imageWidth / NUM_SPRITES;
-        int spriteHeight = imageHeight;
-
-        // Calculez la région de l'image à afficher pour le sprite actuel
-        SDL_Rect spriteRect = {.x = spriteIndex * spriteWidth, .y = 0, .w = spriteWidth, .h = spriteHeight};
-        
-        // Calculez la région de la fenêtre où dessiner le sprite
-        SDL_Rect destRect = {.x = 0, .y = 0, .w = MENU_WINDOW_WIDTH, .h = MENU_WINDOW_HEIGHT};
-
-        // Afficher le sprite actuel
-        if (SDL_RenderCopy(renderer, spriteTexture, &spriteRect, &destRect)){
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in render copy: %s",SDL_GetError());
-        }
-
-        // Libérez la texture une fois qu'elle n'est plus nécessaire
-        SDL_DestroyTexture(spriteTexture);
-
-        // Dessiner une barre horizontale au milieu du curseur
-        SDL_Rect barRect = {MENU_WINDOW_WIDTH / 4, MENU_WINDOW_HEIGHT / 2-5, MENU_WINDOW_WIDTH / 2, 10};
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &barRect);
-        // Dessiner le curseur au milieu de la fenêtre
-        SDL_Rect cursorRect = {(MENU_WINDOW_WIDTH - CURSOR_WIDTH) / 2, (MENU_WINDOW_HEIGHT - CURSOR_HEIGHT) / 2, CURSOR_WIDTH, CURSOR_HEIGHT};
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &cursorRect);
-        SDL_RenderPresent(renderer);
+    // Charger et dessiner l'arrière-plan
+    SDL_Surface* backgroundSurface = IMG_Load("./asset/background/Foret/menu-2.jpg"); 
+    if (backgroundSurface == NULL) {
+        SDL_Log("Erreur lors du chargement de l'arrière-plan : %s", SDL_GetError());
+        return;
     }
+    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(gMenuRenderer, backgroundSurface);
+    if (backgroundTexture == NULL) {
+        SDL_Log("Erreur lors de la création de la texture de l'arrière-plan : %s", SDL_GetError());
+        SDL_FreeSurface(backgroundSurface);
+        return;
+    }
+    SDL_Rect backgroundRect = {0, 0, MENU_WINDOW_WIDTH, MENU_WINDOW_HEIGHT};
+    SDL_RenderCopy(gMenuRenderer, backgroundTexture, NULL, &backgroundRect);
+    SDL_DestroyTexture(backgroundTexture);
+    SDL_FreeSurface(backgroundSurface);
+
+    // Charger et dessiner la première image au centre de la fenêtre
+    SDL_Surface* image1Surface = IMG_Load("./asset/background/Foret/bouton-play.png"); 
+    if (image1Surface == NULL) {
+        SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
+        return;
+    }
+    SDL_Texture* image1Texture = SDL_CreateTextureFromSurface(gMenuRenderer, image1Surface);
+    if (image1Texture == NULL) {
+        SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
+        SDL_FreeSurface(image1Surface);
+        return;
+    }
+    SDL_Rect image1Rect = {(MENU_WINDOW_WIDTH - image1Width) / 2, (MENU_WINDOW_HEIGHT - image1Height) / 2, image1Width, image1Height};
+    SDL_RenderCopy(gMenuRenderer, image1Texture, NULL, &image1Rect);
+    SDL_DestroyTexture(image1Texture);
+    SDL_FreeSurface(image1Surface);
+
+    // Charger et dessiner la deuxième image en haut à droite de la fenêtre
+    SDL_Surface* image2Surface = IMG_Load("./asset/background/Foret/bouton-paramètre.png");
+    if (image2Surface == NULL) {
+        SDL_Log("Erreur lors du chargement de la deuxième image : %s", SDL_GetError());
+        return;
+    }
+    SDL_Texture* image2Texture = SDL_CreateTextureFromSurface(gMenuRenderer, image2Surface);
+    if (image2Texture == NULL) {
+        SDL_Log("Erreur lors de la création de la texture de la deuxième image : %s", SDL_GetError());
+        SDL_FreeSurface(image2Surface);
+        return;
+    }
+    SDL_Rect image2Rect = {MENU_WINDOW_WIDTH - image2Width, 0, image2Width, image2Height};
+    SDL_RenderCopy(gMenuRenderer, image2Texture, NULL, &image2Rect);
+    SDL_DestroyTexture(image2Texture);
+    SDL_FreeSurface(image2Surface);
+
+    // Mettre à jour l'affichage
+    SDL_RenderPresent(gMenuRenderer);
 }
 
-/////////////////
-//// Musique ////
-/////////////////
-
-// Fonction pour initialiser la musique
+// Fonction pour initialiser SDL_mixer
 bool initSDL_mixer() {
+    // Initialisation de SDL_mixer
+    if (Mix_Init(MIX_INIT_MP3) < 0) {
+        SDL_Log("Erreur lors de l'initialisation de SDL_mixer : %s", Mix_GetError());
+        return false;
+    }
+
+    // Initialisation de l'audio
     if (Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048) < 0) {
         SDL_Log("Erreur lors de l'ouverture de l'audio : %s",Mix_GetError());
         return false;
     }
+
     return true;
 }
 
 // Fonction pour charger la musique
 bool loadMusic() {
-    gMusic = Mix_LoadMUS("./asset/musique/musique-menu.mp3");
+    // Charger la musique
+    gMusic = Mix_LoadMUS("./asset/musique/musique-menu.mp3"); // Remplacez "musique.mp3" par le nom de votre musique
     if (gMusic == NULL) {
         SDL_Log("Erreur lors du chargement de la musique : %s", Mix_GetError());
         return false;
     }
+
     return true;
 }
 
-// Fonction pour jouer la musique infiniment
+// Fonction pour jouer la musique
 void playMusic() {
+    // Jouer la musique en boucle (-1 indique une lecture infinie)
     Mix_PlayMusic(gMusic, -1);
 }
 
@@ -303,116 +217,7 @@ void playMusic() {
 void closeSDL_mixer() {
     Mix_FreeMusic(gMusic);
     gMusic = NULL;
+
     Mix_CloseAudio();
     Mix_Quit();
-}
-
-// Fonction pour mettre en pause ou reprendre la musique
-void toggleMusic() {
-    if (Mix_PausedMusic()) {
-        Mix_ResumeMusic();
-        musicPaused = false;
-    } else {
-        Mix_PauseMusic();
-        musicPaused = true;
-    }
-}
-
-////////////////////////
-//// Fenêtre de jeu ////
-////////////////////////
-
-// Fonction qui change la taille de la fenêtre et qui réinitialise le renderer à cette nouvelle fenêtre
-bool initPlayWindow() {
-    resizeWindow(window,WINWIDTH,WINHEIGHT);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL) {
-        SDL_Log(SDL_LOG_CATEGORY_APPLICATION,"Erreur lors de la création du renderer de la fenêtre de jeu : %s", SDL_GetError());
-        return false;
-    }
-    return true;
-}
-
-// Fonction qui dessine le renderer de la fenêtre de jeu
-void drawMapMenu() {
-    if (afficherImage) {
-
-        // Charger et dessiner le boutton retout au menu
-        SDL_Surface *image1Surface = IMG_Load("./asset/background/Foret/bouton-retour-menu.png");
-        if (image1Surface == NULL) {
-            SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-        }
-        SDL_Texture *image1Texture = SDL_CreateTextureFromSurface(renderer, image1Surface);
-        if (image1Texture == NULL) {
-            SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-            SDL_FreeSurface(image1Surface);
-        }
-        SDL_Rect image1Rect = {(WINWIDTH - ImageRetourMenuWidth) / 2, (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50, ImageRetourMenuWidth, ImageRetourMenuHeight};
-        SDL_RenderCopy(renderer, image1Texture, NULL, &image1Rect);
-        SDL_DestroyTexture(image1Texture);
-        SDL_FreeSurface(image1Surface);
-
-        // Charger et dessiner le boutton quitter le jeu
-        SDL_Surface *image2Surface = IMG_Load("./asset/background/Foret/bouton-quitter-le-jeu.png");
-        if (image2Surface == NULL) {
-            SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-        }
-        SDL_Texture *image2Texture = SDL_CreateTextureFromSurface(renderer, image2Surface);
-        if (image1Texture == NULL) {
-            SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-            SDL_FreeSurface(image2Surface);
-        }
-        SDL_Rect image2Rect = {(WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight};
-        SDL_RenderCopy(renderer, image2Texture, NULL, &image2Rect);
-        SDL_DestroyTexture(image2Texture);
-        SDL_FreeSurface(image2Surface);
-
-        // Charger et dessiner le boutton paramètre
-        SDL_Surface *image3Surface = IMG_Load("./asset/UI/option.png");
-        if (image3Surface == NULL) {
-            SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-        }
-        SDL_Texture *image3Texture = SDL_CreateTextureFromSurface(renderer, image3Surface);
-        if (image3Texture == NULL) {
-            SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-            SDL_FreeSurface(image3Surface);
-        }
-        SDL_Rect image3Rect = {WINWIDTH - ImageParametrePauseWidth, 0, ImageParametrePauseWidth, ImageParametrePauseHeight};
-        SDL_RenderCopy(renderer, image3Texture, NULL, &image3Rect);
-        SDL_DestroyTexture(image3Texture);
-        SDL_FreeSurface(image3Surface);
-
-        // Charger et dessiner le boutton retour en arrière
-        SDL_Surface *image4Surface = IMG_Load("./asset/background/Foret/bouton-retour-en-arrière.png");
-        if (image4Surface == NULL) {
-            SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-        }
-        SDL_Texture *image4Texture = SDL_CreateTextureFromSurface(renderer, image4Surface);
-        if (image4Texture == NULL) {
-            SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-            SDL_FreeSurface(image4Surface);
-        }
-        SDL_Rect image4Rect = {0, 0, ImageRetourArrièreWidth, ImageRetourArrièreHeight};
-        SDL_RenderCopy(renderer, image4Texture, NULL, &image4Rect);
-        SDL_DestroyTexture(image4Texture);
-        SDL_FreeSurface(image4Surface);
-    }
-
-    if (parametre) {
-        // Dessiner une barre horizontale au milieu du curseur
-        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2-5, WINWIDTH / 2, 10};
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &barRect); 
-
-        // Dessiner le curseur au milieu de la fenêtre
-        SDL_Rect cursorRect = {cursorX, cursorY, CURSOR_WIDTH, CURSOR_HEIGHT};
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &cursorRect);
-    }
-}
-
-// Fonction qui supprime le renderer de la fenêtre de jeu
-void closeMapWindow() {
-    SDL_DestroyRenderer(renderer);
-    renderer = NULL;
 }

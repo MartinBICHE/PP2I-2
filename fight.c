@@ -43,12 +43,12 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
         lastInputTime = currentTime;
         if (keyboardState[SDL_SCANCODE_UP]) {
             if (player->y >  QUARTERHEIGHT) {
-                player->y -= 1.5 * QUARTERHEIGHT;
+                player->y -= 2 * QUARTERHEIGHT;
             }
         }
         if (keyboardState[SDL_SCANCODE_DOWN]) {
-            if ( player->y < WINHEIGHT - 1.5 * QUARTERHEIGHT - SPRITESIZE) {
-                player->y += 1.5 * QUARTERHEIGHT;
+            if ( player->y < WINHEIGHT - 2 * QUARTERHEIGHT - 1.5*SPRITESIZE) {
+                player->y += 2 * QUARTERHEIGHT;
             }
         }
         if (keyboardState[SDL_SCANCODE_LEFT]) {
@@ -65,7 +65,7 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
 
 
     SDL_Rect spriteRect = {.x = offset * spriteWidth, .y = line * spriteHeight, .w = spriteWidth, .h = spriteHeight};
-    SDL_Rect destRect = { .x = player->x, .y = player->y, .w = spriteWidth, .h = spriteHeight};
+    SDL_Rect destRect = { .x = player->x, .y = player->y, .w = 1.5*spriteWidth, .h = 1.5*spriteHeight};
 
     if (SDL_RenderCopyEx(renderer, spriteTexture, &spriteRect, &destRect, 0, NULL, SDL_FLIP_NONE)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,"Error in render copy: %s", SDL_GetError());
@@ -77,27 +77,70 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, Perso *player) {
 }
 
 
+// // Function to display random-sized and randomly located rectangles
+// int showRectangle(SDL_Renderer* renderer) {
+//     // Seed the random number generator
+//     srand(time(NULL));
 
-int showRectangle(SDL_Renderer* renderer, int x, int y, int w, int h) {
-    int screenWidth = 0;
-    int screenHeight = 0;
-    SDL_GetRendererOutputSize(renderer, &screenWidth, &screenHeight);
+//     // Generate random position and size for the rectangle
+//     int x = rand() % WINWIDTH;
+//     int y = rand() % WINHEIGHT;
+//     int w = rand() % (WINWIDTH / 2); // Random width up to half of the window width
+//     int h = rand() % (WINHEIGHT / 2); // Random height up to half of the window height
 
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
+//     // Set random color
+//     SDL_SetRenderDrawColor(renderer, rand() % 256, rand() % 256, rand() % 256, 255);
+
+//     // Draw the rectangle
+//     SDL_Rect rect = { .x = x, .y = y, .w = w, .h = h };
+//     SDL_RenderFillRect(renderer, &rect);
+
+//     // Update the screen
+//     SDL_RenderPresent(renderer);
+
+//     // Delay for 1 second
+//     SDL_Delay(1000);
+
+//     // Clear the renderer
+//     SDL_RenderClear(renderer);
+
+//     return 0;
+// }
 
 
+
+int showRectangle(SDL_Renderer *renderer, int x, int y, int w, int h) {
+    SDL_Rect rect = {x, y, w, h};
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &rect);    
+    return 0;
+}
 
-    SDL_RenderFillRect(renderer, &rect);
-
-    SDL_Rect destRect = { .x = x, .y = y, .w = w, .h = h};
-    SDL_RenderFillRect(renderer, &rect);
-    SDL_RenderFillRect(renderer, &destRect);
-
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+// Function to perform the low range attack
+int lowRangeAttack(SDL_Renderer *renderer) {
+    // Initialize variables
+    float x = 0;
+    float y = 2 * QUARTERHEIGHT;
+    float w = TIERWIDTH;
+    float h = 2 * QUARTERHEIGHT;
+    
+    Uint32 lastDrawTime = SDL_GetTicks(); // Get the current time
+    
+    // Main loop
+    while (x <= WINWIDTH) {
+        // Check if it's time to proceed to the next turn
+        Uint32 currentTime = SDL_GetTicks();
+        if (currentTime - lastDrawTime >= 1000) { // Adjust the delay duration as needed
+            // Perform the action for the turn
+            showRectangle(renderer, x, y, w, h);
+            
+            // Update the position for the next turn
+            x += TIERWIDTH;
+            
+            // Update the last draw time
+            lastDrawTime = currentTime;
+        }
+    }
+    
     return 0;
 }

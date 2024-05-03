@@ -79,7 +79,7 @@ void scroll_movement(SDL_Renderer *renderer,
     }
     break;
   case SCROLL_SECOND_PAUSE:
-    if (SDL_GetTicks()) - scrollStateData->pauseStart >= interval) {
+    if (SDL_GetTicks() - scrollStateData->pauseStart >= interval) {
       scrollStateData->state = SCROLL_MOVING_UP;
     }
     SDL_Surface *surfaceText =
