@@ -5,6 +5,9 @@
 
 void renderStatusHealth(SDL_Renderer *renderer, Perso *perso){
     SDL_Rect dst_rect = {-10, -80, 128*2, 128*2};
-    SDL_RenderCopy(renderer, healthTextures[perso->health], NULL, &dst_rect);
-
+    if (perso->health >= 0 && perso->health <= 9){
+        SDL_RenderCopy(renderer, healthTextures[perso->health], NULL, &dst_rect);
+    }
 }
+
+

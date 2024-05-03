@@ -21,6 +21,8 @@ CFLAGS += $(shell pkg-config --cflags SDL2_image)
 LDFLAGS += $(shell pkg-config --libs SDL2_image)
 # CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
 # LDFLAGS += $(shell pkg-config --libs SDL2_tff)
+CFLAGS += $(shell pkg-config --cflags SDL2_mixer)
+LDFLAGS += $(shell pkg-config --libs SDL2_mixer)
 
 
 all: $(TARGET)
