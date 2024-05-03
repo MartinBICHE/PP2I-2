@@ -7,24 +7,16 @@
 #include "map.h"
 
 Map *initMap(char *name) {
-	char *str_data = malloc(strlen(name) + 10);
-    char *str_metadata = malloc(strlen(name) + 15);
-	strcpy(str_data, name);
-	strcpy(str_metadata, name);
-	strcat(str_data, "/data.txt");
-	strcat(str_metadata, "/metadata.txt");
 	Map *res = malloc(sizeof(Map));
-	FILE *f = fopen(str_data, "r");
+	FILE *f = fopen(name, "r");
     for (int i = 0 ; i < HEIGHT ; i++) {
         if (fgets(res->matrix[i], 49, f) == 0) {
 			printf("String length is null");
 		}
 	}
     fclose(f);
-	res->start_x = 4.0f; // en nombre de tiles
-	res->start_y = 4.0f; // en nombre de tiles
-	free(str_data);
-	free(str_metadata);
+	res->start_x = 4.0; // en nombre de tiles
+	res->start_y = 4.0; // en nombre de tiles
 	return res;
 }
 
