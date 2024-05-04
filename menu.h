@@ -20,7 +20,6 @@ void renderImage(const char* imagePath, int x, int y, int width, int height);
 bool initSDL_mixer();
 bool loadMusic();
 void playMusic();
-void toggleMusic();
 void closeSDL_mixer();
 
 void interactionMenu();

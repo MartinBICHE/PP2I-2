@@ -8,11 +8,17 @@
 #include "fonts.h"
 
 
+
 void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError());
 		exit(-1);
 	}
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        SDL_Log("Erreur lors de l'initialisation de SDL : %s", SDL_GetError());
+        exit(-1);
+    }
 
 	*window = SDL_CreateWindow("SDL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINWIDTH, WINHEIGHT, SDL_WINDOW_SHOWN);
 	if (!window) {
@@ -29,7 +35,6 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 
     loadTextures(*renderer);
     loadFonts();
-
 }
 
 void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map){

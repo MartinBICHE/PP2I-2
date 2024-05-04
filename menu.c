@@ -114,7 +114,7 @@ void drawMenu() {
         renderSprite();
         renderImage("./asset/UI/play.png",(WINWIDTH / 2 - Image1Width / 2),(WINHEIGHT / 2 - Image1Height / 2), Image1Width, Image1Height);
         renderImage("./asset/UI/option.png", WINWIDTH - Image2Width, 0, Image2Width, Image2Height);
-        renderImage("./asset/background/Foret/bouton-quitter-le-jeu.png",0, 0, Image3Width, Image3Height);
+        renderImage("./asset/UI/bouton-quitter-le-jeu.png",0, 0, Image3Width, Image3Height);
         SDL_RenderPresent(renderer);
     } else {
         renderSprite();
@@ -132,10 +132,10 @@ void drawMenu() {
 
 void drawMapMenu() {
     if (afficherImage) {
-        renderImage("./asset/background/Foret/bouton-retour-menu.png",(WINWIDTH - ImageRetourMenuWidth) / 2, (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50, ImageRetourMenuWidth, ImageRetourMenuHeight);
-        renderImage("./asset/background/Foret/bouton-quitter-le-jeu.png",(WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
+        renderImage("./asset/UI/bouton-retour-menu.png",(WINWIDTH - ImageRetourMenuWidth) / 2, (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50, ImageRetourMenuWidth, ImageRetourMenuHeight);
+        renderImage("./asset/UI/bouton-quitter-le-jeu.png",(WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
         renderImage("./asset/UI/option.png",WINWIDTH - ImageParametrePauseWidth, 0, ImageParametrePauseWidth, ImageParametrePauseHeight);
-        renderImage("./asset/background/Foret/bouton-retour-en-arrière.png",0, 0, ImageRetourArrièreWidth, ImageRetourArrièreHeight);
+        renderImage("./asset/UI/bouton-retour-en-arrière.png",0, 0, ImageRetourArrièreWidth, ImageRetourArrièreHeight);
     }
     if (parametre) {
                                                                                                                         //////
@@ -195,8 +195,8 @@ void interactionPauseJeu() {
         if (afficherImage) {
             if (mouseX >= ((WINWIDTH - ImageQuitterJeuWidth) / 2) && mouseX <= ((WINWIDTH - ImageQuitterJeuWidth) / 2) + ImageQuitterJeuWidth &&
                 mouseY >= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) && mouseY <= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) + ImageQuitterJeuHeight) {
-                quit = true;
                 running = false;
+                quit = true;
             }
             else if (mouseX >= ((WINWIDTH - ImageRetourMenuWidth) / 2) && mouseX <= ((WINWIDTH - ImageRetourMenuWidth) / 2) + ImageRetourMenuWidth &&
                 mouseY >= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) && mouseY <= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) + ImageRetourMenuHeight) {

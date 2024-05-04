@@ -53,7 +53,7 @@ extern SDL_Renderer* renderer;
 
 #define WINHEIGHT 720 // en pixels
 #define WINWIDTH 1280 // en pixels
-#define HEIGHT 16 // i, y en nombre de tiles
+#define HEIGHT 8 // i, y en nombre de tiles
 #define WIDTH 48 // j, x en nombre de tiles
 #define PIX_RECT WINHEIGHT/HEIGHT // en pixels
 #define LEVEL_WIDTH PIX_RECT*WIDTH // en pixels
@@ -68,15 +68,9 @@ extern SDL_Renderer* renderer;
 #define MOVSPEED 7.0f
 
 typedef struct _Map {
-    char** matrix;
-    int height; // en nombre de tiles
-    int width; // en nombre de tiles
-    int pix_rect; // en pixels
-    int start_x; // en nombre de tiles
-    int start_y; // en nombre de tiles
-    int end_x; // en nombre de tiles
-    int end_y; // en nombre de tiles
-    float x_cam; // en pixels
+    char matrix[HEIGHT][WIDTH] ;
+    float start_x ;
+    float start_y ;
 } Map ;
 
 
@@ -85,10 +79,8 @@ typedef struct _Perso {
     float y; // en nombre de tiles
     float vx; // en nombre de tiles par seconde
     float vy; // en nombre de tiles par seconde
+    int health; //je l'ai rajouté
     SDL_Rect hitbox;
-    int health;
-    int jumps; // nombre de sauts restants
-    int jump_delay; // délai entre les sauts (15 frames)
 } Perso;
 
 #endif
