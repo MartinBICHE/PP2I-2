@@ -1,9 +1,6 @@
 #include "menu.h"
 
-SDL_Window* window;
-SDL_Renderer* renderer;
 Mix_Music* gMusic = NULL;
-SDL_Event e;
 
 bool musicPaused = false;
 int spriteIndex = 0;
