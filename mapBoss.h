@@ -4,11 +4,12 @@
 #include "const.h"
 
 Map *initMapBoss(char*);
-float updateCamBoss(float, float);
+void updateCamBoss(Perso*,Map*);
 void loadBackgroundTexturesBoss(SDL_Renderer*,SDL_Texture*[],int);
-int drawBackgroundBoss(SDL_Renderer*, SDL_Texture*[], int, float);
+int drawBackgroundBoss(SDL_Renderer*, SDL_Texture*[], int, Map*);
 void loadTileTexturesBoss(SDL_Renderer*, SDL_Texture**, char*);
-void display_tileBoss(SDL_Renderer*, int, int, int, int, float, SDL_Texture*);
-int drawMapBoss(SDL_Renderer*, Map*, char*, float, SDL_Texture*);
+void display_tileBoss(SDL_Renderer*, int, int, int, int,Map*, SDL_Texture*);
+int drawMapBoss(SDL_Renderer*, Map*, char*, SDL_Texture*);
+void destroyMapBoss(Map*);
 
 #endif
