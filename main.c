@@ -57,23 +57,6 @@ int main(int argc, char **argv) {
   SDL_Event event;
   int running = 1;
 
-  EnemyFlecheData enemyFlecheData;
-  initEnemyFleche(&enemyFlecheData, 800, 500);
-
-
-  EnemyStateData enemyStateData;
-  initEnemy1(800, 630, &enemyStateData);
-
-  DialogBoxData dialogBoxData;
-  initPapirus(&dialogBoxData, 100, 100);
-  const char *text = "a fost odata ca niciodata o baba si un mosneag care au murit de mititei";
-
-  EnemyBatData enemyBatData;
-  initEnemyBat(&enemyBatData, 50, 100, 500);
-
-  Enemy3 enemy;
-  initEnemy3(&enemy, 100, 400, 400);
-
 
 
   loadBackgroundTextures(renderer, bgTextures, 5);
@@ -136,14 +119,6 @@ int main(int argc, char **argv) {
     // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de
     // caméra (à changer)
 
-    renderStatusHealth(renderer, perso);
-    /* flecheAttack(&enemyFlecheData, perso); */
-    /* enemyFleche_mouvement(renderer, &enemyFlecheData, x_cam); */
-    /* enemy1_movement(renderer, &enemyStateData, x_cam); */
-    /* enemy1Attack(&enemyStateData, perso); */
-    /* enemy3_movement(renderer, &enemy, x_cam); */
-    /* render_text(renderer, text, BLACK, &dialogBoxData, x_cam); */
-    enemyBat_mouvement(renderer, &enemyBatData, x_cam);
     SDL_RenderPresent(renderer);
 
     Uint64 end = SDL_GetTicks();
