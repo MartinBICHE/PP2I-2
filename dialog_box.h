@@ -6,8 +6,20 @@
 #include <SDL2/SDL_render.h>
 #include "const.h"
 
-void render_box(SDL_Renderer *renderer, SDL_Texture *boxTexture, SDL_Texture *textTexture, int x, int y);
 
+struct _DialogBoxData{
+    int currentCharIndex;
+    Uint32 delayTimer;
+    int counter;
+    SDL_Rect dst_rect;
+};
+typedef struct _DialogBoxData DialogBoxData;
 
+char *remove_first_word(const char *str);
+
+void render_text(SDL_Renderer *renderer, const char *text,
+                 SDL_Color color, DialogBoxData *dialogBoxData);
+
+void initPapirus(DialogBoxData *dialogBoxData, int x, int y);
 
 #endif

@@ -5,7 +5,26 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
 
-void enemy1_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, int *i);
-void enemy1_movement_2(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, int *i);
+enum EnemyState {
+    MOVING_UP,
+    PAUSE_TOP,
+    MOVING_DOWN,
+    PAUSE_BOTTOM,
+    ANIMATION_START
+};
 
+struct _EnemyStateData{
+    enum EnemyState state;
+    Uint32 pauseStartBits;
+    Uint32 pauseStart;
+    SDL_Rect src_rect;
+    SDL_Rect dst_rect;
+}; 
+
+/* à mettre health dans EnemyState au pire */
+
+typedef struct _EnemyStateData EnemyStateData;
+
+void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData);
+void initEnemy1(int x, int y, EnemyStateData *enemyStateData);
 #endif

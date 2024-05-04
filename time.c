@@ -1,10 +1,10 @@
 #include <SDL2/SDL.h>
+#include "time.h"
 
 char *show_time(Uint32 miliseconds){
     int seconds = (miliseconds / 1000) % 60;
     int minutes = (miliseconds / (1000 * 60) % 60);
     int hours = (miliseconds / (1000 * 60 * 60) % 24);
-    /* printf("seconds: %d, minutes: %d, hours: %d\n", seconds, minutes, hours); */
     char seconds_str[10];
     sprintf(seconds_str, "%d", seconds);
     char minutes_str[10];
@@ -19,4 +19,3 @@ char *show_time(Uint32 miliseconds){
     strcat(result, hours_str);
     return result;
 }
-
