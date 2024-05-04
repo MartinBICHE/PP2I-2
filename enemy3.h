@@ -6,17 +6,19 @@
 #include <SDL2/SDL_ttf.h>
 #include "map.h"
 #include "const.h"
-#include "display.h"
 
 struct _Enemy3{
-    char *image_path;
     float xPosition;
     float yPosition;
     int xCollisionMax;
     int xCollisionMin;
     int speed;
+    int dx;
+    SDL_Rect src_rect;
+    SDL_Rect dst_rect;
 };
 typedef struct _Enemy3 Enemy3;
-void enemy3_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, Enemy3 *enemy, float scale );
+void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax);
 
+void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, float x_cam);
 #endif

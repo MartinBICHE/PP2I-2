@@ -4,40 +4,52 @@
 #include <SDL2/SDL_ttf.h>
 #include "map.h"
 #include "const.h"
-#include "display.h"
 #include "enemy3.h"
+#include "textures.h"
 
+/* s'utilise avec : */
+/*     enemy3_movement(renderer, &enemy, x_cam); */
+/*     Enemy3 enemy; */
+/*     initEnemy3(&enemy, xPos(à définir), yPos(à définir), xCollisionMax(à définir)) */
 
-    /* enemy3_movement(renderer, texture_2, &src_rect1, &dest_rect1, enemy3, 1); */
-    /* SDL_Surface *surface_2 = IMG_Load("ennemy3.png"); */
-    /* SDL_Texture *texture_2 = SDL_CreateTextureFromSurface(renderer, surface_2); */
-    /* SDL_Rect dest_rect1 = {50, 100, 64, 64}; */
-    /* SDL_Rect src_rect1 = {0, 0, 64, 64}; */
-    /* Enemy3 *enemy3 = malloc(sizeof(Enemy3)); */
-    /* enemy3->image_path = "bubble.png"; */
-    /* enemy3->speed = 25; */
-    /* enemy3->xPosition = 1*PIX_RECT; */
-    /* enemy3->yPosition = 4*PIX_RECT ; */
-    /* enemy3->xCollisionMax = 5*PIX_RECT; */
-    /* enemy3->xCollisionMin = 1*PIX_RECT; */
-
-void enemy3_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *src_rect, SDL_Rect *dst_rect, Enemy3 *enemy, float scale ){
-    static int dx = 1;
+void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, float x_cam){
     Uint32 ticks = SDL_GetTicks();
     Uint32 sprite = (ticks / 400) % 9;
 
-    enemy->xPosition += dx * enemy->speed * 0.1;
+    enemy->xPosition += enemy->dx * enemy->speed * 0.1;
+    SDL_Rect dst_rectFixed = {enemy->dst_rect.x - x_cam, enemy->dst_rect.y, enemy->dst_rect.w, enemy->dst_rect.h};
     if (enemy->xPosition <=  enemy->xCollisionMin || enemy->xPosition >= enemy->xCollisionMax ) {
-        dx *= -1;
+        enemy->dx *= -1;
     }
-    src_rect->x = sprite * 64;
-    dst_rect->x += dx * enemy->speed * 0.1;
-    if (dx == 1){
-        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+    enemy->src_rect.x = sprite * 64;
+    enemy->dst_rect.x += enemy->dx * enemy->speed * 0.1;
+    if (enemy->dx == 1){
+        SDL_RenderCopyEx(renderer, textureEnemy3, &enemy->src_rect, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
     }
-    if (dx == -1){
-        SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
+    if (enemy->dx == -1){
+        SDL_RenderCopy(renderer, textureEnemy3, &enemy->src_rect, &dst_rectFixed);
     }
+}
+
+void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax){
+    enemy->src_rect.x = 0;
+    enemy->src_rect.y = 0;
+    enemy->src_rect.w = 64;
+    enemy->src_rect.h = 64;
+
+    enemy->dst_rect.x = x;
+    enemy->dst_rect.y = y;
+    enemy->dst_rect.w = 64;
+    enemy->dst_rect.h = 64;
+
+    enemy->xPosition = enemy->dst_rect.x;
+    enemy->yPosition = enemy->dst_rect.y;
+    enemy->speed = 10;
+    enemy->xCollisionMax = xCollisionMax;
+    enemy->xCollisionMin = enemy->dst_rect.x;
+    enemy->dx = 1;
+
+
 }
 
 

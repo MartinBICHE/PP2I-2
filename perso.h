@@ -1,5 +1,6 @@
 #ifndef PERSO_H
 #define PERSO_H
+#include "map.h"
 
 
 Perso *create_perso(Map*);
@@ -12,7 +13,7 @@ float max(float, float);
 float min(float, float);
 void updatePerso(Perso*, Map*);
 void jump(Perso*, Map*);
-void destroy_perso(Perso *);
+// void destroy_perso(Perso *);
 
 
 #endif

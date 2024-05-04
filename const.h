@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #ifndef CONST_H
 #define CONST_H
 
@@ -33,6 +34,7 @@ typedef struct _Perso {
     float y; // en nombre de tiles
     float vx; // en nombre de tiles par seconde
     float vy; // en nombre de tiles par seconde
+    int health; //je l'ai rajouté
     SDL_Rect hitbox;
     int jumps; // nombre de sauts restants
     int jump_delay; // délai entre les sauts (25 frames)
