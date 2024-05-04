@@ -39,7 +39,7 @@ void savePosition(const char *filename, Perso *perso){
 void loadPosition(const char *filename, Perso *perso){
     FILE *file = fopen(filename, "rb");
     if (file != NULL){
-        fread(perso, sizeof(Perso), 1, file);
+        if (1 != fread(perso, sizeof(Perso), 1, file));
         fclose(file);
     }
 }

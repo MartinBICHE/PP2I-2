@@ -1,7 +1,6 @@
 #include "menu.h"
 
 Mix_Music* gMusic = NULL;
-
 bool musicPaused = false;
 int spriteIndex = 0;
 int spriteScrollDelay = 300;

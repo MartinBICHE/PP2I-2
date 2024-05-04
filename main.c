@@ -5,11 +5,17 @@
 #include "enemy1.h"
 #include "enemy2.h"
 #include "enemy3.h"
+#include "enemyBat.h"
+#include "enemyFleche.h"
+#include "fight.h"
+#include "fonts.h"
+#include "health.h"
 #include "init.h"
 #include "map.h"
 #include "mapBoss.h"
 #include "perso.h"
 #include "scroll.h"
+#include "textures.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
@@ -53,16 +59,18 @@ SDL_Texture *tileTextures;
 
 
 int main(int argc, char **argv) {
+    SDL_Window *window;
+    SDL_Renderer *renderer;
     initSDL(&window, &renderer);
-
-	const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
-	const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
+    
+	// const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
+	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
 	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
 	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
 	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
-	Map *map = initMap("map1/data.txt");
+    Map *map = initMap("map1");
 	Perso *perso = create_perso(map);
 
 	float x_cam = 0; // cam à gauche au début
@@ -135,13 +143,14 @@ again :
 
 
                 updatePerso(perso, map);
-                x_cam = updateCam(perso->x*PIX_RECT, x_cam);
+                updateCam(perso, map);
+                // x_cam = updateCam(perso->x*PIX_RECT, x_cam);
 
-                if (drawBackground(renderer, bgTextures, 5, x_cam)) {
+                if (drawBackground(renderer, bgTextures, 5, map)) {
                     printf("Error drawing the background");
                     exit(-1);
                 }
-                if (drawMap(renderer, map, "./asset/tileset/ground-1.png", x_cam, tileTextures)) {
+                if (drawMap(renderer, map, "./asset/tileset/ground-1.png", tileTextures)) {
                     printf("Error drawing the map");
                     exit(-1);
                 }
@@ -149,9 +158,8 @@ again :
                 // 	printf("Error drawing the fight");
                 // 	exit(-1);
                 // }
-
                 SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
-                if (display_perso(renderer, perso, x_cam)) {
+                if (display_perso(renderer, perso, map)) {
                     printf("Error drawing the perso");
                     exit(-1);
                 }
@@ -175,6 +183,7 @@ again :
     }
     quitSDL(&renderer, &window, perso, map);
     closeSDL_mixer();
+    free(playerInFight); // à bouger ultérieurment dans init.c
     atexit(SDL_Quit);
     return 0;
 }

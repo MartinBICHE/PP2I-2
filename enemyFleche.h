@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
+#include "perso.h"
 
 
 enum EnemyFlecheState{
@@ -19,10 +20,13 @@ struct _EnemyFlecheData{
     SDL_Rect dst_rect;
     Uint32 pauseStartBits;
     Uint32 pauseStart;
+    Uint32 pauseAttack;
+    int attackCounter;
 
 };
 typedef struct _EnemyFlecheData EnemyFlecheData;
-void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData);
 void initEnemyFleche(EnemyFlecheData *enemyFlecheData, int x, int y);
+void flecheAttack(EnemyFlecheData *enemyFlecheData, Perso *perso, Map *map);
+void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData, float x_cam);
 
 #endif

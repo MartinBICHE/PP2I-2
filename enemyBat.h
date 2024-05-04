@@ -1,5 +1,5 @@
-#ifndef enemyBat_h
-#define enemyBat_h
+#ifndef enemybat_h
+#define enemybat_h
 #include "enemyFleche.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -19,7 +19,7 @@ struct _EnemyBatData{
     int xMin;
 };
 typedef struct _EnemyBatData EnemyBatData;
-void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData);
 void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax);
+void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, float x_cam);
 
 #endif
