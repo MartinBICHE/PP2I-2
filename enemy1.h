@@ -28,6 +28,6 @@ struct _EnemyStateData{
 typedef struct _EnemyStateData EnemyStateData;
 
 void initEnemy1(int x, int y, EnemyStateData *enemyStateData);
-void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, float x_cam);
-void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso);
+void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, Map *map);
+void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map);
 #endif

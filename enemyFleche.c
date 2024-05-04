@@ -10,8 +10,7 @@
 /* EnemyFlecheData enemyFlecheData; */
 /* initEnemyFleche(&enemyFlecheData, x(à définir), y(à définir)); */
 
-void enemyFleche_mouvement(SDL_Renderer *renderer,
-                           EnemyFlecheData *enemyFlecheData, float x_cam) {
+void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData, float x_cam) {
   int interval = 200;
   int pauseInterval = 3000;
 
@@ -72,11 +71,11 @@ void initEnemyFleche(EnemyFlecheData *enemyFlecheData, int x, int y) {
   enemyFlecheData->attackCounter = 0;
 }
 
-void flecheAttack(EnemyFlecheData *enemyFlecheData, Perso *perso) {
+void flecheAttack(EnemyFlecheData *enemyFlecheData, Perso *perso, Map *map) {
   int pad = 49;
   int intervalAttack = 1000;
-  if ((perso->x * PIX_RECT - pad <= enemyFlecheData->dst_rect.x + 3 * 64) &&
-      (perso->x * PIX_RECT - pad >= enemyFlecheData->dst_rect.x)) {
+  if ((perso->x * map->pix_rect - pad <= enemyFlecheData->dst_rect.x + 3 * 64) &&
+      (perso->x * map->pix_rect - pad >= enemyFlecheData->dst_rect.x)) {
       if (enemyFlecheData->state != FLECHE_PAUSE_BOTTOM && perso->health > 0){
               if (SDL_GetTicks() - enemyFlecheData->pauseAttack >= intervalAttack){
                   perso->health -= 1;
