@@ -100,18 +100,6 @@ int main(int argc, char **argv) {
             exit(-1);
         }
 
-        // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); //
-        // !!! seulement pour les tests de caméra (à changer) SDL_Rect rect1 = {.x =
-        // x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20};
-        // // !!! seulement pour les tests de caméra (à changer)
-        // SDL_RenderDrawRect(renderer, &rect1); // !!! seulement pour les tests de
-        // caméra (à changer) SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g,
-        // BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
-        // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9,
-        // .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
-        // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de
-        // caméra (à changer)
-
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();
@@ -122,6 +110,7 @@ int main(int argc, char **argv) {
 
 
     quitSDL(&renderer, &window, perso, map);
+    free(playerInFight); // à bouger ultérieurment dans init.c
     atexit(SDL_Quit);
     return 0;
 }
