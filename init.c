@@ -6,6 +6,7 @@
 #include "perso.h"
 #include "textures.h"
 #include "fonts.h"
+#include "music.h"
 #include <SDL2/SDL_mixer.h>
 
 void initSDL(SDL_Window **window, SDL_Renderer **renderer){
@@ -30,15 +31,19 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
        exit(-1);
     }
-
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
     TTF_Init();
+    load_music();
 
     loadTextures(*renderer);
     loadFonts();
 
 }
 
-void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map){
+void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map, Perso *playerInFight){
     SDL_DestroyRenderer(*renderer);
     freeTextures();
     freeFonts();
@@ -46,4 +51,8 @@ void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *m
     free(perso);
     SDL_DestroyWindow(*window);
     destroyMap(map);
+    free_music();
+    Mix_HaltMusic();
+    Mix_CloseAudio();
+    free(playerInFight);
 }

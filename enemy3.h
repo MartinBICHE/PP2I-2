@@ -7,7 +7,14 @@
 #include "map.h"
 #include "const.h"
 
+enum Enemy3State{
+    RIGHT,
+    LEFT,
+    ATTACK
+};
+
 struct _Enemy3{
+    enum Enemy3State state;
     float xPosition;
     float yPosition;
     int xCollisionMax;
@@ -16,9 +23,12 @@ struct _Enemy3{
     int dx;
     SDL_Rect src_rect;
     SDL_Rect dst_rect;
+    Uint32 pauseAttack;
+    Uint32 pauseMusic;
 };
 typedef struct _Enemy3 Enemy3;
 void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax);
 
-void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, float x_cam);
+void enemy3Attack(Enemy3 *enemy, Perso *perso, Map *map);
+void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, Map *map);
 #endif

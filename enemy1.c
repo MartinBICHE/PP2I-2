@@ -12,6 +12,7 @@
 #include "textures.h"
 #include "main.h"
 #include "enemy1.h"
+#include "music.h"
 
 /* s'utilise avec : */
 /* enemy1_movement(renderer, &enemyState, x_cam) */
@@ -21,13 +22,14 @@
 
 
 /* pour l'attaque; */
-/* enemy1Attack(&enemyStateData, perso); */
+/* enemy1Attack(&enemyStateData, perso, map); */
 /* renderStatusHealth(renderer, perso); pour voir l'impact sur la santé */
 
 
 void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, Map *map) {
     int speed = 64;
-    int interval = 1000;
+    int interval = 500;
+    int pauseInterval = 3000;
     Uint32 ticks = SDL_GetTicks();
     Uint32 sprite = (ticks/500) % 10;
     switch(enemyStateData->state){
@@ -73,7 +75,7 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, Map
             }
                 break;
             case PAUSE_BOTTOM:
-                if (SDL_GetTicks() - enemyStateData->pauseStart >= interval){
+                if (SDL_GetTicks() - enemyStateData->pauseStart >= pauseInterval){
                     enemyStateData->state = MOVING_UP;
                 }
                 break;
@@ -97,6 +99,7 @@ void initEnemy1(int x, int y, EnemyStateData *enemyStateData){
     enemyStateData->pauseStart = 0;
     enemyStateData->pauseStartBits = 0;
     enemyStateData->pauseAttack = 0;
+    enemyStateData->pauseMusic = 0;
 
 }
 
@@ -104,13 +107,23 @@ void initEnemy1(int x, int y, EnemyStateData *enemyStateData){
 void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map){
     int intervalAttack = 1000;
     int pad = 50;
+    /* Mix_VolumeMusic(MIX_MAX_VOLUME / 3); */
+    int spriteLength = 64;
+    float borneInf = enemyStateData->dst_rect.x;
+    float borneSup = borneInf + spriteLength;
+    float persoPositionX = perso->x * map->pix_rect;
 
-    if ((perso->x * map->pix_rect + pad >= enemyStateData->dst_rect.x) && (perso->x * map->pix_rect - pad <= enemyStateData->dst_rect.x + 64)){
+    if (persoPositionX >= borneInf && persoPositionX <= borneSup){
         if (enemyStateData->state != PAUSE_BOTTOM && perso->health > 0){
             if (SDL_GetTicks() - enemyStateData->pauseAttack >= intervalAttack){
                 perso->health -= 1;
                 enemyStateData->pauseAttack = SDL_GetTicks();
+                Mix_PlayMusic(musicEnemyFleche, -1);
             }
         }
+    }
+    if (SDL_GetTicks() - enemyStateData->pauseMusic >= intervalAttack){
+        Mix_HaltMusic();
+        enemyStateData->pauseMusic = SDL_GetTicks();
     }
 }

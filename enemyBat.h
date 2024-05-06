@@ -7,7 +7,8 @@
 
 enum EnemyBatState{
     BAT_MOVING_RIGHT,
-    BAT_MOVING_LEFT
+    BAT_MOVING_LEFT,
+    BAT_ATTACK
 };
 
 struct _EnemyBatData{
@@ -17,9 +18,12 @@ struct _EnemyBatData{
     Uint32 pauseStartBits;
     int xMax;
     int xMin;
+    Uint32 pauseAttack;
+    Uint32 pauseMusic;
 };
 typedef struct _EnemyBatData EnemyBatData;
 void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax);
-void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, float x_cam);
+void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map *map);
+void batAttack(EnemyBatData *enemyBatData, Perso *perso, Map *map);
 
 #endif

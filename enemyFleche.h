@@ -22,11 +22,12 @@ struct _EnemyFlecheData{
     Uint32 pauseStart;
     Uint32 pauseAttack;
     int attackCounter;
+    Uint32 pauseMusic;
 
 };
 typedef struct _EnemyFlecheData EnemyFlecheData;
 void initEnemyFleche(EnemyFlecheData *enemyFlecheData, int x, int y);
 void flecheAttack(EnemyFlecheData *enemyFlecheData, Perso *perso, Map *map);
-void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData, float x_cam);
+void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData, Map *map);
 
 #endif

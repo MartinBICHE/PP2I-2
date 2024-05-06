@@ -1,5 +1,6 @@
 #ifndef MENU_H
 #define MENU_H
+#include <stdbool.h>
 
 // Déclaration des fonctions pour le menu
 bool initLoadingWindow();

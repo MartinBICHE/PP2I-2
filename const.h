@@ -40,5 +40,7 @@ typedef struct _Perso {
     int jump_delay; // délai entre les sauts (25 frames)
 } Perso;
 
+extern SDL_Color BLACK;
+
 
 #endif
