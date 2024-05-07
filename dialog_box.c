@@ -89,7 +89,7 @@ char *replaceFirstWordWithSpaces(const char *str) {
 }
 
 void render_text(SDL_Renderer *renderer, const char *text,
-                 SDL_Color color, DialogBoxData *dialogBoxData){
+                 SDL_Color color, DialogBoxData *dialogBoxData, float x_cam){
   int textLength = strlen(text);
   int delay = 90;
   const int pad = 20;
@@ -106,7 +106,9 @@ void render_text(SDL_Renderer *renderer, const char *text,
   SDL_Rect dstRectBox = {dialogBoxData->dst_rect.x - pad,
                          dialogBoxData->dst_rect.y - pad,
                          textWidthInit + 2 * pad, textHeightInit + 2 * pad};
-  SDL_RenderCopy(renderer, texturePapirus, NULL, &dstRectBox);
+  SDL_Rect dstRectDisplay = {dstRectBox.x - x_cam, dstRectBox.y, dstRectBox.w, dstRectBox.h};
+  /* SDL_RenderCopy(renderer, texturePapirus, NULL, &dstRectBox); */
+  SDL_RenderCopy(renderer, texturePapirus, NULL, &dstRectDisplay);
   SDL_FreeSurface(surfaceText);
   SDL_DestroyTexture(textureText);
 
@@ -134,7 +136,11 @@ void render_text(SDL_Renderer *renderer, const char *text,
       SDL_QueryTexture(texture, &format, &access, &textWidth, &textHeight);
       dialogBoxData->dst_rect.h = textHeight;
       dialogBoxData->dst_rect.w = textWidth;
-      SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect);
+      SDL_Rect dst_rectFixed = {dialogBoxData->dst_rect.x - x_cam, dialogBoxData->dst_rect.y, dialogBoxData->dst_rect.w, dialogBoxData->dst_rect.h};
+      SDL_RenderCopy(renderer, texture, NULL, &dst_rectFixed);
+      /* SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect); */
+      SDL_FreeSurface(surfaceName);
+      SDL_DestroyTexture(texture);
     }
     SDL_Surface *surface =
         TTF_RenderText_Blended_Wrapped(currentFont, currentText, color, 200);
@@ -145,7 +151,9 @@ void render_text(SDL_Renderer *renderer, const char *text,
     SDL_QueryTexture(texture, &format, &access, &textWidth, &textHeight);
     dialogBoxData->dst_rect.h = textHeight;
     dialogBoxData->dst_rect.w = textWidth;
-    SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect);
+    SDL_Rect dst_rectFixed = {dialogBoxData->dst_rect.x - x_cam, dialogBoxData->dst_rect.y, dialogBoxData->dst_rect.w, dialogBoxData->dst_rect.h};
+    SDL_RenderCopy(renderer, texture, NULL, &dst_rectFixed);
+    /* SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect); */
     SDL_DestroyTexture(texture);
     if (SDL_GetTicks() - dialogBoxData->delayTimer >= delay) {
       dialogBoxData->currentCharIndex++;
@@ -181,8 +189,12 @@ void render_text(SDL_Renderer *renderer, const char *text,
     dialogBoxData->dst_rect.w = textWidth;
     dst_rectFirstWord.h = textHeightFirstWord;
     dst_rectFirstWord.w = textWidthFirstWord;
-    SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect);
-    SDL_RenderCopy(renderer, textureFirstWord, NULL, &dst_rectFirstWord);
+    SDL_Rect dst_rectFixed = {dialogBoxData->dst_rect.x - x_cam, dialogBoxData->dst_rect.y, dialogBoxData->dst_rect.w, dialogBoxData->dst_rect.h};
+    SDL_RenderCopy(renderer, texture, NULL, &dst_rectFixed);
+    /* SDL_RenderCopy(renderer, texture, NULL, &dialogBoxData->dst_rect); */
+    /* SDL_RenderCopy(renderer, texture, NULL, &dst_rectFirstWord); */
+    SDL_Rect dst_rectFixedName = {dst_rectFirstWord.x - x_cam, dst_rectFirstWord.y, dst_rectFirstWord.w, dst_rectFirstWord.h};
+    SDL_RenderCopy(renderer, textureFirstWord, NULL, &dst_rectFixedName);
     SDL_DestroyTexture(texture);
     SDL_DestroyTexture(textureFirstWord);
   }
@@ -198,5 +210,3 @@ void initPapirus(DialogBoxData *dialogBoxData, int x, int y) {
   dialogBoxData->delayTimer = 0;
   dialogBoxData->counter = 0;
 }
-
-

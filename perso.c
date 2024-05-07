@@ -131,7 +131,7 @@ float min(float a, float b) {
 }
 
 
-void updatePerso(Perso *perso, Map *map) {
+void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData) { // Nouveau : paramètre enemyStateData
     perso->hitbox = (SDL_Rect){.x = perso->x*PIX_RECT - PERSO_WIDTH/2, .y = perso->y*PIX_RECT - PERSO_HEIGHT/2, .w = PERSO_WIDTH, .h = PERSO_HEIGHT};
     int i = floor(perso->y);
     int j = floor(perso->x);
@@ -154,6 +154,21 @@ void updatePerso(Perso *perso, Map *map) {
     }
     perso->y += perso->vy*DT;
     perso->x += perso->vx*DT;
+    // Nouvel ajout
+    // Vérifier si l'ennemi est dans un état permettant au personnage de le traverser
+    if (enemyStateData->state != PAUSE_BOTTOM) {
+        SDL_Rect persoHitbox = perso->hitbox;
+        // Calculer la hitbox de l'ennemi
+        SDL_Rect enemyHitbox = enemyStateData->dst_rect;
+        // Vérifier s'il y a intersection entre les hitboxes
+        SDL_Rect intersection;
+        if (SDL_IntersectRect(&persoHitbox, &enemyHitbox, &intersection)) {
+            // Si une intersection est détectée et que l'ennemi n'est pas en état PAUSE_BOTTOM,
+            // le personnage ne peut pas traverser l'ennemi
+            return; // Sortir de la fonction updatePerso sans mettre à jour la position du personnage
+        }
+    }
+    // Fin nouvel ajout
 }
 
 

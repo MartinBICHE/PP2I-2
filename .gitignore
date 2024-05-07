@@ -2,3 +2,5 @@ main
 .vscode
 *.o
 demo
+.tags
+.ccls-cache

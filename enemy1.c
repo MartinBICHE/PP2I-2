@@ -14,12 +14,16 @@
 #include "enemy1.h"
 
 /* s'utilise avec : */
-/* enemy1_movement(renderer, &enemyState) */
+/* enemy1_movement(renderer, &enemyState, x_cam) */
 /* et */ 
 /* EnemyStateData enemyState; */
 /* initEnemy1(xPos(à définir), yPost(à définir), &enemyState); */
+/* pour l'attaque; */
+/* enemy1Attack(&enemyStateData, perso); */
+/* renderStatusHealth(renderer, perso); pour voir l'impact sur la santé */
 
-void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData){
+
+void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, float x_cam){
     int speed = 64;
     int interval = 1000;
     Uint32 ticks = SDL_GetTicks();
@@ -40,7 +44,6 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData){
                 break;
         case ANIMATION_START:
             enemyStateData->src_rect.x += 64;
-            /* *i = (*i+1); */
             enemyStateData->src_rect.x = sprite * 64;
 
             if (sprite == 9){
@@ -73,9 +76,11 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData){
                 }
                 break;
     } 
-    SDL_RenderCopy(renderer, textureEnemy1, &enemyStateData->src_rect, &enemyStateData->dst_rect);
+    SDL_Rect dst_rectFixed = {
+        enemyStateData->dst_rect.x - x_cam, enemyStateData->dst_rect.y, enemyStateData->dst_rect.w, enemyStateData->dst_rect.h};
+    SDL_RenderCopy(renderer, textureEnemy1, &enemyStateData->src_rect, &dst_rectFixed);
+    }
 
-}
 
 
 void initEnemy1(int x, int y, EnemyStateData *enemyStateData){
@@ -89,9 +94,20 @@ void initEnemy1(int x, int y, EnemyStateData *enemyStateData){
     enemyStateData->dst_rect.h = 64;
     enemyStateData->pauseStart = 0;
     enemyStateData->pauseStartBits = 0;
+    enemyStateData->pauseAttack = 0;
+
 }
 
 
-
-
-
+void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso){
+    int intervalAttack = 1000;
+    int pad = 50;
+    if ((perso->x * PIX_RECT + pad >= enemyStateData->dst_rect.x) && (perso->x * PIX_RECT - pad <= enemyStateData->dst_rect.x + 64)){
+        if (enemyStateData->state != PAUSE_BOTTOM && perso->health > 0){
+            if (SDL_GetTicks() - enemyStateData->pauseAttack >= intervalAttack){
+                perso->health -= 1;
+                enemyStateData->pauseAttack = SDL_GetTicks();
+            }
+        }
+    }
+}
