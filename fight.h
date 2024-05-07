@@ -21,8 +21,8 @@ int showHitPoint(SDL_Renderer*, AttackFight*);
 
 /* Fonction de pattern d'attaque */
 
-int threeRowAttacks(SDL_Renderer*, PersoFight*, AttackFight*, AttackFight*, AttackFight*,int);
-int threeTimedAttack(SDL_Renderer*, PersoFight*, AttackFight*, AttackFight*, AttackFight*, int);
+int threeRowAttacks(SDL_Renderer*, PersoFight*, AttackFight*, AttackFight*, AttackFight*, bossFight*);
+int threeTimedAttack(SDL_Renderer*, PersoFight*, AttackFight*, AttackFight*, AttackFight*, bossFight*);
 
 /* Implémentation des combats de boss */
 

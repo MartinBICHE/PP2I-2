@@ -110,11 +110,8 @@ void damageBoss(AttackFight *hitPoint, PersoFight *player, bossFight *boss) {
 
 void attackTheBoss(SDL_Renderer *renderer, AttackFight *hitPoint, bossFight *boss, PersoFight *player) {
     if (hitPoint -> hitPoint == 1) {
-        if (hitPoint->delay > 0) {
-            showHitPoint(renderer, hitPoint);
-            damageBoss(hitPoint, player, boss);
-            hitPoint->delay -= boss->speed;
-        };
+        showHitPoint(renderer, hitPoint);
+        damageBoss(hitPoint, player, boss);
     }
 }
 
@@ -161,7 +158,7 @@ int showHitPoint(SDL_Renderer *renderer, AttackFight *attack) {
 
 /* Fonction de pattern d'attaque */
 
-int threeTimedAttack(SDL_Renderer *renderer, PersoFight *player, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, int speed) {
+int threeTimedAttack(SDL_Renderer *renderer, PersoFight *player, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, bossFight *boss) {
     if (attack1->delay > 0 && attack2->delay > 0 && attack3->delay > 0) {
         showAttack(renderer, attack1);
         showAttack(renderer, attack2);
@@ -169,29 +166,38 @@ int threeTimedAttack(SDL_Renderer *renderer, PersoFight *player, AttackFight *at
         takeDamage(attack1, player);
         takeDamage(attack2, player);
         takeDamage(attack3, player);
-        attack1->delay -= speed;
-        attack2->delay -= speed;
-        attack3->delay -= speed;
+        attack1->delay -= boss -> speed;
+        attack2->delay -= boss -> speed;
+        attack3->delay -= boss -> speed;
+    } else if (attack1->delay == 0 && attack2->delay == 0 && attack3->delay == 0) {
+        resetAttack(attack1, boss -> delay);
+        resetAttack(attack2, boss -> delay);
+        resetAttack(attack3, boss -> delay);
     }
     return 0;
 }
 
 
-int threeRowAttacks(SDL_Renderer *renderer, PersoFight *player, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, int speed) {
+int threeRowAttacks(SDL_Renderer *renderer, PersoFight *player, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, bossFight *boss) {
     if (attack1->delay > 0) {
         showAttack(renderer, attack1);
         takeDamage(attack1, player);
-        attack1->delay -= speed;
+        attack1->delay -= boss -> speed;
     }
     if (attack2->delay > 0 && attack1->delay == 0) {
         showAttack(renderer, attack2);
         takeDamage(attack2, player);
-        attack2->delay -= speed;
+        attack2->delay -= boss -> speed;
     }
     if (attack3->delay > 0 && attack2->delay == 0 && attack1->delay == 0) {
         showAttack(renderer, attack3);
         takeDamage(attack3, player);
-        attack3->delay -= speed;
+        attack3->delay -=boss ->  speed;
+    }
+    if (attack1->delay == 0 && attack2->delay == 0 && attack3->delay == 0) {
+        resetAttack(attack1, boss -> delay);
+        resetAttack(attack2, boss -> delay);
+        resetAttack(attack3, boss -> delay);
     }
     return 0;
 }
@@ -204,57 +210,33 @@ int threeRowAttacks(SDL_Renderer *renderer, PersoFight *player, AttackFight *att
 int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, AttackFight *nullAttack, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, AttackFight *attack4, AttackFight *attack5, AttackFight *attack6) {
     int attackDelay1Phase1 = 3*boss->attack1Delay;
     int attackDelay2Phase1 = 3*boss->attack2Delay;
-    int attackDelay3Phase1 = 3*boss->attack3Delay;
+    int attackDelay3Phase1 = boss->attack3Delay / 6;
     int attackDelay1Phase2 = 3*boss->attack1Delay;
     int attackDelay2Phase2 = 3*boss->attack2Delay;
-    int attackDelay3Phase2 = 3*boss->attack3Delay;
-    int attackDelay1Phase3 = 3*boss->attack1Delay;
-    int attackDelay2Phase3 = 3*boss->attack2Delay;
-    int attackDelay3Phase3 = 3*boss->attack3Delay;
+    int attackDelay3Phase2 = boss->attack3Delay / 6;
+    int attackDelay1Phase3 = boss->attack1Delay / 6;
+    int attackDelay2Phase3 = boss->attack2Delay / 6;
+    int attackDelay3Phase3 = boss->attack3Delay / 6;
     
     if (boss->phase == 1) {
         if (boss->health > 6) {
             if (attackDelay1Phase1 > 0) {
-                threeRowAttacks(renderer, player, attack1, attack2, attack3, boss->speed);
+                threeRowAttacks(renderer, player, attack1, attack2, attack3, boss);
                 boss -> attack1Delay -= boss->speed;
                 if (attack6 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack6, boss, player);
                 }
-                if (attack1 -> delay == 0 && attack2 -> delay == 0 && attack3 -> delay == 0) {
-                    resetAttack(attack1, boss->delay);
-                    resetAttack(attack2, boss->delay);
-                    resetAttack(attack3, boss->delay);
-                }
-                if (attack6 -> delay == 0) {
-                    resetAttack(attack6, boss->delay);
-                }
             } else if (attackDelay2Phase1 > 0) {
-                threeRowAttacks(renderer, player, attack4, attack5, attack6, boss->speed); 
+                threeRowAttacks(renderer, player, attack4, attack5, attack6, boss); 
                 boss -> attack2Delay -= boss->speed;               
                 if (attack3 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack3, boss, player);
                 }
-                if (attack4 -> delay == 0 && attack5 -> delay == 0 && attack6 -> delay == 0) {
-                    resetAttack(attack4, boss->delay);
-                    resetAttack(attack5, boss->delay);
-                    resetAttack(attack6, boss->delay);
-                }
-                if (attack3 -> delay == 0) {
-                    resetAttack(attack3, boss->delay);
-                }
-            } else if (attackDelay3Phase3 > 0) {
-                threeTimedAttack(renderer, player, attack1, attack2, attack3, boss->speed);
+            } else if (attackDelay3Phase1 > 0) {
+                threeTimedAttack(renderer, player, attack1, attack2, attack3, boss);
                 boss -> attack3Delay -= boss->speed;
                 if (attack5 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack5, boss, player);
-                }
-                if (attack1 -> delay == 0 && attack2 -> delay == 0 && attack3 -> delay == 0) {
-                    resetAttack(attack1, boss->delay);
-                    resetAttack(attack2, boss->delay);
-                    resetAttack(attack3, boss->delay);
-                }
-                if (attack5 -> delay == 0) {
-                    resetAttack(attack5, boss->delay);
                 }
             } else if (attackDelay1Phase1 == 0 && attackDelay2Phase1 == 0 && attackDelay3Phase1 == 0) {
                 boss -> attack1Delay = 3*boss->delay;
@@ -262,13 +244,14 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
                 boss -> attack3Delay = 3*boss->delay;
                 attackDelay1Phase1 = 3*boss-> attack1Delay;
                 attackDelay2Phase1 = 3*boss-> attack2Delay;
-                attackDelay3Phase1 = 3*boss-> attack3Delay;
+                attackDelay3Phase1 = boss-> attack3Delay / 3;
                 resetAttack(attack1, boss->delay);
                 resetAttack(attack2, boss->delay);
                 resetAttack(attack3, boss->delay);
                 resetAttack(attack4, boss->delay);
                 resetAttack(attack5, boss->delay);
                 resetAttack(attack6, boss->delay);
+                resetAttack(nullAttack, boss->delay);
             }
         } else {
             attack6->hitPoint = 1;
@@ -276,66 +259,40 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
             attack5->hitPoint = 1;
             boss -> phase = 2;
         }
-        printf("attack1Delay: %d\n", boss->attack1Delay);
-        printf("attack2Delay: %d\n", boss->attack2Delay);
-        printf("attack3Delay: %d\n", boss->attack3Delay);
-        printf("attack1DelayPhase1: %d\n", attackDelay1Phase1);
-        printf("attack2DelayPhase1: %d\n", attackDelay2Phase1);
-        printf("attack3DelayPhase1: %d\n", attackDelay3Phase1);
-        printf("attack1: %d\n", attack1->delay);
-        printf("attack2: %d\n", attack2->delay);
-        printf("attack3: %d\n", attack3->delay);
-        printf("attack4: %d\n", attack4->delay);
-        printf("attack5: %d\n", attack5->delay);
-        printf("attack6: %d\n", attack6->delay);
     } else if (boss->phase == 2) {
         if (boss->health > 3) {
             if (attackDelay1Phase2 > 0) {
-                threeRowAttacks(renderer, player, attack1, attack5, attack3, boss->speed);
+                threeRowAttacks(renderer, player, attack1, attack5, attack3, boss);
                 boss -> attack1Delay -= boss->speed;
                 if (attack2 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack2, boss, player);
                 }
-                if (attack1 -> delay == 0 && attack5 -> delay == 0 && attack3 -> delay == 0) {
-                    resetAttack(attack1, boss->delay);
-                    resetAttack(attack5, boss->delay);
-                    resetAttack(attack3, boss->delay);
-                }
-                if (attack2 -> delay == 0) {
-                    resetAttack(attack2, boss->delay);
-                }
             } else if (attackDelay2Phase2 > 0) {
-                threeRowAttacks(renderer, player, attack4, attack2, attack6, boss->speed);
+                threeRowAttacks(renderer, player, attack4, attack2, attack6, boss);
                 boss -> attack2Delay -= boss->speed;
                 if (attack1 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack1, boss, player);
                 }
-                if (attack4 -> delay == 0 && attack2 -> delay == 0 && attack6 -> delay == 0) {
-                    resetAttack(attack4, boss->delay);
-                    resetAttack(attack2, boss->delay);
-                    resetAttack(attack6, boss->delay);
-                }
-                if (attack1 -> delay == 0) {
-                    resetAttack(attack1, boss->delay);
-                }
             } else if (attackDelay3Phase2 > 0) {
-                threeTimedAttack(renderer, player, attack4, attack5, attack6, boss->speed);
+                threeTimedAttack(renderer, player, attack4, attack5, attack6, boss);
                 boss -> attack3Delay -= boss->speed;
                 if (attack3 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack3, boss, player);
                 }
-                if (attack4 -> delay == 0 && attack5 -> delay == 0 && attack6 -> delay == 0) {
-                    resetAttack(attack4, boss->delay);
-                    resetAttack(attack5, boss->delay);
-                    resetAttack(attack6, boss->delay);
-                }
-                if (attack3 -> delay == 0) {
-                    resetAttack(attack3, boss->delay);
-                }
             } else {
-                attackDelay1Phase1 = 3*boss->attack1Delay;
-                attackDelay2Phase1 = 3*boss->attack2Delay;
-                attackDelay3Phase1 = 3*boss->attack3Delay;
+                boss -> attack1Delay = 3*boss->delay;
+                boss -> attack2Delay = 3*boss->delay;
+                boss -> attack3Delay = 3*boss->delay;
+                attackDelay1Phase2 = 3*boss-> attack1Delay;
+                attackDelay2Phase2 = 3*boss-> attack2Delay;
+                attackDelay3Phase2 = boss-> attack3Delay / 3;
+                resetAttack(attack1, boss->delay);
+                resetAttack(attack2, boss->delay);
+                resetAttack(attack3, boss->delay);
+                resetAttack(attack4, boss->delay);
+                resetAttack(attack5, boss->delay);
+                resetAttack(attack6, boss->delay);
+                resetAttack(nullAttack, boss->delay);
             }
         } else {
             attack1->hitPoint = 1;
@@ -346,57 +303,40 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
     } else if (boss->phase == 3) {
         if (boss->health > 0) {
             if (attackDelay1Phase3 > 0) {
-                threeTimedAttack(renderer, player, attack1, nullAttack, attack4, boss->speed);
-                threeTimedAttack(renderer, player, attack3, nullAttack, attack6, boss->speed);
+                threeTimedAttack(renderer, player, attack1, nullAttack, attack4, boss);
+                threeTimedAttack(renderer, player, attack3, nullAttack, attack6, boss);
                 boss -> attack1Delay -= boss->speed;
                 if (attack5 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack5, boss, player);
                 }
-                if (attack1 -> delay == 0 && attack4 -> delay == 0 && attack6 -> delay == 0 && attack3 -> delay == 0 && attack6 -> delay == 0) {
-                    resetAttack(attack1, boss->delay);
-                    resetAttack(attack4, boss->delay);
-                    resetAttack(attack6, boss->delay);
-                    resetAttack(attack3, boss->delay);
-                }
-                if (attack5 -> delay == 0) {
-                    resetAttack(attack5, boss->delay);
-                }
             } else if (attackDelay2Phase3 > 0) {
-                threeTimedAttack(renderer, player, attack5, nullAttack, attack3, boss->speed);
-                threeTimedAttack(renderer, player, attack2, nullAttack, attack6, boss->speed);
+                threeTimedAttack(renderer, player, attack5, nullAttack, attack3, boss);
+                threeTimedAttack(renderer, player, attack2, nullAttack, attack6, boss);
                 boss -> attack2Delay -= boss->speed;
                 if (attack4 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack4, boss, player);
                 }
-                if (attack5 -> delay == 0 && attack3 -> delay == 0 && attack6 -> delay == 0 && attack2 -> delay == 0 && attack4 -> delay == 0) {
-                    resetAttack(attack5, boss->delay);
-                    resetAttack(attack3, boss->delay);
-                    resetAttack(attack6, boss->delay);
-                    resetAttack(attack2, boss->delay);
-                }
-                if (attack4 -> delay == 0) {
-                    resetAttack(attack4, boss->delay);
-                }
             } else if (attackDelay3Phase3 > 0) {
-                threeTimedAttack(renderer, player, attack5, nullAttack, attack4, boss->speed);
-                threeTimedAttack(renderer, player, attack2, nullAttack, attack1, boss->speed);
+                threeTimedAttack(renderer, player, attack5, nullAttack, attack4, boss);
+                threeTimedAttack(renderer, player, attack2, nullAttack, attack1, boss);
                 boss -> attack3Delay -= boss->speed;
                 if (attack6 -> hitPoint == 1) {
                     attackTheBoss(renderer, attack6, boss, player);
                 }
-                if (attack5 -> delay == 0 && attack4 -> delay == 0 && attack1 -> delay == 0 && attack2 -> delay == 0) {
-                    resetAttack(attack5, boss->delay);
-                    resetAttack(attack4, boss->delay);
-                    resetAttack(attack1, boss->delay);
-                    resetAttack(attack2, boss->delay);
-                }
-                if (attack6 -> delay == 0) {
-                    resetAttack(attack6, boss->delay);
-                }
             } else {
-                attackDelay1Phase1 = 3*boss->attack1Delay;
-                attackDelay2Phase1 = 3*boss->attack2Delay;
-                attackDelay3Phase1 = 3*boss->attack3Delay;
+                boss -> attack1Delay = 3*boss->delay;
+                boss -> attack2Delay = 3*boss->delay;
+                boss -> attack3Delay = 3*boss->delay;
+                attackDelay1Phase3 = 3*boss-> attack1Delay;
+                attackDelay2Phase3 = 3*boss-> attack2Delay;
+                attackDelay3Phase3 = boss-> attack3Delay / 3;
+                resetAttack(attack1, boss->delay);
+                resetAttack(attack2, boss->delay);
+                resetAttack(attack3, boss->delay);
+                resetAttack(attack4, boss->delay);
+                resetAttack(attack5, boss->delay);
+                resetAttack(attack6, boss->delay);
+                resetAttack(nullAttack, boss->delay);
             }
         } else {
             attack4->hitPoint = 1;
@@ -404,6 +344,19 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
             attack6->hitPoint = 1;
             boss -> phase = 0;
         }
+        printf("Attack 1 boss delay: %d\n", boss->attack1Delay);
+        printf("Attack 2 boss delay: %d\n", boss->attack2Delay);
+        printf("Attack 3 boss delay: %d\n", boss->attack3Delay);
+        printf("Attack 1 : %d\n", attackDelay1Phase3);
+        printf("Attack 2 : %d\n", attackDelay2Phase3);
+        printf("Attack 3 : %d\n", attackDelay3Phase3);
+        printf("Attack delay 1 : %d\n", attack1->delay);
+        printf("Attack delay 2 : %d\n", attack2->delay);
+        printf("Attack delay 3 : %d\n", attack3->delay);
+        printf("Attack delay 4 : %d\n", attack4->delay);
+        printf("Attack delay 5 : %d\n", attack5->delay);
+        printf("Attack delay 6 : %d\n", attack6->delay);
+
     } else if (boss->phase == 0) {
         if (boss->health == 0) {
             printf("You won\n");
