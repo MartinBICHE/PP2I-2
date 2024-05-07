@@ -138,9 +138,9 @@ int main(int argc, char **argv) {
 		// SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
     	// SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
-	// printf("vie = %d\n", playerInFight->health);
-	// printf("vie du boss = %d\n", boss ->health);
-	// printf("phase = %d\n", boss->phase);
+	printf("vie = %d\n", playerInFight->health);
+	printf("vie du boss = %d\n", boss ->health);
+	printf("phase = %d\n", boss->phase);
 
     SDL_RenderPresent(renderer);
 

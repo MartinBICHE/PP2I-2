@@ -142,7 +142,6 @@ void resetAttack(AttackFight *attack, int delay) {
 
 /* Fonction d'affichage d'attaque */
 
-
 int showAttack(SDL_Renderer *renderer, AttackFight *attack) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_Rect rect = { attack->x, attack->y, TIERWIDTH, 2*QUARTERHEIGHT};
@@ -257,11 +256,19 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
                 if (attack5 -> delay == 0) {
                     resetAttack(attack5, boss->delay);
                 }
-            }
-            if (attackDelay1Phase1 == 0 && attackDelay2Phase1 == 0 && attackDelay3Phase1 == 0) {
-                attackDelay1Phase1 = 3*boss->attack1Delay;
-                attackDelay2Phase1 = 3*boss->attack2Delay;
-                attackDelay3Phase1 = 3*boss->attack3Delay;
+            } else if (attackDelay1Phase1 == 0 && attackDelay2Phase1 == 0 && attackDelay3Phase1 == 0) {
+                boss -> attack1Delay = 3*boss->delay;
+                boss -> attack2Delay = 3*boss->delay;
+                boss -> attack3Delay = 3*boss->delay;
+                attackDelay1Phase1 = 3*boss-> attack1Delay;
+                attackDelay2Phase1 = 3*boss-> attack2Delay;
+                attackDelay3Phase1 = 3*boss-> attack3Delay;
+                resetAttack(attack1, boss->delay);
+                resetAttack(attack2, boss->delay);
+                resetAttack(attack3, boss->delay);
+                resetAttack(attack4, boss->delay);
+                resetAttack(attack5, boss->delay);
+                resetAttack(attack6, boss->delay);
             }
         } else {
             attack6->hitPoint = 1;
@@ -272,6 +279,15 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
         printf("attack1Delay: %d\n", boss->attack1Delay);
         printf("attack2Delay: %d\n", boss->attack2Delay);
         printf("attack3Delay: %d\n", boss->attack3Delay);
+        printf("attack1DelayPhase1: %d\n", attackDelay1Phase1);
+        printf("attack2DelayPhase1: %d\n", attackDelay2Phase1);
+        printf("attack3DelayPhase1: %d\n", attackDelay3Phase1);
+        printf("attack1: %d\n", attack1->delay);
+        printf("attack2: %d\n", attack2->delay);
+        printf("attack3: %d\n", attack3->delay);
+        printf("attack4: %d\n", attack4->delay);
+        printf("attack5: %d\n", attack5->delay);
+        printf("attack6: %d\n", attack6->delay);
     } else if (boss->phase == 2) {
         if (boss->health > 3) {
             if (attackDelay1Phase2 > 0) {
