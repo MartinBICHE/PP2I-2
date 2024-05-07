@@ -37,19 +37,42 @@ SDL_Texture *bgTextures[6];
 SDL_Texture *tileTextures;
 
 int main(int argc, char **argv) {
-
-  SDL_Window *window; SDL_Renderer *renderer;
-  initSDL(&window, &renderer);
-
-
+	SDL_Window *window; SDL_Renderer *renderer;
+	initSDL(&window, &renderer);
 
 	// const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
 	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
-	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
+	PersoFight *playerInFight = (PersoFight*)malloc(sizeof(PersoFight));
 	playerInFight->y = QUARTERHEIGHT-1.5*SPRITESIZE/2;
 	playerInFight->x = TIERWIDTH/2-1.5*SPRITESIZE/2;
+	playerInFight->health = 10;
+	playerInFight->iframe = 0;
+
+	/* Création du boss */
+
+	bossFight *boss = (bossFight*)malloc(sizeof(bossFight));
+	boss->health = 9;
+	boss->phase = 1;
+	boss->delay = 200;
+	boss->attack1Delay = 3*boss->delay;
+	boss->attack2Delay = 3*boss->delay;
+	boss->attack3Delay = 3*boss->delay;
+	boss->speed = 2;
+
+	/* Déclaration des attaques pour le gameplay 2 */
+
+	AttackFight *nullAttack = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack1 = initAttack(0, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack2 = initAttack(TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack3 = initAttack(2*TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack4 = initAttack(0, 0, boss);
+	AttackFight *attack5 = initAttack(TIERWIDTH, 0, boss);
+	AttackFight *attack6 = initAttack(2*TIERWIDTH, 0, boss);
+	
+	int attackDelay1 = 3*boss->attack1Delay;
+
 	Map *map = initMap("map1/data.txt");
 	Perso *perso = create_perso(map);
 
@@ -62,7 +85,6 @@ int main(int argc, char **argv) {
 	loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
 
 	while (running) {
-
 		Uint64 start = SDL_GetTicks();
 
 		if (SDL_PollEvent(&event)) {
@@ -85,6 +107,8 @@ int main(int argc, char **argv) {
 		updatePerso(perso, map);
 		x_cam = updateCam(perso->x*PIX_RECT, x_cam);
 
+		invincibility(playerInFight);
+
 		if (drawBackground(renderer, bgTextures, 5, x_cam)) {
 			printf("Error drawing the background");
 			exit(-1);
@@ -93,8 +117,8 @@ int main(int argc, char **argv) {
 			printf("Error drawing the map");
 			exit(-1);
 		}
-        if (showRectangle(renderer, 0, 0, 100, 100, 1000)) {
-            printf("Error drawing the  attack");
+        if (fightBoss(renderer, boss, playerInFight,nullAttack, attack1, attack2, attack3, attack4, attack5, attack6)) {
+            printf("Error playing boss fight");
 			exit(-1);
 		}
 		if (fightMovement(renderer, event, playerInFight)) {
@@ -114,19 +138,26 @@ int main(int argc, char **argv) {
 		// SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
     	// SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
+	// printf("vie = %d\n", playerInFight->health);
+	// printf("vie du boss = %d\n", boss ->health);
+	// printf("phase = %d\n", boss->phase);
 
-  float x_cam = 0; // cam à gauche au début
-
-  SDL_Event event;
-  int running = 1;
     SDL_RenderPresent(renderer);
 
     Uint64 end = SDL_GetTicks();
     float elapsedMS = (end - start);
     SDL_Delay(fmaxf((1000 * DT - elapsedMS) / 1.0f, 0));
-  }
+  	}
 
+	free(nullAttack);
+	free(attack1);
+	free(attack2);
+	free(attack3);
+	free(attack4);
+	free(attack5);
+	free(attack6);
     free(playerInFight);
+	free(boss);
     quitSDL(&renderer, &window, perso, map);
     atexit(SDL_Quit);
     return 0;
