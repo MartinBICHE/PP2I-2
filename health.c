@@ -9,3 +9,4 @@ void renderStatusHealth(SDL_Renderer *renderer, Perso *perso){
         SDL_RenderCopy(renderer, healthTextures[perso->health], NULL, &dst_rect);
     }
 }
+

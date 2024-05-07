@@ -43,7 +43,7 @@ void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *m
     freeTextures();
     freeFonts();
     TTF_Quit();
-    destroy_perso(perso);
+    free(perso);
     SDL_DestroyWindow(*window);
-    free(map);
+    destroyMap(map);
 }

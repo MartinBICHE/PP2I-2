@@ -18,12 +18,14 @@
 /* et */ 
 /* EnemyStateData enemyState; */
 /* initEnemy1(xPos(à définir), yPost(à définir), &enemyState); */
+
+
 /* pour l'attaque; */
 /* enemy1Attack(&enemyStateData, perso); */
 /* renderStatusHealth(renderer, perso); pour voir l'impact sur la santé */
 
 
-void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, float x_cam){
+void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, Map *map) {
     int speed = 64;
     int interval = 1000;
     Uint32 ticks = SDL_GetTicks();
@@ -77,9 +79,9 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, flo
                 break;
     } 
     SDL_Rect dst_rectFixed = {
-        enemyStateData->dst_rect.x - x_cam, enemyStateData->dst_rect.y, enemyStateData->dst_rect.w, enemyStateData->dst_rect.h};
+        enemyStateData->dst_rect.x - map->x_cam, enemyStateData->dst_rect.y, enemyStateData->dst_rect.w, enemyStateData->dst_rect.h};
     SDL_RenderCopy(renderer, textureEnemy1, &enemyStateData->src_rect, &dst_rectFixed);
-    }
+}
 
 
 
@@ -99,10 +101,11 @@ void initEnemy1(int x, int y, EnemyStateData *enemyStateData){
 }
 
 
-void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso){
+void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map){
     int intervalAttack = 1000;
     int pad = 50;
-    if ((perso->x * PIX_RECT + pad >= enemyStateData->dst_rect.x) && (perso->x * PIX_RECT - pad <= enemyStateData->dst_rect.x + 64)){
+
+    if ((perso->x * map->pix_rect + pad >= enemyStateData->dst_rect.x) && (perso->x * map->pix_rect - pad <= enemyStateData->dst_rect.x + 64)){
         if (enemyStateData->state != PAUSE_BOTTOM && perso->health > 0){
             if (SDL_GetTicks() - enemyStateData->pauseAttack >= intervalAttack){
                 perso->health -= 1;

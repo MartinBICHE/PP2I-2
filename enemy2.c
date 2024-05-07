@@ -15,7 +15,7 @@
 /* Pour l'instant celui-là on ne va pas l'utiliser donc c'est pour cela il n'y a pas d'init et les fonctions associées */
 
     /* enemy2_movement_1(renderer, textureEnemy, &dest_rect2, &src_rect2, enemy4, 1, map, &list_mov_right); */
-    /* SDL_Rect dest_rect2 = {PIX_RECT, 130, 64, 64}; */
+    /* SDL_Rect dest_rect2 = {map->pix_rect, 130, 64, 64}; */
     /* SDL_Rect src_rect2 = {0, 0, 64, 64}; */
     /* MoveList *list_mov_right = rightMovementList(1, 4, *map, WIDTH-1); */
     /* MoveList *list_mov_left = leftMovementList(1, 4, *map, WIDTH-4); */
@@ -24,11 +24,11 @@
     /* Enemy2 *enemy4 = malloc(sizeof(Enemy2)); */
     /* enemy4->image_path = "bubble.png"; */
     /* enemy4->speed = 45; */
-    /* enemy4->xPosition = 1*PIX_RECT; */
-    /* enemy4->yPosition = 4*PIX_RECT ; */
+    /* enemy4->xPosition = 1*map->pix_rect; */
+    /* enemy4->yPosition = 4*map->pix_rect ; */
     /* enemy4->health = 0; */
-    /* enemy4->collision_max_x = WIDTH*PIX_RECT; */
-    /* enemy4->collision_min_x = 1*PIX_RECT; */
+    /* enemy4->collision_max_x = WIDTH*map->pix_rect; */
+    /* enemy4->collision_min_x = 1*map->pix_rect; */
     /* enemy4->yInitialPosition = 4; */
 
 
@@ -177,9 +177,9 @@ void enemy2_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *dst
     src_rect->x = sprite * 64;
 
 
-    if (fabs(enemy->xPosition - list->mouvement.position *PIX_RECT) <= position_tolerance){
-        enemy->yPosition += PIX_RECT*list->mouvement.jumpDirection;
-        dst_rect->y += PIX_RECT*list->mouvement.jumpDirection;
+    if (fabs(enemy->xPosition - list->mouvement.position *map->pix_rect) <= position_tolerance){
+        enemy->yPosition += map->pix_rect*list->mouvement.jumpDirection;
+        dst_rect->y += map->pix_rect*list->mouvement.jumpDirection;
         list = list->next;
         *list_ptr = list;
     }
@@ -188,12 +188,12 @@ void enemy2_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *dst
         list = list->next;
         *list_ptr = list;
         if (dx == -1){
-            enemy->yPosition = enemy->yInitialPosition*PIX_RECT;
-            dst_rect->y = enemy->yInitialPosition*PIX_RECT;
+            enemy->yPosition = enemy->yInitialPosition*map->pix_rect;
+            dst_rect->y = enemy->yInitialPosition*map->pix_rect;
         }
         if (dx == 1){
-            enemy->yPosition = (enemy->yInitialPosition + 1)*PIX_RECT;
-            dst_rect->y = (enemy->yInitialPosition + 1)*PIX_RECT;
+            enemy->yPosition = (enemy->yInitialPosition + 1)*map->pix_rect;
+            dst_rect->y = (enemy->yInitialPosition + 1)*map->pix_rect;
         }
     }
     SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
@@ -211,9 +211,9 @@ void enemy2_movement_1(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *d
     src_rect->x = sprite * 64;
 
 
-    if (fabs((double)dst_rect->x - list->mouvement.position *PIX_RECT) <= position_tolerance){
-        enemy->yPosition += PIX_RECT*list->mouvement.jumpDirection;
-        dst_rect->y += PIX_RECT*list->mouvement.jumpDirection;
+    if (fabs((double)dst_rect->x - list->mouvement.position *map->pix_rect) <= position_tolerance){
+        enemy->yPosition += map->pix_rect*list->mouvement.jumpDirection;
+        dst_rect->y += map->pix_rect*list->mouvement.jumpDirection;
         list = list->next;
         *list_ptr = list;
     }
@@ -222,12 +222,12 @@ void enemy2_movement_1(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *d
         list = list->next;
         *list_ptr = list;
         if (dx == -1){
-            enemy->yPosition = enemy->yInitialPosition*PIX_RECT;
-            dst_rect->y = enemy->yInitialPosition*PIX_RECT;
+            enemy->yPosition = enemy->yInitialPosition*map->pix_rect;
+            dst_rect->y = enemy->yInitialPosition*map->pix_rect;
         }
         if (dx == 1){
-            enemy->yPosition = (enemy->yInitialPosition + 1)*PIX_RECT;
-            dst_rect->y = (enemy->yInitialPosition + 1)*PIX_RECT;
+            enemy->yPosition = (enemy->yInitialPosition + 1)*map->pix_rect;
+            dst_rect->y = (enemy->yInitialPosition + 1)*map->pix_rect;
         }
     }
     if (dx == -1){
