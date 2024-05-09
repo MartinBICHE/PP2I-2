@@ -19,4 +19,3 @@ char *show_time(Uint32 miliseconds){
     strcat(result, hours_str);
     return result;
 }
-

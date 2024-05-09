@@ -56,21 +56,24 @@ int main(int argc, char **argv) {
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
 
-    while (running) {
+  EnemyStateData enemyStateData;
+  initEnemy1(300, 460, &enemyStateData);
 
-        Uint64 start = SDL_GetTicks();
+  while (running) {
 
-        if (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                running = 0;
-                break;
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_SPACE) {
-                jump(perso, map);
-                }
-            }
+    Uint64 start = SDL_GetTicks();
+
+    if (SDL_PollEvent(&event)) {
+      switch (event.type) {
+      case SDL_QUIT:
+        running = 0;
+        break;
+      case SDL_KEYDOWN:
+        if (event.key.keysym.sym == SDLK_SPACE) {
+          jump(perso, map);
         }
+      }
+    }
 
         perso->vx = 0;
         const Uint8 *state = SDL_GetKeyboardState(NULL);
@@ -79,7 +82,6 @@ int main(int argc, char **argv) {
         if (state[SDL_SCANCODE_D])
         perso->vx += MOOVSPEED;
             
-        updatePerso(perso, map);
         updateCam(perso, map);
 
         if (drawBackground(renderer, bgTextures, 5, map)) {
@@ -99,7 +101,8 @@ int main(int argc, char **argv) {
             printf("Error drawing the perso");
             exit(-1);
         }
-
+        enemy1_movement(renderer, &enemyStateData, map);
+        updatePerso(perso, map, &enemyStateData);
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();
@@ -109,8 +112,8 @@ int main(int argc, char **argv) {
     }
 
 
-    quitSDL(&renderer, &window, perso, map);
-    free(playerInFight); // à bouger ultérieurment dans init.c
-    atexit(SDL_Quit);
-    return 0;
+  quitSDL(&renderer, &window, perso, map);
+  free(playerInFight);
+  atexit(SDL_Quit);
+  return 0;
 }

@@ -32,4 +32,3 @@ int freeFonts(){
     fontScroll = NULL;
     return 0;
 }
-

@@ -10,4 +10,3 @@ void renderStatusHealth(SDL_Renderer *renderer, Perso *perso){
     }
 }
 
-
