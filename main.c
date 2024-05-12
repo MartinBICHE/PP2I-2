@@ -41,6 +41,7 @@
 #include "fight.h"
 #include "menu.h"
 #include "projectile.h"
+#include "boss.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -61,7 +62,9 @@ bool showAttentionImage = true;
 bool firstIteration = true;
 SDL_Texture *tileTextures;
 Uint32 lastGravityChange = 0;
-const Uint32 GRAVITY_CHANGE_INTERVAL = 10000; // 3 secondes en millisecondes
+const Uint32 GRAVITY_CHANGE_INTERVAL = 10000; // 10 secondes en millisecondes
+Uint32 lastProjectileLoad = 0;
+const Uint32 PROJECTILE_LOAD_INTERVAL = 5000; // 10 secondes en millisecondes
 // Initialisation du tableau de projectiles
 Projectile projectiles[MAX_PROJECTILES] = {
     {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 1
@@ -83,6 +86,7 @@ int main(int argc, char **argv) {
 	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
     Map *map = initMap("mapBoss1");
 	Perso *perso = create_perso(map);
+    Boss *boss = create_boss(map);
 
 	float x_cam = 0; // cam à gauche au début
 
@@ -153,7 +157,9 @@ again :
 
 
                 updatePerso(perso, map);
+                updateBoss(boss,map);
                 updateCam(perso, map);
+
                 // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
 
                 if (drawBackground(renderer, bgTextures, 5, map)) {
@@ -173,18 +179,19 @@ again :
                     printf("Error drawing the perso");
                     exit(-1);
                 }
+                displayBoss(renderer, boss, map);
 
-                Uint32 currentTime = SDL_GetTicks();
-                if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL) {
+                Uint32 currentTime1 = SDL_GetTicks();
+                if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL) {
                     changeGravity();
-                    lastGravityChange = currentTime; // Mettre à jour le temps du dernier changement de gravité
+                    lastGravityChange = currentTime1; // Mettre à jour le temps du dernier changement de gravité
                     showAttentionImage = false;
                 }
-                if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-2500 && currentTime - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-2000) {
+                if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-2500 && currentTime1 - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-2000) {
                     showAttentionImage = true;
-                } else if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-1500 && currentTime - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-1000) {
+                } else if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-1500 && currentTime1 - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-1000) {
                     showAttentionImage = true;
-                } else if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-500 && currentTime - lastGravityChange <= GRAVITY_CHANGE_INTERVAL) {
+                } else if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-500 && currentTime1 - lastGravityChange <= GRAVITY_CHANGE_INTERVAL) {
                     showAttentionImage = true;
                 } else {
                     showAttentionImage = false;
@@ -195,11 +202,20 @@ again :
                 }
                 drawMapMenu();
 
-                if (firstIteration) {
-                    spawnProjectile(0, 3, 3, perso->x*map->pix_rect, perso->y*map->pix_rect, map);
-                    firstIteration = false; // Marquer que le spawn a été effectué
+                Uint32 currentTime2 = SDL_GetTicks();
+                if (currentTime2 - lastProjectileLoad >= PROJECTILE_LOAD_INTERVAL) {
+                    for (int i = 0 ; i < MAX_PROJECTILES ; i++) {
+                        if (projectiles[i].active == false) {
+                            spawnProjectile(i, boss->x, boss->y, perso->x*map->pix_rect, perso->y*map->pix_rect, map);
+                            lastProjectileLoad = currentTime2;
+                            printf("lastProjectileLoad: %u\n", lastProjectileLoad);
+                            break;
+                        }
+                    }
+                    
                 }
-                updateProjectile(&projectiles[0],perso->x*map->pix_rect, perso->y*map->pix_rect, map);
+                updateProjectile(&projectiles[0],perso,perso->x*map->pix_rect, perso->y*map->pix_rect, map);
+                
                 renderProjectiles(renderer);
                 // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
                 // SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)

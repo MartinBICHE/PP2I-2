@@ -64,10 +64,15 @@ extern SDL_Renderer* renderer;
 #define JUMPSPEED 11.0f
 #define JUMPSPEED_INVERTED -11.0f
 #define MOVSPEED 7.0f
-#define PROJECTILE_SPEED 200 // Vitesse du projectile (en nombre de tiles par frame)
+#define PROJECTILE_SPEED 150 // Vitesse du projectile (en nombre de tiles par frame)
 #define MAX_PROJECTILES 3
 #define PROJECTILE_WIDTH 50
 #define PROJECTILE_HEIGHT 50
+#define BOSS_SPEED 5
+#define BOSS_WIDTH 0.66666f // en nombre de tiles
+#define BOSS_HEIGHT 1.33333f // en nombre de tiles
+#define BOSS_LEFT_LIMIT 0
+#define BOSS_RIGHT_LIMIT 100
 
 typedef struct _Map {
     char** matrix;
@@ -76,6 +81,8 @@ typedef struct _Map {
     int pix_rect; // en pixels
     int start_x; // en nombre de tiles
     int start_y; // en nombre de tiles
+    int start_xboss;
+    int start_yboss;
     int end_x; // en nombre de tiles
     int end_y; // en nombre de tiles
     float x_cam; // en pixels
@@ -103,6 +110,7 @@ typedef struct {
     float vx;
     float vy;
     bool active;
+    SDL_Rect hitbox;
 } Projectile;
 
 extern Projectile projectiles[MAX_PROJECTILES]; // Tableau pour stocker les projectiles actifs
