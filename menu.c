@@ -1,4 +1,5 @@
 #include "menu.h"
+#include "init.h"
 
 Mix_Music* gMusic = NULL;
 bool musicPaused = false;
@@ -46,7 +47,7 @@ void renderSprite() {
     SDL_DestroyTexture(spriteTexture);
 }
 
-void renderImage(const char* imagePath, int x, int y, int width, int height) {
+void renderImage(SDL_Renderer *renderer, const char* imagePath, int x, int y, int width, int height) {
     SDL_Surface* imageSurface = IMG_Load(imagePath);
     if (imageSurface == NULL) {
         SDL_Log("Erreur lors du chargement de l'image : %s", SDL_GetError());
@@ -67,6 +68,7 @@ void renderImage(const char* imagePath, int x, int y, int width, int height) {
     SDL_DestroyTexture(imageTexture);
     SDL_FreeSurface(imageSurface);
 }
+
 
 bool initSDL_mixer() {
     if (Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048) < 0) {
@@ -111,9 +113,9 @@ void drawMenu() {
     SDL_RenderClear(renderer);
     if (showMenu == true){
         renderSprite();
-        renderImage("./asset/UI/play.png",(WINWIDTH / 2 - Image1Width / 2),(WINHEIGHT / 2 - Image1Height / 2), Image1Width, Image1Height);
-        renderImage("./asset/UI/option.png", WINWIDTH - Image2Width, 0, Image2Width, Image2Height);
-        renderImage("./asset/UI/bouton-quitter-le-jeu.png",0, 0, Image3Width, Image3Height);
+        renderImage(renderer,"./asset/UI/play.png",(WINWIDTH / 2 - Image1Width / 2),(WINHEIGHT / 2 - Image1Height / 2), Image1Width, Image1Height);
+        renderImage(renderer,"./asset/UI/option.png", WINWIDTH - Image1Width, 0, Image1Width, Image1Height);
+        renderImage(renderer,"./asset/UI/bouton-quitter-le-jeu.png",0, 0, Image1Width, Image1Height);
         SDL_RenderPresent(renderer);
     } else {
         renderSprite();
@@ -124,17 +126,17 @@ void drawMenu() {
         SDL_Rect cursorRect = {(WINWIDTH - CURSOR_WIDTH) / 2, (WINHEIGHT - CURSOR_HEIGHT) / 2, CURSOR_WIDTH, CURSOR_HEIGHT};//
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);                                                                   //
         SDL_RenderFillRect(renderer, &cursorRect);                                                                      //////
-
         SDL_RenderPresent(renderer);
     }
 }
 
 void drawMapMenu() {
     if (afficherImage) {
-        renderImage("./asset/UI/bouton-retour-menu.png",(WINWIDTH - ImageRetourMenuWidth) / 2, (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50, ImageRetourMenuWidth, ImageRetourMenuHeight);
-        renderImage("./asset/UI/bouton-quitter-le-jeu.png",(WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
-        renderImage("./asset/UI/option.png",WINWIDTH - ImageParametrePauseWidth, 0, ImageParametrePauseWidth, ImageParametrePauseHeight);
-        renderImage("./asset/UI/bouton-retour-en-arrière.png",0, 0, ImageRetourArrièreWidth, ImageRetourArrièreHeight);
+        renderImage(renderer,"./asset/UI/bouton-retour-menu.png",(WINWIDTH - ImageRetourMenuWidth) / 2, (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50, ImageRetourMenuWidth, ImageRetourMenuHeight);
+        renderImage(renderer,"./asset/UI/bouton-quitter-le-jeu.png",(WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
+        renderImage(renderer,"./asset/UI/option.png",WINWIDTH - ImageParametrePauseWidth, 0, ImageParametrePauseWidth, ImageParametrePauseHeight);
+        renderImage(renderer,"./asset/UI/bouton-retour-en-arrière.png",0, 0, ImageRetourArrièreWidth, ImageRetourArrièreHeight);
+        SDL_RenderPresent(renderer);
     }
     if (parametre) {
                                                                                                                         //////
@@ -144,6 +146,7 @@ void drawMapMenu() {
         SDL_Rect cursorRect = {(WINWIDTH - CURSOR_WIDTH) / 2, (WINHEIGHT - CURSOR_HEIGHT) / 2, CURSOR_WIDTH, CURSOR_HEIGHT};//
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);                                                                   //
         SDL_RenderFillRect(renderer, &cursorRect);                                                                      //////
+        SDL_RenderPresent(renderer);                                                               
     }
 }
 
@@ -154,15 +157,15 @@ void interactionMenu() {
         } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
             int mouseX = e.button.x;
             int mouseY = e.button.y;
-                if (mouseX >= 0 && mouseX <= Image3Width && mouseY >= 0 && mouseY <= Image3Height && showMenu == true) {
+                if (mouseX >= 0 && mouseX <= Image1Width && mouseY >= 0 && mouseY <= Image1Height && showMenu == true) {
                     quit = true;
                 } else if (mouseX >= ((WINWIDTH - Image1Width) / 2) && mouseX <= ((WINWIDTH - Image1Width) / 2) + Image1Width &&
                             mouseY >= ((WINHEIGHT - Image1Height) / 2) && mouseY <= ((WINHEIGHT - Image1Height) / 2) + Image1Height && showMenu == true) {
                     startGame = true;
                     retourMenu = false;
                     showMenu = true;
-                } else if (mouseX >= (WINWIDTH - Image2Width) && mouseX <= WINWIDTH &&
-                    mouseY >= 0 && mouseY <= Image2Height) {
+                } else if (mouseX >= (WINWIDTH - Image1Width) && mouseX <= WINWIDTH &&
+                    mouseY >= 0 && mouseY <= Image1Height) {
                     showMenu = false;
                 }
         } else if (e.type == SDL_KEYUP ) {

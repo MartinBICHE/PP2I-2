@@ -12,7 +12,6 @@
 #include "health.h"
 #include "init.h"
 #include "map.h"
-#include "mapBoss.h"
 #include "perso.h"
 #include "scroll.h"
 #include "textures.h"
@@ -41,6 +40,7 @@
 #include "enemyBat.h"
 #include "fight.h"
 #include "menu.h"
+#include "projectile.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -55,14 +55,25 @@ bool prevShowMenu = true;
 bool musicToggled = false;
 bool quit = false;
 bool running = true;
+float currentGravity = ACC;
+float jumpSpeed = JUMPSPEED;
+bool showAttentionImage = true;
+bool firstIteration = true;
 SDL_Texture *tileTextures;
-
+Uint32 lastGravityChange = 0;
+const Uint32 GRAVITY_CHANGE_INTERVAL = 10000; // 3 secondes en millisecondes
+// Initialisation du tableau de projectiles
+Projectile projectiles[MAX_PROJECTILES] = {
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 1
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 2
+    {0.0f, 0.0f, 0.0f, 0.0f, false}  // Projectile 3
+};
 
 int main(int argc, char **argv) {
     SDL_Window *window;
     SDL_Renderer *renderer;
     initSDL(&window, &renderer);
-    
+
 	// const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
 	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
 	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
@@ -70,7 +81,7 @@ int main(int argc, char **argv) {
 	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
 	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
 	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
-    Map *map = initMap("map1");
+    Map *map = initMap("mapBoss1");
 	Perso *perso = create_perso(map);
 
 	float x_cam = 0; // cam à gauche au début
@@ -104,10 +115,9 @@ again :
 
     // Boucle principale du menu
     quit = false;
-
     while (!quit) {
         interactionMenu();   
-
+        
         if (startGame) {
             if (!map) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Erreur lors du chargement de la carte.");
@@ -144,7 +154,7 @@ again :
 
                 updatePerso(perso, map);
                 updateCam(perso, map);
-                // x_cam = updateCam(perso->x*PIX_RECT, x_cam);
+                // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
 
                 if (drawBackground(renderer, bgTextures, 5, map)) {
                     printf("Error drawing the background");
@@ -164,8 +174,33 @@ again :
                     exit(-1);
                 }
 
+                Uint32 currentTime = SDL_GetTicks();
+                if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL) {
+                    changeGravity();
+                    lastGravityChange = currentTime; // Mettre à jour le temps du dernier changement de gravité
+                    showAttentionImage = false;
+                }
+                if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-2500 && currentTime - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-2000) {
+                    showAttentionImage = true;
+                } else if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-1500 && currentTime - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-1000) {
+                    showAttentionImage = true;
+                } else if (currentTime - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-500 && currentTime - lastGravityChange <= GRAVITY_CHANGE_INTERVAL) {
+                    showAttentionImage = true;
+                } else {
+                    showAttentionImage = false;
+                }
+
+                if (showAttentionImage) {
+                    renderImage(renderer,"./asset/UI/attention.png",(WINWIDTH / 2 - ImageAttentionWidth / 2),(WINHEIGHT / 2 - ImageAttentionHeight / 2), ImageAttentionWidth, ImageAttentionHeight);
+                }
                 drawMapMenu();
 
+                if (firstIteration) {
+                    spawnProjectile(0, 3, 3, perso->x*map->pix_rect, perso->y*map->pix_rect, map);
+                    firstIteration = false; // Marquer que le spawn a été effectué
+                }
+                updateProjectile(&projectiles[0],perso->x*map->pix_rect, perso->y*map->pix_rect, map);
+                renderProjectiles(renderer);
                 // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
                 // SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)
                 // SDL_RenderDrawRect(renderer, &rect1); // !!! seulement pour les tests de caméra (à changer)
@@ -181,6 +216,7 @@ again :
             }
         }
     }
+    cleanupProjectiles();
     quitSDL(&renderer, &window, perso, map);
     closeSDL_mixer();
     free(playerInFight); // à bouger ultérieurment dans init.c

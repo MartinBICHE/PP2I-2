@@ -12,8 +12,9 @@ extern bool prevShowMenu;
 extern bool musicToggled;
 extern bool quit;
 extern bool running;
+extern float currentGravity;
+extern float jumpSpeed;
 extern SDL_Event e;
-
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 
@@ -26,10 +27,8 @@ extern SDL_Renderer* renderer;
 // #define MENU_WINDOW_HEIGHT 800
 #define Image1Width 200
 #define Image1Height 150
-#define Image2Width 200
-#define Image2Height 150
-#define Image3Width 200
-#define Image3Height 150
+#define ImageAttentionWidth 800
+#define ImageAttentionHeight 500
 // #define LOADING_WINDOW_WIDTH 600
 // #define LOADING_WINDOW_HEIGHT 400
 #define BLUR_AMOUNT 0.5f
@@ -53,16 +52,22 @@ extern SDL_Renderer* renderer;
 
 
 #define WINHEIGHT 720 // en pixels
-#define WINWIDTH 1280 // en pixels
+#define WINWIDTH 1260 // en pixels
 #define TIERWIDTH WINWIDTH/3
 #define QUARTERHEIGHT WINHEIGHT/4
 #define SPRITESIZE 64 // 64x64 taille des sprites de base
 #define PERSO_WIDTH 0.66666f // en nombre de tiles
 #define PERSO_HEIGHT 1.33333f // en nombre de tiles
-#define ACC 25.5f
+#define ACC 25.5f // Gravité 
+#define ACC_INVERTED -25.5f // Gravité inversée
 #define DT 1/60.0f
 #define JUMPSPEED 11.0f
+#define JUMPSPEED_INVERTED -11.0f
 #define MOVSPEED 7.0f
+#define PROJECTILE_SPEED 200 // Vitesse du projectile (en nombre de tiles par frame)
+#define MAX_PROJECTILES 3
+#define PROJECTILE_WIDTH 50
+#define PROJECTILE_HEIGHT 50
 
 typedef struct _Map {
     char** matrix;
@@ -88,4 +93,17 @@ typedef struct _Perso {
     int jump_delay; // délai entre les sauts (25 frames)
 } Perso;
 
+extern Perso* perso;
+extern Map* map;
+
+// Structure de données représentant un projectile
+typedef struct {
+    float x; 
+    float y;
+    float vx;
+    float vy;
+    bool active;
+} Projectile;
+
+extern Projectile projectiles[MAX_PROJECTILES]; // Tableau pour stocker les projectiles actifs
 #endif

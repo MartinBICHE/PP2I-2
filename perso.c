@@ -73,7 +73,6 @@ int hitbox_top(Perso *perso, Map *map) {
     return 0;
 }
 
-
 int hitbox_left(Perso *perso, Map *map) {
     SDL_Rect hbl = {.x = perso->hitbox.x - 3, .y = perso->hitbox.y + 7, .w = 1, .h = perso->hitbox.h - 12};
     SDL_Rect res;
@@ -129,17 +128,30 @@ float min(float a, float b) {
 
 
 void updatePerso(Perso *perso, Map *map) {
+    perso->vy += currentGravity*DT;
     perso->jump_delay = max(perso->jump_delay - 1, 0);
     int i = floor(perso->y);
     int j = floor(perso->x);
-    perso->vy += ACC*DT;
-    if (hitbox_bottom(perso, map)) {
-        perso->vy = min(perso->vy, 0.0f);
-        perso->y = i+1 - PERSO_HEIGHT/2.0f;
-    }
-    if (hitbox_top(perso, map)) {
-        perso->vy = max(perso->vy, 0.0f);
-        perso->y = i + PERSO_HEIGHT/2.0f;
+    if (currentGravity > 0) {
+        if (hitbox_bottom(perso, map)) {
+            perso->vy = min(perso->vy, 0.0f);
+            perso->y = i + 1 - PERSO_HEIGHT/2.0f;
+            perso->jumps = 1;
+        }
+        if (hitbox_top(perso, map)) {
+            perso->vy = max(perso->vy, 0.0f);
+            perso->y = i + PERSO_HEIGHT/2.0f;
+        }
+    } else {
+        if (hitbox_bottom(perso, map)) {
+            perso->vy = min(perso->vy, 0.0f);
+            perso->y = i + 1 - PERSO_HEIGHT/2.0f;
+        }
+        if (hitbox_top(perso, map)) {
+            perso->vy = max(perso->vy, 0.0f);
+            perso->y = i + PERSO_HEIGHT/2.0f;
+            perso->jumps = 1;
+        }
     }
     if (hitbox_left(perso, map)) {
         perso->vx = max(perso->vx, 0.0f);
@@ -152,17 +164,27 @@ void updatePerso(Perso *perso, Map *map) {
     perso->y += perso->vy*DT;
     perso->x += perso->vx*DT;
     perso->hitbox = (SDL_Rect){.x = (perso->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (perso->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
-    if (hitbox_bottom(perso, map)) {
-        perso->jumps = 2;
-    }
-
 }
 
 
 void jump(Perso *perso, Map *map) {
     if (perso->jumps > 0 && perso->jump_delay == 0) {
-        perso->vy = -JUMPSPEED;
+        if (currentGravity < 0) {
+            perso->vy = -JUMPSPEED_INVERTED;
+        } else {
+            perso->vy = -JUMPSPEED;
+        }
         perso->jumps -= 1;
         perso->jump_delay = 25;
     }
+}
+
+void changeGravity() {
+	if (currentGravity == ACC) {
+		currentGravity = ACC_INVERTED;
+		jumpSpeed = JUMPSPEED_INVERTED;
+	} else {
+		currentGravity = ACC;
+		jumpSpeed = JUMPSPEED;
+	}
 }

@@ -7,12 +7,15 @@ Perso *create_perso(Map*);
 int display_perso(SDL_Renderer*, Perso*, Map*);
 int hitbox_bottom(Perso*, Map*);
 int hitbox_top(Perso*, Map*);
+int hitbox_bottom_inverted(Perso *perso, Map *map);
+int hitbox_top_inverted(Perso *perso, Map *map);
 int hitbox_left(Perso*, Map*);
 int hitbox_right(Perso*, Map*);
 float max(float, float);
 float min(float, float);
 void updatePerso(Perso*, Map*);
 void jump(Perso*, Map*);
+void changeGravity();
 // void destroy_perso(Perso *);
 
 

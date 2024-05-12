@@ -5,10 +5,11 @@
 #include <SDL2/SDL_image.h>
 #include "const.h"
 #include "map.h"
+#include "perso.h"
 
 Map *initMap(char *name) {
-	char *str_data = malloc(strlen(name) + 10);
-	char *str_metadata = malloc(strlen(name) + 15);
+	char *str_data = malloc(strlen(name) + 20);
+	char *str_metadata = malloc(strlen(name) + 25);
 	strcpy(str_data, name);
 	strcpy(str_metadata, name);
 	strcat(str_data, "/data.txt");

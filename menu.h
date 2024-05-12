@@ -9,12 +9,13 @@
 #include <stdbool.h>
 #include <math.h>
 #include "const.h"
+#include "init.h"
 
 // Fonctions qui permettent de dessiner
 void drawMenu();
 void drawMapMenu();
 void renderSprite();
-void renderImage(const char* imagePath, int x, int y, int width, int height);
+void renderImage(SDL_Renderer *renderer, const char* imagePath, int x, int y, int width, int height);
 
 // Fonctions qui touchent à la musique 
 bool initSDL_mixer();
