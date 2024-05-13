@@ -7,8 +7,6 @@
 enum EnemyPenduleState{
     PENDULE_MOVING_UP,
     PENDULE_MOVING_DOWN,
-    PENDULE_PAUSE_TOP,
-    PENDULE_PAUSE_BOTTOM
 
 };
 

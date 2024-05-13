@@ -58,34 +58,6 @@ int main(int argc, char **argv) {
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
     /* const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255}; */ 
-    EnemyFlecheData enemyFlecheData1;
-    initEnemyFleche(&enemyFlecheData1, 100, 100);
-
-    DialogBoxData dialogBoxData;
-    initPapirus(&dialogBoxData, 100, 560);
-    const char *text ="interactions   des personnages";
-    /* Mix_PlayMusic(musicEnemyFleche, -1); */
-
-    EnemyFlecheData enemyFlecheData;
-    initEnemyFleche(&enemyFlecheData, 700, 560);
-
-    EnemyStateData enemyStateData;
-    initEnemy1(1100, 620, &enemyStateData);
-
-
-    Enemy3 enemy;
-    initEnemy3(&enemy, 700, 620, 900);
-
-
-    EnemyBatData enemyBatData;
-    initEnemyBat(&enemyBatData, 100, 360, 400);
-
-
-    EnemyPenduleData enemyPenduleData;
-    initEnemyPendule(&enemyPenduleData, 2900, 70);
-
-    EnemyPenduleData enemyPenduleData1;
-    initEnemyPendule(&enemyPenduleData1, 2300, 30);
 
     while (running) {
 
@@ -109,6 +81,7 @@ int main(int argc, char **argv) {
             perso->vx -= MOOVSPEED;
         if (state[SDL_SCANCODE_D])
         perso->vx += MOOVSPEED;
+
             
             updatePerso(perso, map);
             updateCam(perso, map);
@@ -131,19 +104,6 @@ int main(int argc, char **argv) {
             exit(-1);
         }
 
-        /* render_text(renderer, text, BLACK, &dialogBoxData, map); */
-        /* enemy1_movement(renderer, &enemyStateData, map); */
-        /* enemy1Attack(&enemyStateData, perso, map); */
-        /* enemyFleche_mouvement(renderer, &enemyFlecheData, map); */
-        /* flecheAttack(&enemyFlecheData, perso, map); */  
-        /* enemy3_movement(renderer, &enemy, map); */
-        /* enemy3Attack(&enemy, perso, map); */
-        renderStatusHealth(renderer, perso);
-        /* enemyBat_mouvement(renderer, &enemyBatData, map); */
-        /* batAttack(&enemyBatData, perso, map); */
-        /* enemyFleche_mouvement(renderer, &enemyFlecheData1, map); */
-        enemyPendule_mouvement(renderer, &enemyPenduleData, map);
-        enemyPendule_mouvement(renderer, &enemyPenduleData1, map);
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();

@@ -20,6 +20,7 @@ extern SDL_Texture* textureHealth9;
 
 extern SDL_Texture* textureFleche;
 extern SDL_Texture* textureBat;
+extern SDL_Texture* textureBatAttack;
 
 extern SDL_Texture *healthTextures[10];
 

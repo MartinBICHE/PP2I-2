@@ -22,6 +22,7 @@ SDL_Texture* textureHealth8 = NULL;
 SDL_Texture* textureHealth9 = NULL;
 SDL_Texture* textureFleche = NULL;
 SDL_Texture* textureBat = NULL;
+SDL_Texture* textureBatAttack = NULL;
 
 SDL_Texture *healthTextures[10];
 
@@ -49,6 +50,7 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_Surface *surfaceHealth9 = IMG_Load("asset/spritesheet/health9.png");
     SDL_Surface *surfaceFleche = IMG_Load("asset/spritesheet/fleche.png");
     SDL_Surface *surfaceBat = IMG_Load("asset/spritesheet/bat.png");
+    SDL_Surface *surfaceBatAttack = IMG_Load("asset/spritesheet/batAttack.png");
     if (!surfaceEnemy1 || !surfacePapirus || !surfaceScroll || !surfaceEnemy3 || !surfacePendule ){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init surfaceEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
 		exit(-1);
@@ -72,6 +74,7 @@ int loadTextures(SDL_Renderer *renderer){
     textureHealth9 = SDL_CreateTextureFromSurface(renderer, surfaceHealth9);
     textureFleche = SDL_CreateTextureFromSurface(renderer, surfaceFleche);
     textureBat = SDL_CreateTextureFromSurface(renderer, surfaceBat);
+    textureBatAttack = SDL_CreateTextureFromSurface(renderer, surfaceBatAttack);
 
     if (!textureEnemy1 || !texturePapirus || !textureScroll || !textureEnemy3 || !texturePendule){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init textureEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
@@ -108,6 +111,7 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_FreeSurface(surfaceHealth9);
     SDL_FreeSurface(surfaceFleche);
     SDL_FreeSurface(surfaceBat);
+    SDL_FreeSurface(surfaceBatAttack);
 
     return 0;
 }
@@ -133,6 +137,7 @@ int freeTextures(){
     SDL_DestroyTexture(textureHealth9);
     SDL_DestroyTexture(textureBat);
     SDL_DestroyTexture(textureFleche);
+    SDL_DestroyTexture(textureBatAttack);
 
     textureEnemy1 = NULL;
     textureEnemy3 = NULL;
@@ -152,6 +157,7 @@ int freeTextures(){
     textureHealth9 = NULL;
     textureFleche = NULL;
     textureBat = NULL;
+    textureBatAttack = NULL;
 
     return 0;
 }

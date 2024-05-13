@@ -53,7 +53,7 @@ void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheD
   SDL_Rect dst_rectFixed = {
       enemyFlecheData->dst_rect.x - map->x_cam, enemyFlecheData->dst_rect.y,
       enemyFlecheData->dst_rect.w, enemyFlecheData->dst_rect.h};
-  SDL_RenderCopy(renderer, texturePendule, &enemyFlecheData->src_rect,
+  SDL_RenderCopy(renderer, textureFleche, &enemyFlecheData->src_rect,
                  &dst_rectFixed);
 }
 

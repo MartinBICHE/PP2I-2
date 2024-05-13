@@ -15,11 +15,15 @@ struct _EnemyBatData{
     enum EnemyBatState state;
     SDL_Rect src_rect;
     SDL_Rect dst_rect;
+    SDL_Rect src_rectAttack;
+    SDL_Rect dst_rectAttack;
     Uint32 pauseStartBits;
+    Uint32 pauseStartBitsAttack;
     int xMax;
     int xMin;
     Uint32 pauseAttack;
     Uint32 pauseMusic;
+    enum EnemyBatState previousState;
 };
 typedef struct _EnemyBatData EnemyBatData;
 void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax);

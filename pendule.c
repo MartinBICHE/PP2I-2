@@ -23,16 +23,6 @@ void enemyPendule_mouvement(SDL_Renderer *renderer, EnemyPenduleData *enemyPendu
       enemyPenduleData->pauseStart = SDL_GetTicks();
     }
     break;
-  case PENDULE_PAUSE_TOP:
-    if (SDL_GetTicks() - enemyPenduleData->pauseStart >= pauseInterval) {
-      enemyPenduleData->state = PENDULE_MOVING_DOWN;
-    }
-    break;
-  case PENDULE_PAUSE_BOTTOM:
-    if (SDL_GetTicks() - enemyPenduleData->pauseStart >= pauseInterval) {
-      enemyPenduleData->state = PENDULE_MOVING_UP;
-    }
-    break;
   case PENDULE_MOVING_DOWN:
     if (SDL_GetTicks() - enemyPenduleData->pauseStartBits >= interval) {
       enemyPenduleData->src_rect.x += 64;
@@ -54,7 +44,7 @@ void enemyPendule_mouvement(SDL_Renderer *renderer, EnemyPenduleData *enemyPendu
 
 
 void initEnemyPendule(EnemyPenduleData *enemyPenduleData, int x, int y) {
-  enemyPenduleData->src_rect.x = 4 * 64;
+  enemyPenduleData->src_rect.x = 1 * 64;
   enemyPenduleData->src_rect.y = 0;
   enemyPenduleData->src_rect.w = 64;
   enemyPenduleData->src_rect.h = 64;
