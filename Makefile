@@ -39,4 +39,3 @@ clean:
 run:
 	make
 	./demo
-

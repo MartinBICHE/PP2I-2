@@ -237,4 +237,3 @@ void enemy2_movement_1(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *d
         SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
     }
 }
-

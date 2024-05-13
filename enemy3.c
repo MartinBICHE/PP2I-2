@@ -106,7 +106,7 @@ void enemy3Attack(Enemy3 *enemy, Perso *perso, Map *map){
             perso->health -= 1;
             enemy->pauseAttack = SDL_GetTicks();
             enemy->state = ATTACK;
-            Mix_PlayMusic(musicEnemySnake, -1);
+            /* Mix_PlayMusic(musicEnemySnake, -1); */
         }
     }
     if (SDL_GetTicks() - enemy->pauseMusic >= intervalAttack){
@@ -114,5 +114,4 @@ void enemy3Attack(Enemy3 *enemy, Perso *perso, Map *map){
         enemy->pauseMusic = SDL_GetTicks();
     }
 }
-
 

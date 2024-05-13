@@ -55,4 +55,3 @@ void checkCheckpoint(CheckpointList *list, Perso *perso, const char *filename) {
     }
 }
 
-
