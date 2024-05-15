@@ -15,3 +15,5 @@ Création d'une fonction drawBackground dans map.c
 Dans les metadata d'une map : 
 - 1ère ligne : nombre de tiles en hauteur, nombre de tiles en largeur, abscisse départ, ordonnée départ, abscisse arrivée, ordonnée arrivée, nombre de checkpoint
 - nième ligne : abscisse du (n-1)-ième checkpoint, ordonnée du (n-1)-ème checkpoint
+
+Nouvelle fonctionnalité de dash : touche J

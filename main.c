@@ -50,38 +50,30 @@ int main(int argc, char **argv) {
     Map *map = initMap("map2");
     Perso *perso = create_perso(map);
 
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
+
     SDL_Event event;
     int running = 1;
 
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
 
-  EnemyStateData enemyStateData;
-  initEnemy1(300, 460, &enemyStateData);
+    EnemyStateData enemyStateData;
+    initEnemy1(300, 460, &enemyStateData);
 
-  while (running) {
+    while (running) {
 
-    Uint64 start = SDL_GetTicks();
+        Uint64 start = SDL_GetTicks();
 
-    if (SDL_PollEvent(&event)) {
-      switch (event.type) {
-      case SDL_QUIT:
-        running = 0;
-        break;
-      case SDL_KEYDOWN:
-        if (event.key.keysym.sym == SDLK_SPACE) {
-          jump(perso, map);
+        if (SDL_PollEvent(&event)) {
+            switch (event.type) {
+            case SDL_QUIT:
+                running = 0;
+                break;
+            }
         }
-      }
-    }
-
-        perso->vx = 0;
-        const Uint8 *state = SDL_GetKeyboardState(NULL);
-        if (state[SDL_SCANCODE_A])
-        perso->vx -= MOOVSPEED;
-        if (state[SDL_SCANCODE_D])
-        perso->vx += MOOVSPEED;
-            
+        
+        updatePerso(perso, map, &enemyStateData, state);
         updateCam(perso, map);
 
         if (drawBackground(renderer, bgTextures, 5, map)) {
@@ -102,18 +94,17 @@ int main(int argc, char **argv) {
             exit(-1);
         }
         enemy1_movement(renderer, &enemyStateData, map);
-        updatePerso(perso, map, &enemyStateData);
+        
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();
         float elapsedMS = (end - start);
         SDL_Delay(fmaxf((1000 * DT - elapsedMS) / 1.0f, 0));
-        atexit(SDL_Quit);
-    }
+        }
 
 
-  quitSDL(&renderer, &window, perso, map);
-  free(playerInFight);
-  atexit(SDL_Quit);
-  return 0;
+    quitSDL(&renderer, &window, perso, map);
+    free(playerInFight);
+    atexit(SDL_Quit);
+    return 0;
 }

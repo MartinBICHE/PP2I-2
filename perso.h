@@ -13,7 +13,7 @@ int hitbox_right(Perso*, Map*);
 int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData);
 float max(float, float);
 float min(float, float);
-void updatePerso(Perso*, Map*, EnemyStateData*);
+void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*);
 void jump(Perso*, Map*);
 
 

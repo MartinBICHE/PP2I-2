@@ -16,8 +16,11 @@ Perso *create_perso(Map *map) {
     res->vy = 0;
     res->hitbox = (SDL_Rect){.x = (res->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (res->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
     res->jumps = 2;
-    res->jump_delay = 25;
+    res->jump_delay = 0;
     res->health = 9;
+    res->dash_duration = 0;
+    res->dash_speed = 25.0f;
+    res->dash_delay = 0;
     return res;
 }
 
@@ -75,10 +78,14 @@ int hitbox_top(Perso *perso, Map *map) {
 
 
 int hitbox_left(Perso *perso, Map *map) {
-    SDL_Rect hbl = {.x = perso->hitbox.x - 3, .y = perso->hitbox.y + 7, .w = 1, .h = perso->hitbox.h - 12};
+    SDL_Rect hbl = {.x = perso->hitbox.x - 3, .y = perso->hitbox.y + 7, .w = 3, .h = perso->hitbox.h - 12};
     SDL_Rect res;
     int i = perso->y;
     int j = perso->x - 1;
+    if (map->matrix[i][j+1] != '-') {
+        SDL_Rect rect = {.x = (j+1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
+        if (SDL_IntersectRect(&hbl, &rect, &res)) return 1;
+    }
     if (map->matrix[i][j] != '-') {
         SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbl, &rect, &res)) return 1;
@@ -96,10 +103,14 @@ int hitbox_left(Perso *perso, Map *map) {
 
 
 int hitbox_right(Perso *perso, Map *map) {
-    SDL_Rect hbr = {.x = perso->hitbox.x + perso->hitbox.w + 3, .y = perso->hitbox.y + 7, .w = 1, .h = perso->hitbox.h - 12};
+    SDL_Rect hbr = {.x = perso->hitbox.x + perso->hitbox.w + 1, .y = perso->hitbox.y + 7, .w = 3, .h = perso->hitbox.h - 12};
     SDL_Rect res;
     int i = perso->y;
     int j = perso->x + 1;
+    if (map->matrix[i][j-1] != '-') {
+        SDL_Rect rect = {.x = (j-1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
+        if (SDL_IntersectRect(&hbr, &rect, &res)) return 1;
+    }
     if (map->matrix[i][j] != '-') {
         SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
         if (SDL_IntersectRect(&hbr, &rect, &res)) return 1;
@@ -142,32 +153,83 @@ float min(float a, float b) {
 }
 
 
-void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
-    perso->jump_delay = max(perso->jump_delay - 1, 0);
-    int i = floor(perso->y);
-    int j = floor(perso->x);
-    perso->vy += ACC*DT;
-    if (hitbox_bottom(perso, map)) {
-        perso->vy = min(perso->vy, 0.0f);
-        perso->y = i+1 - PERSO_HEIGHT/2.0f;
+void jump(Perso *perso, Map *map) {
+    if (perso->jumps > 0 && perso->jump_delay == 0) {
+        perso->vy = -JUMPSPEED;
+        perso->jumps--;
+        perso->jump_delay = 22;
     }
-    if (hitbox_top(perso, map)) {
-        perso->vy = max(perso->vy, 0.0f);
-        perso->y = i + PERSO_HEIGHT/2.0f;
-    }
-    if (hitbox_left(perso, map)) {
-        perso->vx = max(perso->vx, 0.0f);
-        perso->x = j + PERSO_WIDTH/2.0f;
-    }
-    if (hitbox_right(perso, map)) {
-        perso->vx = min(perso->vx, 0.0f);
-        perso->x = j+1 - PERSO_WIDTH/2.0f;
-    }
-    perso->y += perso->vy*DT;
-    perso->x += perso->vx*DT;
+}
+
+
+void updateHitbox(Perso *perso, Map *map) {
     perso->hitbox = (SDL_Rect){.x = (perso->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (perso->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
-    if (hitbox_bottom(perso, map)) {
-        perso->jumps = 2;
+}
+
+
+void updatePersoDashing(Perso *perso, Map *map) {
+    perso->vy = 0;
+    int j = floor(perso->x);
+    perso->vx = perso->dash_speed*perso->facing;
+    perso->x += perso->vx*DT;
+    updateHitbox(perso, map);
+    if (perso->facing == -1 && hitbox_left(perso, map)) {
+        perso->x = j + 0.33f;
+        perso->dash_duration = 0;
+    }
+    if (perso->facing == 1 && hitbox_right(perso, map)) {
+        perso->x = j+1 - 0.32f;
+        perso->dash_duration = 0;
+    };
+    updateHitbox(perso, map);
+}
+
+
+void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const Uint8 *state) {
+    perso->jump_delay = max(perso->jump_delay - 1, 0);
+    perso->dash_duration = max(perso->dash_duration - 1, 0);
+    perso->dash_delay = max(perso->dash_delay - 1, 0);
+    if (perso->dash_duration > 0) updatePersoDashing(perso, map);
+    else {
+        perso->vx = 0;
+        if (state[SDL_SCANCODE_A]) { // Q en AZERTY
+            perso->facing = -1;
+            perso->vx -= MOOVSPEED;
+        }
+        if (state[SDL_SCANCODE_D]) {
+            perso->facing = 1;
+            perso->vx += MOOVSPEED;
+        }
+        if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
+        if (state[SDL_SCANCODE_J] && perso->dash_delay == 0) {
+            perso->dash_duration = 10;
+            perso->dash_delay = 40;
+        }
+        int i = floor(perso->y);
+        int j = floor(perso->x);
+        perso->vy += ACC*DT;
+        if (hitbox_bottom(perso, map)) {
+            perso->vy = min(perso->vy, 0.0f);
+            perso->y = i+1 - PERSO_HEIGHT/2.0f;
+        }
+        if (hitbox_top(perso, map)) {
+            perso->vy = max(perso->vy, 0.0f);
+            perso->y = i + PERSO_HEIGHT/2.0f;
+        }
+        if (hitbox_left(perso, map)) {
+            perso->vx = max(perso->vx, 0.0f);
+            perso->x = j + PERSO_WIDTH/2.0f;
+        }
+        if (hitbox_right(perso, map)) {
+            perso->vx = min(perso->vx, 0.0f);
+            perso->x = j+1 - PERSO_WIDTH/2.0f;
+        }
+        perso->y += perso->vy*DT;
+        perso->x += perso->vx*DT;
+        updateHitbox(perso, map);
+        if (hitbox_bottom(perso, map)) {
+            perso->jumps = 2;
+        }
     }
     if (enemyStateData->state != PAUSE_BOTTOM) { // Le personnage peut passer si l'ennemi est abaissé
         if (hitbox_enemy(perso, map, enemyStateData)) {
@@ -191,10 +253,4 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
 }
 
 
-void jump(Perso *perso, Map *map) {
-    if (perso->jumps > 0 && perso->jump_delay == 0) {
-        perso->vy = -JUMPSPEED;
-        perso->jumps -= 1;
-        perso->jump_delay = 25;
-    }
-}
+

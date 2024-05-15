@@ -34,10 +34,14 @@ typedef struct _Perso {
     float y; // en nombre de tiles
     float vx; // en nombre de tiles par seconde
     float vy; // en nombre de tiles par seconde
-    int health; //je l'ai rajouté
+    int facing; // -1 : gauche ; 1 : droite
+    int health; // je l'ai rajouté
     SDL_Rect hitbox;
     int jumps; // nombre de sauts restants
-    int jump_delay; // délai entre les sauts (25 frames)
+    int jump_delay; // délai entre les sauts (22 frames)
+    int dash_duration;
+    float dash_speed;
+    int dash_delay;
 } Perso;
 
 
