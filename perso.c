@@ -6,7 +6,6 @@
 #include <SDL2/SDL_events.h>
 #include "const.h"
 #include "perso.h"
-#include "textures.h"
 
 
 Perso *create_perso(Map *map) {
@@ -22,7 +21,7 @@ Perso *create_perso(Map *map) {
     res->jumps = 2;
     res->jump_delay = 0;
     res->dash_duration = 0;
-    res->dash_speed = 25.0f;
+    res->dash_speed = 21.0f;
     res->dash_delay = 0;
     return res;
 }
@@ -60,13 +59,36 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
     SDL_Rect dst_rect = {.x = perso->x*map->pix_rect - map->x_cam - c/2, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c};
     perso->spriteOffset = (perso->spriteOffset + 1) % 72;
     if (perso->dash_duration > 0) {
-        SDL_Rect src_rect = {.x = 4*64, .y = 64, .w = 64, .h = 64};
-        // mettre les sprites de dash
+        int offset = 45; // décalage en x pour les "rémanences"
         SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+        SDL_Rect src_rect = {.x = 4*64, .y = 64, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
             exit(-1);
         }
+        if (perso->dash_duration <= 4) {
+            SDL_Rect dst_rect1 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - 3*offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c}; // rémanence très loin derrière
+            SDL_SetTextureAlphaMod(persoTexture, 63);
+            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect1, 0, NULL, flip)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+                exit(-1);
+            }
+        }
+        if (perso->dash_duration <= 7) {
+            SDL_Rect dst_rect2 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - 2*offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c}; // rémanence loin derrière
+            SDL_SetTextureAlphaMod(persoTexture, 95);
+            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect2, 0, NULL, flip)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+                exit(-1);
+            }
+        }
+        SDL_Rect dst_rect3 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c}; // rémanence proche derrière
+        SDL_SetTextureAlphaMod(persoTexture, 159);
+        if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect3, 0, NULL, flip)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+            exit(-1);
+        }
+        SDL_SetTextureAlphaMod(persoTexture, 255);
     }
     if (perso->vx == 0) {
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 0, .w = 64, .h = 64};
@@ -231,7 +253,7 @@ void updatePersoDashing(Perso *perso, Map *map) {
     if (perso->facing == 1 && hitbox_right(perso, map)) {
         perso->x = j+1 - 0.32f;
         perso->dash_duration = 0;
-    };
+    }
     updateHitbox(perso, map);
 }
 
@@ -253,8 +275,8 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         }
         if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
         if (state[SDL_SCANCODE_J] && perso->dash_delay == 0) {
-            perso->dash_duration = 10;
-            perso->dash_delay = 40;
+            perso->dash_duration = 11;
+            perso->dash_delay = 30;
         }
         int i = floor(perso->y);
         int j = floor(perso->x);
@@ -274,7 +296,7 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         if (hitbox_right(perso, map)) {
             perso->vx = min(perso->vx, 0.0f);
             perso->x = j+1 - PERSO_WIDTH/2.0f;
-        };
+        }
         perso->y += perso->vy*DT;
         perso->x += perso->vx*DT;
         updateHitbox(perso, map);
