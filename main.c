@@ -34,7 +34,7 @@
 #include <string.h>
 
 SDL_Texture *bgTextures[6];
-SDL_Texture *tileTextures;
+SDL_Texture *tileTextures, *persoTexture;
 
 int main(int argc, char **argv) {
 
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     SDL_Renderer *renderer;
     initSDL(&window, &renderer);
 
-    const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
+    // const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
     Perso *playerInFight = (Perso *)malloc(sizeof(Perso));
     playerInFight->y = QUARTERHEIGHT - SPRITESIZE / 2;
@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
 
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
+    loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
     EnemyStateData enemyStateData;
     initEnemy1(300, 460, &enemyStateData);
@@ -80,7 +81,7 @@ int main(int argc, char **argv) {
             printf("Error drawing the background");
             exit(-1);
         }
-        if (drawMap(renderer, map, "./asset/tileset/ground-1.png", tileTextures)) {
+        if (drawMap(renderer, map, tileTextures)) {
             printf("Error drawing the map");
             exit(-1);
         }
@@ -88,8 +89,7 @@ int main(int argc, char **argv) {
         // 	printf("Error drawing the fight");
         // 	exit(-1);
         // }
-        SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
-        if (display_perso(renderer, perso, map)) {
+        if (display_perso(renderer, perso, map, persoTexture, 1)) { // 1 pour afficher la hitbox
             printf("Error drawing the perso");
             exit(-1);
         }

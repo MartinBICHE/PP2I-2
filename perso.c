@@ -6,6 +6,7 @@
 #include <SDL2/SDL_events.h>
 #include "const.h"
 #include "perso.h"
+#include "textures.h"
 
 
 Perso *create_perso(Map *map) {
@@ -14,10 +15,12 @@ Perso *create_perso(Map *map) {
     res->y = map->start_y;
     res->vx = 0;
     res->vy = 0;
+    res->facing = 1;
     res->hitbox = (SDL_Rect){.x = (res->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (res->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
+    res->spriteOffset = 0;
+    res->health = 9;
     res->jumps = 2;
     res->jump_delay = 0;
-    res->health = 9;
     res->dash_duration = 0;
     res->dash_speed = 25.0f;
     res->dash_delay = 0;
@@ -25,11 +28,59 @@ Perso *create_perso(Map *map) {
 }
 
 
-int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map) {
+void loadPersoTexture(SDL_Renderer *renderer, SDL_Texture **persoTexture, char *path) {
+	SDL_Surface *persoSurface = IMG_Load(path);
+	if (!persoSurface) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in perso surface init %s", IMG_GetError());
+		exit(-1);
+	}
+	*persoTexture = SDL_CreateTextureFromSurface(renderer, persoSurface);
+	if (!*persoTexture) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in perso texture init: %s", SDL_GetError());
+		exit(-1);
+	}
+    // SDL_SetTextureScaleMode(*persoTexture, SDL_ScaleModeLinear);
+	SDL_FreeSurface(persoSurface);
+}
+
+
+int display_perso_hitbox(SDL_Renderer *renderer, Perso *perso, Map *map) {
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
     SDL_Rect rect1 = {.x = perso->hitbox.x - map->x_cam, .y = perso->hitbox.y, .w = perso->hitbox.w, .h = perso->hitbox.h};
     if (SDL_RenderDrawRect(renderer, &rect1)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in draw rect : %s", SDL_GetError());
 		exit(-1);
+    }
+    return 0;
+}
+
+
+int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox) {
+    int c = 96; // côté du carré de destination du sprite du perso
+    SDL_Rect dst_rect = {.x = perso->x*map->pix_rect - map->x_cam - c/2, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c};
+    perso->spriteOffset = (perso->spriteOffset + 1) % 72;
+    if (perso->dash_duration > 0) {
+        SDL_Rect src_rect = {.x = 4*64, .y = 64, .w = 64, .h = 64};
+        // mettre les sprites de dash
+        SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+        if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+            exit(-1);
+        }
+    }
+    if (perso->vx == 0) {
+        SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 0, .w = 64, .h = 64};
+        SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+        if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+            exit(-1);
+        }
+    }
+    if (showHitbox) {
+        if (display_perso_hitbox(renderer, perso, map)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in display perso hitbox: %s", SDL_GetError());
+            exit(-1);
+        }
     }
     return 0;
 }
@@ -223,7 +274,7 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         if (hitbox_right(perso, map)) {
             perso->vx = min(perso->vx, 0.0f);
             perso->x = j+1 - PERSO_WIDTH/2.0f;
-        }
+        };
         perso->y += perso->vy*DT;
         perso->x += perso->vx*DT;
         updateHitbox(perso, map);
