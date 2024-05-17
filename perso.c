@@ -54,14 +54,40 @@ int display_perso_hitbox(SDL_Renderer *renderer, Perso *perso, Map *map) {
 }
 
 
+int hitbox_bottom(Perso *perso, Map *map) {
+    SDL_Rect hbb = {.x = perso->hitbox.x + 2, .y = perso->hitbox.y + perso->hitbox.h + 3, .w = perso->hitbox.w - 4, .h = 1};
+    SDL_Rect res;
+    int i = perso->y + 1;
+    int j = perso->x;
+    if (map->matrix[i][j] != '-') {
+        SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
+        if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
+    }
+    if (map->matrix[i][j-1] != '-') {
+        SDL_Rect rect = {.x = (j-1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
+        if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
+    }
+    if (map->matrix[i][j+1] != '-') {
+        SDL_Rect rect = {.x = (j+1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
+        if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
+    }
+    return 0;
+}
+
+
 int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox) {
     int c = 96; // côté du carré de destination du sprite du perso
     SDL_Rect dst_rect = {.x = perso->x*map->pix_rect - map->x_cam - c/2, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c};
-    perso->spriteOffset = (perso->spriteOffset + 1) % 72;
     if (perso->dash_duration > 0) {
         int offset = 45; // décalage en x pour les "rémanences"
         SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
-        SDL_Rect src_rect = {.x = 4*64, .y = 64, .w = 64, .h = 64};
+        SDL_Rect src_rect;
+        if (hitbox_bottom(perso, map)) {
+            perso->spriteOffset = (perso->spriteOffset + 1) % 24; // 6 frames par sprite, 4 sprites
+            src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 3*64, .w = 64, .h = 64};
+        } else {
+            src_rect = (SDL_Rect){.x = 6*64, .y = 2*64, .w = 64, .h = 64};
+        }
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
             exit(-1);
@@ -89,8 +115,24 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
             exit(-1);
         }
         SDL_SetTextureAlphaMod(persoTexture, 255);
-    }
-    if (perso->vx == 0) {
+    } else if (perso->vy != 0) {
+        perso->spriteOffset = (perso->spriteOffset + 1) % 42; // 6 frames par sprite, 7 sprites
+        SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 2*64, .w = 64, .h = 64};
+        SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+        if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+            exit(-1);
+        }
+    } else if (perso->vx != 0) {
+        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
+        SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
+        SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
+        if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+            exit(-1);
+        }
+    } else {
+        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 0, .w = 64, .h = 64};
         SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {
@@ -103,27 +145,6 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in display perso hitbox: %s", SDL_GetError());
             exit(-1);
         }
-    }
-    return 0;
-}
-
-
-int hitbox_bottom(Perso *perso, Map *map) {
-    SDL_Rect hbb = {.x = perso->hitbox.x + 2, .y = perso->hitbox.y + perso->hitbox.h + 3, .w = perso->hitbox.w - 4, .h = 1};
-    SDL_Rect res;
-    int i = perso->y + 1;
-    int j = perso->x;
-    if (map->matrix[i][j] != '-') {
-        SDL_Rect rect = {.x = j*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
-        if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
-    }
-    if (map->matrix[i][j-1] != '-') {
-        SDL_Rect rect = {.x = (j-1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
-        if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
-    }
-    if (map->matrix[i][j+1] != '-') {
-        SDL_Rect rect = {.x = (j+1)*map->pix_rect, .y = i*map->pix_rect, .w = map->pix_rect, .h = map->pix_rect};
-        if (SDL_IntersectRect(&hbb, &rect, &res)) return 1;
     }
     return 0;
 }

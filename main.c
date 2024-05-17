@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
         // 	printf("Error drawing the fight");
         // 	exit(-1);
         // }
-        if (display_perso(renderer, perso, map, persoTexture, 1)) { // 1 pour afficher la hitbox
+        if (display_perso(renderer, perso, map, persoTexture, 0)) { // 1 pour afficher la hitbox
             printf("Error drawing the perso");
             exit(-1);
         }
