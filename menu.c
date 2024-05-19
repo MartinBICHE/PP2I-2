@@ -148,7 +148,7 @@ void interactionMenu(SDL_Renderer *renderer) {
     while (SDL_PollEvent(&e) != 0) {
         if (e.type == SDL_QUIT) {
             quit = true;
-        } else if (e.type == SDL_MOUSEBUTTONDOWN || (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT)) {
+        } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
             int mouseX = e.button.x;
             int mouseY = e.button.y;
             if (mouseX >= 0 && mouseX <= Image1Width && mouseY >= 0 && mouseY <= Image1Height && showMenu) {
@@ -247,7 +247,6 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
     // Nettoyez les ressources existantes
     cleanupProjectiles();
     freeProjectileTexture();
-    quitSDL(renderer, window, *perso, *map);
     closeSDL_mixer();
     *perso = NULL;
     *map = NULL;
@@ -268,9 +267,6 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
 
     // Réinitialisez les projectiles
     resetProjectiles();
-
-    // Initialiser SDL et créer la fenêtre et le renderer
-    initSDL(window, renderer);
 
     if (!loadProjectileTexture(*renderer)) {
         SDL_Log("Erreur lors du chargement de la texture du projectile.");

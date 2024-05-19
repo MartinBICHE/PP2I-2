@@ -81,7 +81,7 @@ void updateProjectile(Projectile* projectiles, Perso* perso, float targetX, floa
                     perso->vx += recoil_dx * recoil_strength;
                     perso->vy += recoil_dy * recoil_strength;
                     // Activer le mode recul
-                    perso->recoil_timer = 5; // Définir la durée du recul en frames
+                    perso->recoil_timer = 8; // Définir la durée du recul en frames
                 }
                 projectiles[i].active = false;
             }

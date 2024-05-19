@@ -134,6 +134,7 @@ again :
 
             loadBackgroundTextures(renderer, bgTextures, 5);
             loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
+            loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
             while (running) {
                 Uint64 start = SDL_GetTicks();
@@ -159,8 +160,6 @@ again :
 
                     if (!afficherImage && !isBossMap) {
                         perso->vx = 0;
-                        // if (state[SDL_SCANCODE_A]) perso->vx -= MOOVSPEED;
-                        // if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
                         updateCam(perso, map);
                         updatePerso(perso, map, &enemyStateData, state);
                     }
@@ -185,15 +184,6 @@ again :
                             lastProjectileLoad += totalPauseDuration; 
                             lastBossMoveTime += totalPauseDuration;
                             totalPauseDuration = 0;
-                        }
-
-                        if (perso->recoil_timer > 0) {
-                            perso->recoil_timer--;
-                        } else {
-                            perso->vx = 0;
-                            const Uint8 *state = SDL_GetKeyboardState(NULL);
-                            // if (state[SDL_SCANCODE_A]) perso->vx -= MOVSPEED;
-                            // if (state[SDL_SCANCODE_D]) perso->vx += MOVSPEED;
                         }
 
                         updatePerso(perso, map, &enemyStateData, state);
