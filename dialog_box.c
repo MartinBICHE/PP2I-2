@@ -210,4 +210,3 @@ void initPapirus(DialogBoxData *dialogBoxData, int x, int y) {
   dialogBoxData->delayTimer = 0;
   dialogBoxData->counter = 0;
 }
-

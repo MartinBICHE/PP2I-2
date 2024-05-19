@@ -52,4 +52,3 @@ void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax){
 
 }
 
-

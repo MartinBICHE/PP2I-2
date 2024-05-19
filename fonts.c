@@ -32,4 +32,3 @@ int freeFonts(void){
     fontScroll = NULL;
     return 0;
 }
-

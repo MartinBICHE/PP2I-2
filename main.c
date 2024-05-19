@@ -11,11 +11,14 @@
 #include "fonts.h"
 #include "health.h"
 #include "init.h"
-#include "boss.h"
 #include "map.h"
+#include "pendule.h"
 #include "perso.h"
 #include "scroll.h"
 #include "textures.h"
+#include "projectile.h"
+#include "boss.h"
+#include "menu.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
@@ -27,26 +30,18 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
-#include <SDL2/SDL_mixer.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pendule.h"
-#include "textures.h"
-#include "fonts.h"
-#include "health.h"
-#include "enemyFleche.h"
-#include "enemyBat.h"
-#include "fight.h"
-#include "menu.h"
-#include "projectile.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Event e;
 SDL_Texture *bgTextures[6];
+SDL_Texture *persoTexture;
+SDL_Texture *tileTextures;
 SDL_Texture* projectileTexture = NULL;
 bool showMenu = true;
 bool parametre = false;
@@ -61,7 +56,6 @@ float currentGravity = ACC;
 float jumpSpeed = JUMPSPEED;
 bool showAttentionImage = true;
 bool firstIteration = true;
-SDL_Texture *tileTextures;
 Uint32 lastGravityChange = 0;
 const Uint32 GRAVITY_CHANGE_INTERVAL = 10000; // 10 secondes en millisecondes
 Uint32 lastProjectileLoad = 0;
@@ -73,7 +67,6 @@ Uint32 totalPauseDuration = 0;
 bool isBossMap = false;
 Uint32 boutonGTime = 0;
 Uint32 currentTime1 = 0;
-
 
 // Initialisation du tableau de projectiles
 Projectile projectiles[MAX_PROJECTILES] = {
@@ -87,10 +80,6 @@ int main(int argc, char **argv) {
     SDL_Renderer *renderer;
     initSDL(&window, &renderer);
 
-	// const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255};
-	// const SDL_Color WHITE = {.r = 255, .g = 255, .b = 255, .a = 255};
-	const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
-
 	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
 	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
 	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
@@ -98,10 +87,17 @@ int main(int argc, char **argv) {
 	Perso *perso = create_perso(map);
     Boss *boss = NULL;
 
-	int running = 1;
+    const Uint8 *state = SDL_GetKeyboardState(NULL);
 
-	loadBackgroundTextures(renderer, bgTextures, 5);
-	loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
+    SDL_Event event;
+    int running = 1;
+
+    loadBackgroundTextures(renderer, bgTextures, 5);
+    loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
+    loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+
+    EnemyStateData enemyStateData;
+    initEnemy1(300, 460, &enemyStateData);
 
     // Initialiser SDL_mixer
     if (!initSDL_mixer()) {
@@ -163,11 +159,10 @@ again :
 
                     if (!afficherImage && !isBossMap) {
                         perso->vx = 0;
-                        const Uint8 *state = SDL_GetKeyboardState(NULL);
-                        if (state[SDL_SCANCODE_A]) perso->vx -= MOVSPEED;
-                        if (state[SDL_SCANCODE_D]) perso->vx += MOVSPEED;
+                        // if (state[SDL_SCANCODE_A]) perso->vx -= MOOVSPEED;
+                        // if (state[SDL_SCANCODE_D]) perso->vx += MOOVSPEED;
                         updateCam(perso, map);
-                        updatePerso(perso, map);
+                        updatePerso(perso, map, &enemyStateData, state);
                     }
 
                     if (afficherImage && isBossMap) {
@@ -197,11 +192,11 @@ again :
                         } else {
                             perso->vx = 0;
                             const Uint8 *state = SDL_GetKeyboardState(NULL);
-                            if (state[SDL_SCANCODE_A]) perso->vx -= MOVSPEED;
-                            if (state[SDL_SCANCODE_D]) perso->vx += MOVSPEED;
+                            // if (state[SDL_SCANCODE_A]) perso->vx -= MOVSPEED;
+                            // if (state[SDL_SCANCODE_D]) perso->vx += MOVSPEED;
                         }
 
-                        updatePerso(perso, map);
+                        updatePerso(perso, map, &enemyStateData, state);
                         if (currentTime1 - lastBossMoveTime >= BOSS_MOVE_INTERVAL) {
                             updateBoss(boss, map);
                             lastBossMoveTime = currentTime1;
@@ -241,7 +236,7 @@ again :
                     printf("Error drawing the background");
                     exit(-1);
                 }
-                if (drawMap(renderer, map, "./asset/tileset/ground-1.png", tileTextures)) {
+                if (drawMap(renderer, map, tileTextures)) {
                     printf("Error drawing the map");
                     exit(-1);
                 }
@@ -249,12 +244,13 @@ again :
                 // 	printf("Error drawing the fight");
                 // 	exit(-1);
                 // }
-                SDL_SetRenderDrawColor(renderer, RED.r, RED.g, RED.b, RED.a);
-                if (display_perso(renderer, perso, map)) {
+                if (display_perso(renderer, perso, map, persoTexture, 0)) {
                     printf("Error drawing the perso");
                     exit(-1);
                 }
-                
+                if (!isBossMap) {
+                    enemy1_movement(renderer, &enemyStateData, map);
+                }
                 if (isBossMap) {
                     displayBoss(renderer, boss, map);
 

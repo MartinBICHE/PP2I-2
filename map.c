@@ -131,7 +131,7 @@ void display_tile(SDL_Renderer *renderer, int xoffset, int yoffset, int xpos, in
 
 // Fonction d'affichage de la map
 
-int drawMap(SDL_Renderer *renderer, Map *map, char *ImagePath, SDL_Texture *tileTexture) {
+int drawMap(SDL_Renderer *renderer, Map *map, SDL_Texture *tileTexture) {
 	for (int i = 0 ; i < map->height ; i++) {
 		for (int j = 0 ; j < map->width ; j++) {
 			if (j*map->pix_rect - map->x_cam > -map->pix_rect && j*map->pix_rect - map->x_cam < WINWIDTH) {
