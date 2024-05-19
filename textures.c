@@ -112,7 +112,7 @@ int loadTextures(SDL_Renderer *renderer){
     return 0;
 }
 
-int freeTextures(){
+int freeTextures(void){
 
     SDL_DestroyTexture(textureEnemy1);
     SDL_DestroyTexture(textureEnemy3);

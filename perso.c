@@ -129,7 +129,7 @@ float min(float a, float b) {
 
 void updatePerso(Perso *perso, Map *map) {
     perso->vy += currentGravity*DT;
-    perso->jump_delay = max(perso->jump_delay - 1, 0);
+    perso->jump_delay = max(perso->jump_delay - 1,0);
     int i = floor(perso->y);
     int j = floor(perso->x);
     if (currentGravity > 0) {
@@ -179,7 +179,7 @@ void jump(Perso *perso, Map *map) {
     }
 }
 
-void changeGravity() {
+void changeGravity(void) {
 	if (currentGravity == ACC) {
 		currentGravity = ACC_INVERTED;
 		jumpSpeed = JUMPSPEED_INVERTED;

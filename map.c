@@ -6,6 +6,7 @@
 #include "const.h"
 #include "map.h"
 #include "perso.h"
+#include "boss.h"
 
 Map *initMap(char *name) {
 	char *str_data = malloc(strlen(name) + 20);
@@ -19,7 +20,7 @@ Map *initMap(char *name) {
 
 	int n_cp; // Nombre de checkpoints (pas encore utilisé)
 	FILE *fmetadata = fopen(str_metadata, "r");
-	if (fscanf(fmetadata, "%d %d %d %d %d %d %d %d %d", &res->height, &res->width, &res->start_x, &res->start_y,&res->start_xboss, &res->start_yboss, &res->end_x, &res->end_y, &n_cp) == 0) {
+	if (fscanf(fmetadata, "%d %d %d %d %d %d %d %d %d", &res->height, &res->width, &res->start_x, &res->start_y, &res->end_x, &res->end_y, &n_cp, &res->start_xboss, &res->start_yboss) == 0) {
 		printf("Error in metadata reading");
 	}
 	res->pix_rect = WINHEIGHT/res->height;

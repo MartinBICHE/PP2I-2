@@ -12,6 +12,10 @@ typedef struct _Boss {
     float vx; 
     float vy;
     SDL_Rect hitbox;
+    Uint32 lastMoveTime; // Temps du dernier mouvement
+    int parcoursIndex;
+    int direction;
+    int currentMove;
 } Boss;
 
 // Fonctions

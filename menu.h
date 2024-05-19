@@ -10,20 +10,27 @@
 #include <math.h>
 #include "const.h"
 #include "init.h"
+#include "boss.h"
+#include "projectile.h"
+#include "textures.h"
+#include "map.h"
+#include "perso.h"
+#include "boss.h"
+#include <string.h>
 
-// Fonctions qui permettent de dessiner
-void drawMenu();
-void drawMapMenu();
-void renderSprite();
+
+
+void renderSprite(SDL_Renderer *renderer);
 void renderImage(SDL_Renderer *renderer, const char* imagePath, int x, int y, int width, int height);
-
-// Fonctions qui touchent à la musique 
-bool initSDL_mixer();
-bool loadMusic();
-void playMusic();
-void closeSDL_mixer();
-
-void interactionMenu();
-void interactionPauseJeu();
+bool initSDL_mixer(void);
+bool loadMusic(void);
+void playMusic(void);
+void closeSDL_mixer(void);
+void toggleMusic(void);
+void drawMenu(SDL_Renderer *renderer);
+void drawMapMenu(SDL_Renderer *renderer);
+void interactionMenu(SDL_Renderer *renderer);
+void interactionPauseJeu(SDL_Renderer *renderer);
+void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **perso, Boss **boss);
 
 #endif /* MENU_H */

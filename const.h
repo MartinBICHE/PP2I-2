@@ -14,9 +14,18 @@ extern bool quit;
 extern bool running;
 extern float currentGravity;
 extern float jumpSpeed;
+extern bool showAttentionImage;
+extern bool firstIteration;
+extern Uint32 lastGravityChange;
+extern Uint32 lastProjectileLoad;
+extern Uint32 lastBossMoveTime;
 extern SDL_Event e;
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
+extern SDL_Texture* projectileTexture;
+extern bool isBossMap;
+extern Uint32 currentTime1;
+extern Uint32 boutonGTime;
 
 #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2
 #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2
@@ -62,17 +71,18 @@ extern SDL_Renderer* renderer;
 #define ACC_INVERTED -25.5f // Gravité inversée
 #define DT 1/60.0f
 #define JUMPSPEED 11.0f
-#define JUMPSPEED_INVERTED -11.0f
+#define JUMPSPEED_INVERTED -11.0f 
 #define MOVSPEED 7.0f
 #define PROJECTILE_SPEED 150 // Vitesse du projectile (en nombre de tiles par frame)
 #define MAX_PROJECTILES 3
 #define PROJECTILE_WIDTH 50
 #define PROJECTILE_HEIGHT 50
 #define BOSS_SPEED 5
-#define BOSS_WIDTH 0.66666f // en nombre de tiles
-#define BOSS_HEIGHT 1.33333f // en nombre de tiles
+#define BOSS_WIDTH 1.33333f // en nombre de tiles
+#define BOSS_HEIGHT 2.66666f // en nombre de tiles
 #define BOSS_LEFT_LIMIT 0
 #define BOSS_RIGHT_LIMIT 100
+#define MAX_ROTATION_ANGLE 0.02f // Limite de rotation par mise à jour en radians
 
 typedef struct _Map {
     char** matrix;
@@ -98,6 +108,7 @@ typedef struct _Perso {
     SDL_Rect hitbox;
     int jumps; // nombre de sauts restants
     int jump_delay; // délai entre les sauts (25 frames)
+    int recoil_timer;
 } Perso;
 
 extern Perso* perso;

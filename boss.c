@@ -1,15 +1,29 @@
 #include "boss.h"
 #include <stdlib.h>
 #include "perso.h"
+#include "projectile.h"
+
+// Définition des parcours
+const int parcours[1][20] = {
+    {0,2,0,2,2,0,0,0,1,3,1,1,3,2,1,3,3,2,1,3}
+};
+// 0 : haut
+// 1 : bas 
+// 2 : gauche
+// 3 : droite
+// Parcours 1 : {0,2,0,2,2,2}
 
 // Créer un nouveau boss
 Boss *create_boss(Map* map) {
     Boss* boss = malloc(sizeof(Boss));
-    // Position de départ du boss sur la carte
     boss->x = map->start_xboss; 
     boss->y = map->start_yboss; 
-    boss->vx = BOSS_SPEED;
+    boss->vx = 0;
+    boss->vy = 0;
     boss->hitbox = (SDL_Rect){.x = (boss->x - BOSS_WIDTH/2.0f) * map->pix_rect, .y = (boss->y - BOSS_HEIGHT/2.0f) * map->pix_rect, .w = BOSS_WIDTH * map->pix_rect, .h = BOSS_HEIGHT * map->pix_rect};
+    boss->lastMoveTime = SDL_GetTicks(); // Initialiser le temps du dernier mouvement
+    boss->parcoursIndex = rand() % 1; // Choisir un parcours aléatoire parmi les deux définis
+    boss->currentMove = 0;
     return boss;
 }
 
@@ -131,58 +145,35 @@ int hitboxRightBoss(Boss *boss, Map *map) {
     return 0;
 }
 
-
 void updateBoss(Boss *boss, Map *map) {
-    boss->vy += currentGravity * DT;
-    int i = floor(boss->y);
-    int j = floor(boss->x);
+    // Récupérer la direction du parcours actuel
+    boss->direction = parcours[boss->parcoursIndex][boss->currentMove];
 
-    if (boss->x < 1.4 || boss->x > map->width - BOSS_WIDTH - 0.7) {
-        boss->vx = -boss->vx; // Inverser la direction horizontale
+    float new_x = boss->x;
+    float new_y = boss->y;
+
+    switch (boss->direction) {
+        case 0: // Haut
+            new_y -= 1;
+            break;
+        case 1: // Basg
+            new_y += 1;
+            break;
+        case 2: // Gauche
+            new_x -= 1;
+            break;
+        case 3: // Droite
+            new_x += 1;
+            break;
     }
 
-    static bool gravityChanged = false;
+    // Vérifier les obstacles
+    boss->x = new_x;
+    boss->y = new_y;
 
-    if (currentGravity > 0) {
-        if (hitboxBottomBoss(boss, map)) {
-            boss->vy = min(boss->vy, 0.0f);
-            boss->y = i + 1 - BOSS_HEIGHT / 2.0f;
-        }
-        if (hitboxTopBoss(boss, map)) {
-            boss->vy = max(boss->vy, 0.0f);
-            boss->y = i + BOSS_HEIGHT / 2.0f;
-        }
-    } else {
-        if (hitboxBottomBoss(boss, map)) {
-            boss->vy = min(boss->vy, 0.0f);
-            boss->y = i + 1 - BOSS_HEIGHT / 2.0f;
-        }
-        if (hitboxTopBoss(boss, map)) {
-            boss->vy = max(boss->vy, 0.0f);
-            boss->y = i + BOSS_HEIGHT / 2.0f;
-        }
-    }
+    boss->hitbox.x = (boss->x - BOSS_WIDTH / 2.0f) * map->pix_rect;
+    boss->hitbox.y = (boss->y - BOSS_HEIGHT / 2.0f) * map->pix_rect;
 
-    if (boss->x > 1.5 && boss->x < map->width - BOSS_WIDTH - 0.8) {
-        if (!gravityChanged) {
-            if (hitboxLeftBoss(boss, map)) {
-                boss->vx = max(boss->vx, 0.0f);
-                boss->x = j + BOSS_WIDTH / 2.0f;
-            }
-            if (hitboxRightBoss(boss, map)) {
-                boss->vx = min(boss->vx, 0.0f);
-                boss->x = j + 1 - BOSS_WIDTH / 2.0f;
-            }
-        }
-    }
-
-    gravityChanged = (currentGravity != 0);
-
-    boss->y += boss->vy * DT;
-    boss->x += boss->vx * DT;
-    boss->hitbox = (SDL_Rect){
-        .x = (boss->x - BOSS_WIDTH / 2.0f) * map->pix_rect,
-        .y = (boss->y - BOSS_HEIGHT / 2.0f) * map->pix_rect,
-        .w = BOSS_WIDTH * map->pix_rect,
-        .h = BOSS_HEIGHT * map->pix_rect};
+    // Passer au mouvement suivant du parcours
+    boss->currentMove = (boss->currentMove + 1) % 20; // Parcours de 5 déplacements
 }

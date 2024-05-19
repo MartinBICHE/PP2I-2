@@ -9,7 +9,7 @@ int fontDialogBoxSize = 20;
 int fontDialogBoxBoldSize = 20;
 int fontScrollSize = 23;
 
-int loadFonts(){
+int loadFonts(void){
     fontDialogBox = TTF_OpenFont("asset/Fonts/DisposableDroidBB.ttf", fontDialogBoxSize);
     fontDialogBoxBold = TTF_OpenFont("asset/Fonts/DisposableDroidBB_bld.ttf", fontDialogBoxBoldSize);
     fontScroll = TTF_OpenFont("asset/Fonts/ChopinScript.ttf", fontScrollSize);
@@ -22,7 +22,7 @@ int loadFonts(){
     return 0;
 }
 
-int freeFonts(){
+int freeFonts(void){
 
     TTF_CloseFont(fontDialogBox);
     TTF_CloseFont(fontDialogBoxBold);
