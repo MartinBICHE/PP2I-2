@@ -13,6 +13,7 @@
 #include <SDL2/SDL_video.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "perso.h"
 
 /* s'utilise avec : */
 /* enemy1_movement(renderer, &enemyState, x_cam) */
@@ -27,8 +28,8 @@
 void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData,
                      Map *map) {
   int speed = 64;
-  int interval = 3500;
-  int pauseInterval = 3000;
+  int interval = 1000;
+  /* int pauseInterval = 3000; */
   Uint32 ticks = SDL_GetTicks();
   Uint32 sprite = (ticks / 500) % 10;
   switch (enemyStateData->state) {
@@ -74,8 +75,9 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData,
     }
     break;
   case PAUSE_BOTTOM:
-    if (SDL_GetTicks() - enemyStateData->pauseStart >= pauseInterval) {
+    if (SDL_GetTicks() - enemyStateData->pauseStart >= interval) {
       enemyStateData->state = MOVING_UP;
+      enemyStateData->pauseStart = SDL_GetTicks();
     }
     break;
   }
@@ -103,38 +105,15 @@ void initEnemy1(int x, int y, EnemyStateData *enemyStateData) {
 
 void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map) {
   int intervalAttack = 1000;
-  int pad = 50;
-  /* Mix_VolumeMusic(MIX_MAX_VOLUME / 3); */
-  int spriteLength = 64;
-  float borneInf = enemyStateData->dst_rect.x;
-  float borneSup = borneInf + spriteLength;
-  float persoPositionX = perso->x * map->pix_rect;
-  float borneInfY1 = WINHEIGHT - 128 - map->pix_rect;
-  float borneInfY2 = WINHEIGHT - 192;
-  float persoPositionY = perso->y * map->pix_rect;
-  /* printf("%f\n", perso->y * map->pix_rect - PERSO_HEIGHT * map->pix_rect); */
-  /* printf("%f\n",PERSO_HEIGHT); */
-  /* printf("%f\n",persoPositionY); */
-  /* printf("borne inf %f\n", borneInfY1); */
-  printf("floor %d\n", WINHEIGHT - map->pix_rect);
-  printf("perso %f\n", perso->y * map->pix_rect + PERSO_HEIGHT * map->pix_rect);
-
-  if (persoPositionX >= borneInf && persoPositionX <= borneSup) {
-    if (enemyStateData->state != PAUSE_BOTTOM && perso->health > 0) {
-      if ((enemyStateData->dst_rect.h == borneInfY1 &&
-           persoPositionY >= borneInfY1) ||
-          (enemyStateData->dst_rect.h == borneInfY2 &&
-           persoPositionY >= borneInfY2)) {
-        if (SDL_GetTicks() - enemyStateData->pauseAttack >= intervalAttack) {
-          perso->health -= 1;
-          enemyStateData->pauseAttack = SDL_GetTicks();
-          /* Mix_PlayMusic(musicEnemyFleche, -1); */
-        }
+  if (hitbox_enemy(perso, map, enemyStateData)){
+      if (SDL_GetTicks() - enemyStateData->pauseAttack >= intervalAttack){
+          if (perso->health > 0){
+              perso->health -= 1;
+              enemyStateData->pauseAttack = SDL_GetTicks();
+              /* à mettre effet sonore et animation */
+          }
       }
-    }
-  }
-  if (SDL_GetTicks() - enemyStateData->pauseMusic >= intervalAttack) {
-    Mix_HaltMusic();
-    enemyStateData->pauseMusic = SDL_GetTicks();
   }
 }
+
+/* ajouter une contrainte sur le health pour que ça soit inf à 9 */

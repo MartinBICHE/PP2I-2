@@ -11,6 +11,7 @@
 Perso *create_perso(Map *map) {
     Perso *res = malloc(sizeof(Perso));
     res->x = map->start_x;
+    /* res->x = 3 * map->pix_rect; */
     res->y = map->start_y;
     res->vx = 0;
     res->vy = 0;
@@ -170,6 +171,7 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
         perso->jumps = 2;
     }
     if (enemyStateData->state != PAUSE_BOTTOM) { // Le personnage peut passer si l'ennemi est abaissé
+
         if (hitbox_enemy(perso, map, enemyStateData)) {
             float dx = perso->vx * DT;
             float dy = perso->vy * DT;

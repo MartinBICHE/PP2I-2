@@ -1,9 +1,10 @@
-#ifndef enemybat_h
-#define enemybat_h
+#ifndef ENEMYBAT_H
+#define ENEMYBAT_H
 #include "enemyFleche.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
+#include "graph.h"
 
 enum EnemyBatState{
     BAT_MOVING_RIGHT,
@@ -29,5 +30,14 @@ typedef struct _EnemyBatData EnemyBatData;
 void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax);
 void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map *map);
 void batAttack(EnemyBatData *enemyBatData, Perso *perso, Map *map);
+/* void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **path, int path_length); */
+/* void move_enemy_to_node(EnemyBatData *enemyBatData, Node *node); */
+void enemyBat_mouvement2(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **pathList, Map *map);
+/* void move_enemy_to_node(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node *node); */
+/* void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **path, int path_length, Map *map); */
 
+/* void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], int path_length, Map *map); */
+void move_enemy_smoothly(SDL_Renderer *renderer, EnemyBatData *enemy, Node **path, int path_length, float speed, Map *map);
+void move_enemy_to_node(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node *node, Map *map);
+void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map);
 #endif

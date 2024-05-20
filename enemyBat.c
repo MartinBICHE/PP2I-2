@@ -1,10 +1,11 @@
-#include "enemyBat.h"
 #include "textures.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_timer.h>
-#include "music.h"
+#include "enemyBat.h"
+/* #include "graph.c" */
+/* #include "music.h" */
 
 /* s'utilise avec: */
   /* EnemyBatData enemyBatData; */
@@ -144,4 +145,132 @@ void batAttack(EnemyBatData *enemyBatData, Perso *perso, Map *map){
         enemyBatData->pauseAttack = SDL_GetTicks();
     }
 
+}
+
+void move_enemy_to_node(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node *node, Map *map) {
+    enemyBatData->dst_rect.x = node->x * map->pix_rect;
+    enemyBatData->dst_rect.y = node->y * map->pix_rect;
+    printf("'%d, %d\n", node->x, node->y);
+    SDL_Rect dst_rectFixed = {enemyBatData->dst_rect.x - map->x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h};
+    SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed);
+}
+
+
+/* void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[150], int path_length, Map *map) { */
+/*     int interval = 100; */
+/*     int speed = 10; */
+
+/*     if (path == NULL || enemyBatData == NULL) { */
+/*         printf("Error: Null pointer detected\n"); */
+/*         return; */
+/*     } */
+
+/*     SDL_Rect dst_rectFixed = {enemyBatData->dst_rect.x - map->x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h}; */
+/*     if (enemyBatData->state == BAT_MOVING_RIGHT){ */
+/*         SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed); */
+/*     } */
+/*     for (int i = 0; i < 150; i++) { */
+/*         /1* move_enemy_to_node(renderer, enemyBatData, &path[i], map); *1/ */
+/*         switch(enemyBatData->state){ */
+/*             case BAT_MOVING_RIGHT: */
+/*                 if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){ */
+/*                     enemyBatData->dst_rect.x += speed; */
+/*                     /1* enemyBatData->dst_rect.x = path[i].x * map->pix_rect; *1/ */
+/*                     /1* enemyBatData->dst_rect.y = path[i].y * map->pix_rect; *1/ */
+/*                     SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed); */
+/*                     enemyBatData->pauseStartBits = SDL_GetTicks(); */
+/*                 } */
+/*         } */
+/*     } */
+/* } */
+
+
+void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map) {
+    int interval = 130;
+    int speed = 32;
+    /* int path_length = len_nodes(path); */
+
+
+
+    SDL_Rect dst_rectFixed = {enemyBatData->dst_rect.x - map->x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h};
+
+    int i;
+    for (i = 0; i < 140; i++) {
+         if ((enemyBatData->dst_rect.x < path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_RIGHT && path[i].walkable) ||
+            (enemyBatData->dst_rect.x > path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_LEFT)) {
+            break;
+        }
+    }
+        /* if (path[0].x <= path[path_length-1].x){ */
+        /*     enemyBatData->state = BAT_MOVING_RIGHT; */
+        /*     puts("flkdsj"); */
+        /* } else{ */
+        /*     enemyBatData->state = BAT_MOVING_LEFT; */
+        /* } */
+
+
+    if (enemyBatData->state == BAT_MOVING_RIGHT){
+        SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
+    }
+    if (enemyBatData->state == BAT_MOVING_LEFT){
+        SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed);
+    }
+
+    int pad = 55;
+    int dx = path[i].x * map->pix_rect - enemyBatData->dst_rect.x;
+    int dy = path[i].y * map->pix_rect - enemyBatData->dst_rect.y;
+    printf("%d\n", dx);
+    /* printf("path[%d] %d, %d\n", i, path[i].x, path[i].y); */
+        /* printf("%d\n", enemyBatData->state); */
+    
+
+    switch(enemyBatData->state){
+        case BAT_MOVING_RIGHT:
+            /* if (dx <= 0){ */
+            /*     enemyBatData->state = BAT_MOVING_LEFT; */
+            /* } */
+            if (enemyBatData->dst_rect.x/map->pix_rect >= path[i].x ){
+                enemyBatData->state = BAT_MOVING_LEFT;
+            }
+            if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
+                if (abs(dx) >= speed){
+                    enemyBatData->dst_rect.x += speed * 1;
+                } else {
+                    enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
+                }
+                if (abs(dy) >= speed) {
+                    enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+                } else {
+                    enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
+                }
+                enemyBatData->src_rect.x += 32;
+                if (enemyBatData->src_rect.x == 160){
+                    enemyBatData->src_rect.x = 0;
+                }
+                enemyBatData->pauseStartBits = SDL_GetTicks();
+            }
+            break;
+        case BAT_MOVING_LEFT:
+            /* if (dx >= 0){ */
+            /*     enemyBatData->state = BAT_MOVING_RIGHT; */
+            /* } */
+            if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
+                if (abs(dx) >= speed){
+                    enemyBatData->dst_rect.x += speed * -1;
+                } else{
+                    enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
+                }
+                if (abs(dy) >= speed) {
+                    enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+                } else {
+                    enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
+                }
+                enemyBatData->src_rect.x += 32;
+                if (enemyBatData->src_rect.x == 160){
+                    enemyBatData->src_rect.x = 0;
+                }
+                enemyBatData->pauseStartBits = SDL_GetTicks();
+            }
+            break;
+    }
 }

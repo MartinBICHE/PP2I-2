@@ -33,7 +33,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <SDL2/SDL_mixer.h>
-#include "music.h"
+/* #include "music.h" */
+#include "graph.h"
 
 SDL_Texture *bgTextures[6];
 SDL_Texture *tileTextures;
@@ -60,7 +61,35 @@ int main(int argc, char **argv) {
     /* const SDL_Color BLACK = {.r = 0, .g = 0, .b = 0, .a = 255}; */ 
 
   EnemyStateData enemyStateData;
-  initEnemy1(300, 460, &enemyStateData);
+  initEnemy1(-10, 480, &enemyStateData);
+  /* EnemyStateData enemyStateData2; */
+  /* initEnemy1(800, 580, &enemyStateData2); */
+      EnemyBatData enemyBatData;
+    initEnemyBat(&enemyBatData, 50, 360, 800);
+      EnemyBatData enemyBatData1;
+    initEnemyBat(&enemyBatData1, 0, 460, 800);
+    Node **graph = create_graph(map);
+    Node *goal = &graph[2][123];
+    Node *startA = &graph[8][1];
+    /* print_node(goal); */
+    /* print_node(startA); */
+    /* Node *list1 = a_star(graph, map, goal, start); */
+    Node *list = a_star(graph, map, goal, startA);
+    /* enemyBatData.state = BAT_MOVING_LEFT; */
+    /* print_node(&list[4]); */
+
+    /* for (int i = 0; i<33; i++){ */
+    /*     print_node(&list[i]); */
+    /* } */
+    /* printf("size of list: %d\n", len_nodes(list)); */
+    /* print_node(goal); */
+    /* print_list(list, 30); */
+    /* printf("first element :%d\n", list[0]); */
+    /* print_list(pathList, 10); */
+    /* print_node(graph[2][5].parent); */
+    /* print_node(path); */
+
+
 
   while (running) {
 
@@ -105,8 +134,40 @@ int main(int argc, char **argv) {
             printf("Error drawing the perso");
             exit(-1);
         }
-        enemy1_movement(renderer, &enemyStateData, map);
+        /* enemy1_movement(renderer, &enemyStateData, map); */
+        /* enemy1Attack(&enemyStateData, perso, map); */
         updatePerso(perso, map, &enemyStateData);
+        /* enemyBat_mouvement2(renderer, &enemyBatData, &list, map); */
+        /* updatePerso(perso, map, &enemyStateData2); */
+        /* renderStatusHealth(renderer, perso); */
+                /* enemyBat_mouvement(renderer, &enemyBatData, map); */
+
+        /* for (int i = 0; i<27; i++){ */
+        /*     move_enemy_to_node(renderer, &enemyBatData, &list[i], map); */
+        /* } */
+        /* move_enemy_smoothly(renderer, &enemyBatData, &list, 27, 1, map); */
+        /* printf("%d\n", list[0].x); */
+
+        int goal_y = round(perso->y);
+        int goal_x = round(perso->x);
+        int start_y = round(enemyBatData.dst_rect.y/map->pix_rect);
+        int start_x = round(enemyBatData.dst_rect.x/map->pix_rect);
+        Node goalEnemy = graph[goal_y-1][goal_x-1];
+        Node startEnemy = graph[start_y-1][start_x-1];
+        /* Node *listB = a_star(graph, map, &goalEnemy, startA); */
+        /* printf("start_x, start_y %d, %d\n", start_x, start_y); */
+        /* printf("enemy: start_x, start_y %d, %d\n", enemyBatData.dst_rect.x, enemyBatData.dst_rect.y); */
+        /* printf("goalEnemy (%d, %d)\n", goalEnemy.x, goalEnemy.y); */
+        /* printf("walkable:%b\n", goalEnemy.walkable); */
+        /* print_node(&graph[10][124]); */
+        /* printf("path %d, %d, walkable:%b \n", graph[10][124].walkable, graph[10][124].x, graph[10][124].y ); */
+
+        /* printf("start_x, start_y %f, %f\n", perso->x, perso->y); */
+        /* Node *list = a_star(graph, map, goal, start); */
+        /* follow_path(renderer, &enemyBatData, listB, map); */
+        /* follow_path(renderer, &enemyBatData1, list, map); */
+        /* printf("%d\n", enemyBatData.state); */
+    
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();
@@ -114,7 +175,10 @@ int main(int argc, char **argv) {
         SDL_Delay(fmaxf((1000 * DT - elapsedMS) / 1.0f, 0));
         atexit(SDL_Quit);
     }
+  /* print_graph(graph, map); */
 
+  /* free(list); */
+  free(graph);
     quitSDL(&renderer, &window, perso, map, playerInFight);
     atexit(SDL_Quit);
     return 0;
