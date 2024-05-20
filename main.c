@@ -27,6 +27,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
+#include <SDL2/SDL_mixer.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -35,6 +36,7 @@
 
 SDL_Texture *bgTextures[6];
 SDL_Texture *tileTextures, *persoTexture;
+Mix_Chunk *sounds[1];
 
 int main(int argc, char **argv) {
 
@@ -58,6 +60,8 @@ int main(int argc, char **argv) {
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
     loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+
+    loadSounds(sounds);
 
     EnemyStateData enemyStateData;
     initEnemy1(300, 460, &enemyStateData);
@@ -89,7 +93,7 @@ int main(int argc, char **argv) {
         // 	printf("Error drawing the fight");
         // 	exit(-1);
         // }
-        if (display_perso(renderer, perso, map, persoTexture, 0)) { // 1 pour afficher la hitbox
+        if (display_perso(renderer, perso, map, persoTexture, 0, sounds)) { // 1 pour afficher la hitbox
             printf("Error drawing the perso");
             exit(-1);
         }

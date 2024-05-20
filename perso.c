@@ -4,6 +4,7 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
+#include <SDL2/SDL_mixer.h>
 #include "const.h"
 #include "perso.h"
 
@@ -75,7 +76,7 @@ int hitbox_bottom(Perso *perso, Map *map) {
 }
 
 
-int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox) {
+int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox, Mix_Chunk **sounds) {
     int c = 96; // côté du carré de destination du sprite du perso
     SDL_Rect dst_rect = {.x = perso->x*map->pix_rect - map->x_cam - c/2, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c};
     if (perso->dash_duration > 0) { // perso en train de dasher
@@ -125,6 +126,13 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         }
     } else if (perso->vx != 0) { // perso en train de marcher
         perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
+        if (perso->spriteOffset == 24 || perso->spriteOffset == 60) {
+            int channel = Mix_PlayChannel(-1, sounds[0], 0);
+            if(channel == -1) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing walking sound: %s", Mix_GetError());
+                exit(-1);
+            }
+        }
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
         SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, 0, NULL, flip)) {

@@ -30,12 +30,24 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
        exit(-1);
     }
-
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 6, 2048) < 0) {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
+    
     TTF_Init();
 
     loadTextures(*renderer);
     loadFonts();
 
+}
+
+void loadSounds(Mix_Chunk **sounds){
+    sounds[0] = Mix_LoadWAV("./asset/sounds/walk.wav");
+    if (sounds[0] == NULL) {
+        printf("Failed to load walking sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
 }
 
 void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map){
