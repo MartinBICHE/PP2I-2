@@ -27,4 +27,5 @@ int hitboxLeftBoss(Boss *boss, Map *map);
 int hitboxTopBoss(Boss *boss, Map *map);
 int hitboxBottomBoss(Boss *boss, Map *map);
 
+
 #endif /* BOSS_H */

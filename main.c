@@ -19,6 +19,7 @@
 #include "projectile.h"
 #include "boss.h"
 #include "menu.h"
+#include "game.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
@@ -56,17 +57,17 @@ float currentGravity = ACC;
 float jumpSpeed = JUMPSPEED;
 bool showAttentionImage = true;
 bool firstIteration = true;
+
 Uint32 lastGravityChange = 0;
-const Uint32 GRAVITY_CHANGE_INTERVAL = 10000; // 10 secondes en millisecondes
 Uint32 lastProjectileLoad = 0;
-const Uint32 PROJECTILE_LOAD_INTERVAL = 5000; // 10 secondes en millisecondes
-Uint32 lastBossMoveTime = 0; // Temps du dernier mouvement du boss
-const Uint32 BOSS_MOVE_INTERVAL = 2000;
-Uint32 pauseStartTime = 0;
-Uint32 totalPauseDuration = 0;
-bool isBossMap = false;
+Uint32 lastBossMoveTime = 0;
 Uint32 boutonGTime = 0;
 Uint32 currentTime1 = 0;
+
+Uint32 pauseStartTime = 0;
+Uint32 totalPauseDuration = 0;
+
+bool isBossMap = false;
 
 // Initialisation du tableau de projectiles
 Projectile projectiles[MAX_PROJECTILES] = {
@@ -89,7 +90,6 @@ int main(int argc, char **argv) {
 
     const Uint8 *state = SDL_GetKeyboardState(NULL);
 
-    SDL_Event event;
     int running = 1;
 
     loadBackgroundTextures(renderer, bgTextures, 5);
@@ -158,67 +158,7 @@ again :
                         goto again;
                     } 
 
-                    if (!afficherImage && !isBossMap) {
-                        perso->vx = 0;
-                        updateCam(perso, map);
-                        updatePerso(perso, map, &enemyStateData, state);
-                    }
-
-                    if (afficherImage && isBossMap) {
-                        if (pauseStartTime == 0) {
-                            pauseStartTime = SDL_GetTicks();
-                        }
-                    } else if (!afficherImage && isBossMap){
-                        currentTime1 = SDL_GetTicks();
-                        if (firstIteration) {
-                            lastGravityChange = boutonGTime;
-                            lastProjectileLoad = boutonGTime;
-                            lastBossMoveTime = boutonGTime;
-                            firstIteration = false;
-                        }
-                        if (pauseStartTime != 0) {
-                            Uint32 pauseEndTime = SDL_GetTicks();
-                            totalPauseDuration += (pauseEndTime - pauseStartTime);
-                            pauseStartTime = 0;
-                            lastGravityChange += totalPauseDuration; 
-                            lastProjectileLoad += totalPauseDuration; 
-                            lastBossMoveTime += totalPauseDuration;
-                            totalPauseDuration = 0;
-                        }
-
-                        updatePerso(perso, map, &enemyStateData, state);
-                        if (currentTime1 - lastBossMoveTime >= BOSS_MOVE_INTERVAL) {
-                            updateBoss(boss, map);
-                            lastBossMoveTime = currentTime1;
-                        }
-                        updateCam(perso, map);
-
-                        if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL) {
-                            changeGravity();
-                            lastGravityChange = currentTime1; // Mettre à jour le temps du dernier changement de gravité
-                            showAttentionImage = false;
-                        }
-                        if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-2500 && currentTime1 - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-2000) {
-                            showAttentionImage = true;
-                        } else if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-1500 && currentTime1 - lastGravityChange <= GRAVITY_CHANGE_INTERVAL-1000) {
-                            showAttentionImage = true;
-                        } else if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL-500 && currentTime1 - lastGravityChange <= GRAVITY_CHANGE_INTERVAL) {
-                            showAttentionImage = true;
-                        } else {
-                            showAttentionImage = false;
-                        }
-
-                        if (currentTime1 - lastProjectileLoad >= PROJECTILE_LOAD_INTERVAL) {
-                            for (int i = 0 ; i < MAX_PROJECTILES ; i++) {
-                                if (projectiles[i].active == false) {
-                                    spawnProjectile(i, boss->x, boss->y, perso->x*map->pix_rect, perso->y*map->pix_rect, map);
-                                    lastProjectileLoad = currentTime1;
-                                    break;
-                                }
-                            } 
-                        }
-                        updateProjectile(&projectiles[0],perso,perso->x*map->pix_rect, perso->y*map->pix_rect, map);
-                    }
+                    game(enemyStateData,boss,map,perso,state);
 
                 // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
 
@@ -243,14 +183,11 @@ again :
                 }
                 if (isBossMap) {
                     displayBoss(renderer, boss, map);
-
                     if (showAttentionImage) {
                         renderImage(renderer,"./asset/UI/attention.png",(WINWIDTH / 2 - ImageAttentionWidth / 2),(WINHEIGHT / 2 - ImageAttentionHeight / 2), ImageAttentionWidth, ImageAttentionHeight);
                     }
-                    
                     renderProjectiles(renderer);
                 }
-                
                 drawMapMenu(renderer);
                     
                 // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)

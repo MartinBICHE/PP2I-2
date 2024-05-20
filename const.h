@@ -26,6 +26,9 @@ extern SDL_Texture* projectileTexture;
 extern bool isBossMap;
 extern Uint32 currentTime1;
 extern Uint32 boutonGTime;
+extern Uint32 pauseStartTime;
+extern Uint32 totalPauseDuration;
+extern const Uint8 *state;
 
 #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2
 #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2
@@ -86,6 +89,10 @@ extern Uint32 boutonGTime;
 #define BOSS_LEFT_LIMIT 0
 #define BOSS_RIGHT_LIMIT 100
 #define MAX_ROTATION_ANGLE 0.02f // Limite de rotation par mise à jour en radians
+
+#define GRAVITY_CHANGE_INTERVAL 10000
+#define PROJECTILE_LOAD_INTERVAL 5000
+#define BOSS_MOVE_INTERVAL 2000
 
 typedef struct _Map {
     char** matrix;
