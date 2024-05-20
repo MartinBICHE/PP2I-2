@@ -97,6 +97,7 @@ void initEnemy1(int x, int y, EnemyStateData *enemyStateData){
     enemyStateData->pauseStart = 0;
     enemyStateData->pauseStartBits = 0;
     enemyStateData->pauseAttack = 0;
+    enemyStateData->health = 3; // L'ennemi peut mourir au bout de 3 coups
 
 }
 

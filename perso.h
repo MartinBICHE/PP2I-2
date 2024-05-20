@@ -16,6 +16,8 @@ float max(float, float);
 float min(float, float);
 void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*);
 void jump(Perso*, Map*);
+void persoAttack(Perso *perso, EnemyStateData *enemyStateData);
+void distanceAttack(Perso *perso, EnemyStateData *enemyStateData, Map *map);
 
 
 #endif

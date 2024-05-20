@@ -21,6 +21,7 @@ struct _EnemyStateData{
     SDL_Rect src_rect;
     SDL_Rect dst_rect;
     Uint32 pauseAttack;
+    int health;
 }; 
 
 /* à mettre health dans EnemyState au pire */

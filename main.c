@@ -94,7 +94,6 @@ int main(int argc, char **argv) {
             exit(-1);
         }
         enemy1_movement(renderer, &enemyStateData, map);
-        
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();
