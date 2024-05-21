@@ -64,7 +64,16 @@ int main(int argc, char **argv) {
     loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
     EnemyStateData enemyStateData;
-    initEnemy1(300, 460, &enemyStateData);
+    initEnemy1(-100, 460, &enemyStateData);
+
+    EnemyBatData enemyBatData;
+    initEnemyBat(&enemyBatData, 0, 0,  1000);
+
+
+     Node **graph = create_graph(map);
+     Node *goal = &graph[2][123];
+    Node *startA = &graph[8][1];
+    Node *list = a_star(graph, map, goal, startA);
 
     while (running) {
 
@@ -97,6 +106,14 @@ int main(int argc, char **argv) {
             printf("Error drawing the perso");
             exit(-1);
         }
+
+        
+        int goal_y = round(perso->y);
+        int goal_x = round(perso->x);
+        Node goalEnemy = graph[goal_y-1][goal_x-1];
+        Node *listB = a_star(graph, map, &goalEnemy, startA);
+
+        follow_path(renderer, &enemyBatData, listB, map);
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();

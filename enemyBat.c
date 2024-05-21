@@ -188,25 +188,16 @@ void move_enemy_to_node(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node
 void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map) {
     int interval = 130;
     int speed = 32;
-    /* int path_length = len_nodes(path); */
-
-
-
+    int path_length = len_nodes(path);
     SDL_Rect dst_rectFixed = {enemyBatData->dst_rect.x - map->x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h};
 
     int i;
-    for (i = 0; i < 140; i++) {
-         if ((enemyBatData->dst_rect.x < path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_RIGHT && path[i].walkable) ||
+    for (i = 0; i < path_length; i++) {
+         if ((enemyBatData->dst_rect.x < path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_RIGHT ) ||
             (enemyBatData->dst_rect.x > path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_LEFT)) {
             break;
         }
     }
-        /* if (path[0].x <= path[path_length-1].x){ */
-        /*     enemyBatData->state = BAT_MOVING_RIGHT; */
-        /*     puts("flkdsj"); */
-        /* } else{ */
-        /*     enemyBatData->state = BAT_MOVING_LEFT; */
-        /* } */
 
 
     if (enemyBatData->state == BAT_MOVING_RIGHT){

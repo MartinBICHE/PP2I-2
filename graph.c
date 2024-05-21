@@ -62,7 +62,6 @@ void print_graph(Node **graph, Map *map) {
     }
 }
 
-// Manhattan distance heuristic
 int manhattan_distance(Node *a, Node *b) {
     return abs(a->x - b->x) + abs(a->y - b->y);
 }
@@ -71,7 +70,6 @@ int euclidean_distance(Node *a, Node *b) {
     return round(sqrt(pow(a->x - b->x, 2) + pow(a->y - b->y, 2)));
 }
 
-// Find node with the lowest total cost (g-cost + h-cost) in the open_list
 Node *find_lowest_cost_node(Node **open_list, int open_list_size) {
     int lowest_cost_index = 0;
     for (int i = 1; i < open_list_size; i++) {
@@ -82,7 +80,6 @@ Node *find_lowest_cost_node(Node **open_list, int open_list_size) {
     return open_list[lowest_cost_index];
 }
 
-// Check if a node is in the list
 bool node_in_list(Node **list, int list_size, Node *node) {
     for (int i = 0; i < list_size; i++) {
         if (list[i] == node) {
@@ -92,40 +89,19 @@ bool node_in_list(Node **list, int list_size, Node *node) {
     return false;
 }
 
-// Reconstruct the path from the goal node to the start node
-/* Node *reconstruct_path(Node *current_node) { */
-/*     if (current_node->parent == NULL) { */
-/*         return current_node; */
-/*     } */
-/*     Node *parent_node = reconstruct_path(current_node->parent); */
-/*     parent_node->parent = current_node; */
-/*     return current_node; */
-/* } */
-/* Node *reconstruct_path(Node *end_node) { */
-/*     Node *current_node = end_node; */
-/*     Node *start_node = NULL; */
-
-/*     while (current_node != NULL) { */
-/*         start_node = current_node; */
-/*         current_node = current_node->parent; */
-/*     } */
-
-/*     return start_node; */
-/* } */
 Node *reconstruct_path(Node *end_node) {
     Node *current_node = end_node;
-    Node *path = NULL; // This will store the reconstructed path
+    Node *path = NULL; 
     Node *temp;
 
     while (current_node != NULL) {
-        // Prepend the current node to the path
         temp = path;
         path = current_node;
-        path->parent = temp; // Update the parent pointer for the reconstructed path
+        path->parent = temp; 
         current_node = current_node->parent;
     }
 
-    return path; // Return the start of the reconstructed path
+    return path; 
 }
 
 // A* algorithm
@@ -216,19 +192,6 @@ void print_list(int *list, int length) {
 }
 
 
-int *create_array(int n) {
-    // allocate memory for the array
-    int *array = malloc(n * sizeof(int));
-
-    // fill the array with values from 1 to n
-    for (int i = 0; i < n; i++) {
-        array[i] = i + 1;
-    }
-
-    // return a pointer to the first element of the array
-    return array;
-}
-
 int len_nodes(Node array[MAX_NODES]){
     int i = 0;
     int len = 0;
@@ -239,16 +202,6 @@ int len_nodes(Node array[MAX_NODES]){
     return len;
 }
 
-/* int len_nodes(Node array[MAX_NODES]) { */
-/*     int len = 0; */
-/*     for (int i = 0; i < MAX_NODES; i++) { */
-/*         if (array[i].parent == NULL) { */
-/*             break; */ 
-/*         } */
-/*         len++; */
-/*     } */
-/*     return len; */
-/* } */
 
 
 
