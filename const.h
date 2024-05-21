@@ -8,8 +8,8 @@
 #define TIERWIDTH WINWIDTH/3
 #define QUARTERHEIGHT WINHEIGHT/4
 #define SPRITESIZE 64 // 64x64 taille des sprites de base
-#define PERSO_WIDTH 0.66666f // en nombre de tiles
-#define PERSO_HEIGHT 1.33333f // en nombre de tiles
+#define PERSO_WIDTH 0.8f // en nombre de tiles (la hitbox pas le sprite)
+#define PERSO_HEIGHT 1.8f // en nombre de tiles (la hitbox pas le sprite)
 #define ACC 25.5f
 #define DT 1/60.0f
 #define JUMPSPEED 11.0f
@@ -34,10 +34,15 @@ typedef struct _Perso {
     float y; // en nombre de tiles
     float vx; // en nombre de tiles par seconde
     float vy; // en nombre de tiles par seconde
-    int health; //je l'ai rajouté
+    int facing; // -1 : gauche ; 1 : droite
     SDL_Rect hitbox;
+    int spriteOffset; // décalage du sprite dans la spritesheet
+    int health; // je l'ai rajouté
     int jumps; // nombre de sauts restants
-    int jump_delay; // délai entre les sauts (25 frames)
+    int jump_delay; // délai entre les sauts (22 frames)
+    int dash_duration;
+    float dash_speed;
+    int dash_delay;
 } Perso;
 
 extern SDL_Color BLACK;
