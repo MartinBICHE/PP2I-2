@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>
+//#include "perso.h"
 
 enum EnemyState {
     MOVING_UP,
@@ -19,12 +20,14 @@ struct _EnemyStateData{
     Uint32 pauseStart;
     SDL_Rect src_rect;
     SDL_Rect dst_rect;
+    Uint32 pauseAttack;
 }; 
 
 /* à mettre health dans EnemyState au pire */
 
 typedef struct _EnemyStateData EnemyStateData;
 
-void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData);
 void initEnemy1(int x, int y, EnemyStateData *enemyStateData);
+void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, Map *map);
+void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map);
 #endif

@@ -15,15 +15,15 @@
 #include "fonts.h"
 
 
-/* s'utilise avec: */ 
+/* s'utilise avec: */
 /* ScrollStateData scrollStateData; */
 /*   initScroll(&scrollStateData, xPos(à définir), yPos(à définir)); */
 /* const char *text = "texte(à définir)"; */
-/* scroll_movement(renderer, text, BLACK, &scrollStateData); */
+/* scroll_movement(renderer, text, BLACK, &scrollStateData, x_cam); */
 
-void scroll_movement(SDL_Renderer *renderer, 
+void scroll_movement(SDL_Renderer *renderer,
                        const char *text, SDL_Color color,
-                       ScrollStateData *scrollStateData) {
+                       ScrollStateData *scrollStateData, float x_cam) {
   int speed = 1;
   int interval = 6000;
   int textLength = strlen(text);
@@ -37,7 +37,9 @@ void scroll_movement(SDL_Renderer *renderer,
   Uint32 format;
   int access, textWidth, textHeight;
   SDL_QueryTexture(textureText, &format, &access, &textWidth, &textHeight);
-  SDL_RenderCopy(renderer, textureScroll, &scrollStateData->src_rect, &scrollStateData->dst_rect);
+  SDL_Rect dst_rectFixed = {scrollStateData->dst_rect.x - x_cam, scrollStateData->dst_rect.y, scrollStateData->dst_rect.w, scrollStateData->dst_rect.h};
+  /* SDL_RenderCopy(renderer, textureScroll, &scrollStateData->src_rect, &scrollStateData->dst_rect); */
+  SDL_RenderCopy(renderer, textureScroll, &scrollStateData->src_rect, &dst_rectFixed);
   SDL_Rect dst_rectText = {scrollStateData->dst_rect.x + pad, scrollStateData->dst_rect.y + pad, 5, 5};
   int padText = 100;
 
@@ -58,15 +60,16 @@ void scroll_movement(SDL_Renderer *renderer,
       currentText[scrollStateData->currentCharIndex + 1] = '\0';
       SDL_Surface *surfaceText = TTF_RenderText_Blended_Wrapped(
           fontScroll, currentText, color, scrollStateData->dst_rect.w - 50);
-      SDL_Texture *textureText =
-          SDL_CreateTextureFromSurface(renderer, surfaceText);
+      SDL_Texture *textureText = SDL_CreateTextureFromSurface(renderer, surfaceText);
       SDL_FreeSurface(surfaceText);
       Uint32 format;
       int access, textWidth, textHeight;
       SDL_QueryTexture(textureText, &format, &access, &textWidth, &textHeight);
       dst_rectText.h = textHeight;
       dst_rectText.w = textWidth;
-      SDL_RenderCopy(renderer, textureText, NULL, &dst_rectText);
+      SDL_Rect dst_rectTextFixed = {dst_rectText.x - x_cam, dst_rectText.y, dst_rectText.w, dst_rectText.h};
+      /* SDL_RenderCopy(renderer, textureText, NULL, &dst_rectText); */
+      SDL_RenderCopy(renderer, textureText, NULL, &dst_rectTextFixed);
       SDL_DestroyTexture(textureText);
       if (SDL_GetTicks() - scrollStateData->delayTimer >= delay) {
         scrollStateData->currentCharIndex++;
@@ -82,8 +85,7 @@ void scroll_movement(SDL_Renderer *renderer,
     if (SDL_GetTicks() - scrollStateData->pauseStart >= interval) {
       scrollStateData->state = SCROLL_MOVING_UP;
     }
-    SDL_Surface *surfaceText =
-        TTF_RenderText_Blended_Wrapped(fontScroll, text, color, scrollStateData->dst_rect.w - 50);
+    SDL_Surface *surfaceText = TTF_RenderText_Blended_Wrapped(fontScroll, text, color, scrollStateData->dst_rect.w - 50);
     SDL_Texture *textureText =
         SDL_CreateTextureFromSurface(renderer, surfaceText);
     SDL_FreeSurface(surfaceText);
@@ -92,11 +94,9 @@ void scroll_movement(SDL_Renderer *renderer,
     SDL_QueryTexture(textureText, &format, &access, &textWidth, &textHeight);
     dst_rectText.h = textHeight;
     dst_rectText.w = textWidth;
-    SDL_RenderCopy(renderer, textureText, NULL, &dst_rectText);
-
-    if (SDL_GetTicks() - scrollStateData->pauseStart >= interval) {
-      scrollStateData->state = SCROLL_MOVING_UP;
-    }
+    SDL_Rect dst_rectFixed = {dst_rectText.x - x_cam, dst_rectText.y, dst_rectText.w, dst_rectText.h};
+    /* SDL_RenderCopy(renderer, textureText, NULL, &dst_rectText); */
+    SDL_RenderCopy(renderer, textureText, NULL, &dst_rectFixed);
     break;
 
   case SCROLL_MOVING_UP:
@@ -115,10 +115,8 @@ void initScroll(ScrollStateData *scrollStateData, int x, int y){
   scrollStateData->src_rect.y = 0;
   scrollStateData->src_rect.w = 250;
   scrollStateData->src_rect.h = 10;
-
   scrollStateData->dst_rect.x = x;
   scrollStateData->dst_rect.y = y;
   scrollStateData->dst_rect.w = 250;
   scrollStateData->dst_rect.h = 10;
 }
-

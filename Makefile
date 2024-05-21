@@ -22,8 +22,7 @@ CFLAGS += $(shell pkg-config --cflags SDL2_gfx)
 LDFLAGS += $(shell pkg-config --libs SDL2_gfx)
 CFLAGS += $(shell pkg-config --cflags SDL2_mixer)
 LDFLAGS += $(shell pkg-config --libs SDL2_mixer)
-# CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
-# LDFLAGS += $(shell pkg-config --libs SDL2_tff)
+
 
 
 
@@ -41,4 +40,3 @@ clean:
 run:
 	make
 	./demo
-

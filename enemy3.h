@@ -20,5 +20,5 @@ struct _Enemy3{
 typedef struct _Enemy3 Enemy3;
 void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax);
 
-void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy);
+void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, float x_cam);
 #endif

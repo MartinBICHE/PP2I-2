@@ -6,20 +6,21 @@
 #include <SDL2/SDL_timer.h>
 
 /* s'utilise avec: */
-/*   EnemyBatData enemyBatData; */
+  /* EnemyBatData enemyBatData; */
 /*   initEnemyBat(&enemyBatData, xPos(à définir), yPos(à définir), xMax(à définir)); */
-/* enemyBat_mouvement(renderer, &enemyBatData); */
+/* enemyBat_mouvement(renderer, &enemyBatData, x_cam); */
 
-void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData) {
+void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, float x_cam) {
     int interval = 130;
     int speed = 20;
+    double position_tolerance = 10;
+    SDL_Rect dst_rect = {enemyBatData->dst_rect.x - x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h};
     if (enemyBatData->state == BAT_MOVING_RIGHT){
-            SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &enemyBatData->dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
     }
     if (enemyBatData->state == BAT_MOVING_LEFT){
-        SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &enemyBatData->dst_rect);
+        SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &dst_rect);
     }
-
     switch(enemyBatData->state){
         case BAT_MOVING_RIGHT:
             if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
@@ -30,7 +31,7 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData) {
             if (enemyBatData->src_rect.x == 160){
                 enemyBatData->src_rect.x = 0;
             }
-            if (enemyBatData->dst_rect.x == enemyBatData->xMax){
+            if (fabs((double)enemyBatData->dst_rect.x - enemyBatData->xMax) <= position_tolerance){
                 enemyBatData->state = BAT_MOVING_LEFT;
             }
         case BAT_MOVING_LEFT:
@@ -42,10 +43,11 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData) {
         if (enemyBatData->src_rect.x == 160){
             enemyBatData->src_rect.x = 0;
         }
-        if (enemyBatData->dst_rect.x == enemyBatData->xMin){
+        if (fabs((double)enemyBatData->dst_rect.x - enemyBatData->xMin) <= position_tolerance){
             enemyBatData->state = BAT_MOVING_RIGHT;
         }
     }
+
 }
 
 

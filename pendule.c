@@ -13,6 +13,8 @@
 /* PenduleData penduleData; */
 /* initPendule(&penduleData, texturePendule, xPos(à définir), yPost(à définir")) */
 
+/* ça fonctionne bien mais c'est moche donc on va le laisser pour l'instant */
+
 void pendule_mouvement(SDL_Renderer *renderer, PenduleData *penduleData){
     float angle = penduleData->amplitude * cos(2 * PI * penduleData->time / penduleData->period + PI);
     penduleData->x = 30*penduleData->amplitude * sin(angle) + penduleData->xInit;

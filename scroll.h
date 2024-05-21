@@ -34,7 +34,7 @@ typedef struct _ScrollStateData ScrollStateData;
 
 void initScroll(ScrollStateData *scrollStateData, int x, int y);
 
-void scroll_movement(SDL_Renderer *renderer, 
-                        const char *text, SDL_Color color,
-                       ScrollStateData *scrollStateData);
+void scroll_movement(SDL_Renderer *renderer,
+                       const char *text, SDL_Color color,
+                       ScrollStateData *scrollStateData, float x_cam);
 #endif
