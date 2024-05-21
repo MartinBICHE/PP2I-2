@@ -45,7 +45,8 @@ typedef struct _PersoFight {
 
 typedef struct _AttackFight {
     int x; // Position de l'attaque
-    int y; // Position de l'attaque
+    int y;
+    int warning; // Position de l'attaque
     int delay; // Temps avant la prochaine attaque
     int hitPoint; // Si l'attaque est un point pour infliger des dégats au boss
 } AttackFight;

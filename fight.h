@@ -26,7 +26,7 @@ int threeTimedAttack(SDL_Renderer*, PersoFight*, AttackFight*, AttackFight*, Att
 
 /* Implémentation des combats de boss */
 
-int fightBoss(SDL_Renderer*, bossFight*, PersoFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*);
+int fightBoss(SDL_Renderer*, bossFight*, PersoFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*);
 
 
 

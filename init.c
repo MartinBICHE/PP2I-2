@@ -25,6 +25,7 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError());
 		exit(-1);
 	}
+
     TTF_Init();
 
     loadTextures(*renderer);

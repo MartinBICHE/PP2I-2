@@ -59,11 +59,12 @@ int main(int argc, char **argv) {
 	boss->attack1Delay = 3*boss->delay;
 	boss->attack2Delay = 3*boss->delay;
 	boss->attack3Delay = 3*boss->delay;
-	boss->speed = 2;
+	boss->speed = 4;
 
 	/* Déclaration des attaques pour le gameplay 2 */
 
-	AttackFight *nullAttack = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *nullAttack1 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *nullAttack2 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, boss);
 	AttackFight *attack1 = initAttack(0, 2*QUARTERHEIGHT, boss);
 	AttackFight *attack2 = initAttack(TIERWIDTH, 2*QUARTERHEIGHT, boss);
 	AttackFight *attack3 = initAttack(2*TIERWIDTH, 2*QUARTERHEIGHT, boss);
@@ -117,7 +118,7 @@ int main(int argc, char **argv) {
 			printf("Error drawing the map");
 			exit(-1);
 		}
-        if (fightBoss(renderer, boss, playerInFight,nullAttack, attack1, attack2, attack3, attack4, attack5, attack6)) {
+        if (fightBoss(renderer, boss, playerInFight, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6)) {
             printf("Error playing boss fight");
 			exit(-1);
 		}
@@ -138,10 +139,6 @@ int main(int argc, char **argv) {
 		// SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
     	// SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
-	printf("vie = %d\n", playerInFight->health);
-	printf("vie du boss = %d\n", boss ->health);
-	printf("phase = %d\n", boss->phase);
-
     SDL_RenderPresent(renderer);
 
     Uint64 end = SDL_GetTicks();
@@ -149,7 +146,8 @@ int main(int argc, char **argv) {
     SDL_Delay(fmaxf((1000 * DT - elapsedMS) / 1.0f, 0));
   	}
 
-	free(nullAttack);
+	free(nullAttack1);
+    free(nullAttack2);
 	free(attack1);
 	free(attack2);
 	free(attack3);
