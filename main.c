@@ -36,7 +36,7 @@
 
 SDL_Texture *bgTextures[6];
 SDL_Texture *tileTextures, *persoTexture;
-Mix_Chunk *sounds[1];
+Mix_Chunk *sounds[2];
 
 int main(int argc, char **argv) {
 

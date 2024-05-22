@@ -48,6 +48,12 @@ void loadSounds(Mix_Chunk **sounds){
         printf("Failed to load walking sound effect! SDL_mixer Error: %s\n", Mix_GetError());
         exit(-1);
     }
+    sounds[1] = Mix_LoadWAV("./asset/sounds/dash.wav");
+    if (sounds[1] == NULL) {
+        printf("Failed to load dashing sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
+    Mix_VolumeChunk(sounds[1], MIX_MAX_VOLUME/2);
 }
 
 void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map){

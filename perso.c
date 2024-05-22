@@ -79,6 +79,13 @@ int hitbox_bottom(Perso *perso, Map *map) {
 int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox, Mix_Chunk **sounds) {
     int c = 96; // côté du carré de destination du sprite du perso
     SDL_Rect dst_rect = {.x = perso->x*map->pix_rect - map->x_cam - c/2, .y = perso->y*map->pix_rect - c/2 - 6, .w = c, .h = c};
+    if (perso->dash_duration == 10) {
+        int channel = Mix_PlayChannel(-1, sounds[1], 0);
+        if(channel == -1) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing dashing sound: %s", Mix_GetError());
+            exit(-1);
+        }
+    }
     if (perso->dash_duration > 0) { // perso en train de dasher
         int offset = 45; // décalage en x pour les "rémanences"
         SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
@@ -305,7 +312,7 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
         if (state[SDL_SCANCODE_J] && perso->dash_delay == 0) {
             perso->dash_duration = 11;
-            perso->dash_delay = 30;
+            perso->dash_delay = 25;
         }
         int i = floor(perso->y);
         int j = floor(perso->x);
