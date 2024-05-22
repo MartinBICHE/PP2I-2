@@ -6,45 +6,30 @@
 #include <SDL2/SDL_ttf.h>
 #include "map.h"
 #include "const.h"
+#include "graph.h"
+#include "textures.h"
 
-struct _MoveData{
-    int jumpDirection;  
-    int position;
+
+enum Enemy2State{
+    EYE_MOVING_RIGHT,
+    EYE_MOVING_LEFT
 };
-typedef struct _MoveData MoveData;
-
-
-struct _MoveList{
-    MoveData mouvement;
-    struct _MoveList *next;
-};
-typedef struct _MoveList MoveList;
-
 
 struct _Enemy2{
-    char *image_path;
-    int speed;
-    float xPosition;
-    float yPosition;
+    enum Enemy2State state;
     int health;
-    int collision_min_x;
-    int collision_max_x;
-    int collision_min_y;
-    int collision_max_y;
-    int xInitialPosition;
-    int yInitialPosition;
+    SDL_Rect dst_rect;
+    SDL_Rect src_rect;
+    Uint32 pauseStartBits;
+    Uint32 pauseAttack;
+    Node *goal;
+    Node *start;
 };
 typedef struct _Enemy2 Enemy2;
 
 
-MoveList *newMoveList(MoveData data);
-void insertAtEnd(MoveList **head, MoveData data);
-void printList(MoveList* head);
-void traverse(MoveList *last);
-void enemy2_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *dst_rect, SDL_Rect *src_rect, Enemy2 *enemy, float scale, Map *map, MoveList **list_ptr);
-void enemy2_movement_1(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *dst_rect, SDL_Rect *src_rect, Enemy2 *enemy, float scale, Map *map, MoveList **list_ptr);
-void concatenate(MoveList** head1, MoveList** head2);
-MoveList *rightMovementList(const int xInitialPosition, const int yInitialPosition, Map map, int xEndPosition);
-MoveList *leftMovementList(const int xInitialPosition, const int yInitialPosition, Map map, int xEndPosition);
+void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map);
+void initEnemy2(Enemy2 *enemy, Node *start, Node *goal, Map *map);
+void enemy2Attack(Enemy2 *enemy, Perso *perso, Map *map);
 
 #endif

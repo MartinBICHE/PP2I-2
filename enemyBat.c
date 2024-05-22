@@ -5,7 +5,6 @@
 #include <SDL2/SDL_timer.h>
 #include "enemyBat.h"
 /* #include "graph.c" */
-/* #include "music.h" */
 
 /* s'utilise avec: */
   /* EnemyBatData enemyBatData; */
@@ -185,83 +184,159 @@ void move_enemy_to_node(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node
 /* } */
 
 
-void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map) {
-    int interval = 130;
-    int speed = 32;
-    int path_length = len_nodes(path);
+void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map, Perso *perso) {
+    int interval = 130;   // Animation interval in milliseconds
+    int speed = 32;       // Movement speed
     SDL_Rect dst_rectFixed = {enemyBatData->dst_rect.x - map->x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h};
+    int path_length = len_nodes(path);
 
+    // Find the current target node in the path
     int i;
     for (i = 0; i < path_length; i++) {
-         if ((enemyBatData->dst_rect.x < path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_RIGHT ) ||
+        if ((enemyBatData->dst_rect.x < path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_RIGHT) ||
             (enemyBatData->dst_rect.x > path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_LEFT)) {
             break;
         }
     }
 
-
-    if (enemyBatData->state == BAT_MOVING_RIGHT){
-        SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
+    // Play sound effect and adjust volume based on distance to the player
+    int channel = Mix_PlayChannel(-1, musicEnemyBat, 0);
+    double distance = fabs(perso->x * map->pix_rect - enemyBatData->dst_rect.x);
+    if (distance > MAX_HEARING_DISTANCE) {
+        Mix_Volume(channel, MIN_VOLUME);
+    } else {
+        double attenuation = 5.0 / (distance - 100); // Adjust the attenuation formula as needed
+        int volume = (int)(MAX_VOLUME * attenuation);
+        Mix_Volume(channel, volume);
+        printf("Adjusting volume to %d on channel %d based on distance %f\n", volume, channel, distance);
     }
-    if (enemyBatData->state == BAT_MOVING_LEFT){
+
+    // Render the bat sprite based on its state (direction)
+    if (enemyBatData->state == BAT_MOVING_RIGHT) {
+        SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
+    } else if (enemyBatData->state == BAT_MOVING_LEFT) {
         SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed);
     }
 
-    int pad = 55;
+    // Calculate the difference in position to the current target node
     int dx = path[i].x * map->pix_rect - enemyBatData->dst_rect.x;
     int dy = path[i].y * map->pix_rect - enemyBatData->dst_rect.y;
-    printf("%d\n", dx);
-    /* printf("path[%d] %d, %d\n", i, path[i].x, path[i].y); */
-        /* printf("%d\n", enemyBatData->state); */
-    
+    printf("dx: %d\n", dx);
 
-    switch(enemyBatData->state){
-        case BAT_MOVING_RIGHT:
-            /* if (dx <= 0){ */
-            /*     enemyBatData->state = BAT_MOVING_LEFT; */
-            /* } */
-            if (enemyBatData->dst_rect.x/map->pix_rect >= path[i].x ){
+    // Move the bat towards the target node
+    if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval) {
+        if (enemyBatData->state == BAT_MOVING_RIGHT) {
+            if (enemyBatData->dst_rect.x / map->pix_rect >= path[i].x) {
                 enemyBatData->state = BAT_MOVING_LEFT;
             }
-            if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
-                if (abs(dx) >= speed){
-                    enemyBatData->dst_rect.x += speed * 1;
-                } else {
-                    enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
-                }
-                if (abs(dy) >= speed) {
-                    enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
-                } else {
-                    enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
-                }
-                enemyBatData->src_rect.x += 32;
-                if (enemyBatData->src_rect.x == 160){
-                    enemyBatData->src_rect.x = 0;
-                }
-                enemyBatData->pauseStartBits = SDL_GetTicks();
+            if (abs(dx) >= speed) {
+                enemyBatData->dst_rect.x += speed;
+            } else {
+                enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
             }
-            break;
-        case BAT_MOVING_LEFT:
-            /* if (dx >= 0){ */
-            /*     enemyBatData->state = BAT_MOVING_RIGHT; */
-            /* } */
-            if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
-                if (abs(dx) >= speed){
-                    enemyBatData->dst_rect.x += speed * -1;
-                } else{
-                    enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
-                }
-                if (abs(dy) >= speed) {
-                    enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
-                } else {
-                    enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
-                }
-                enemyBatData->src_rect.x += 32;
-                if (enemyBatData->src_rect.x == 160){
-                    enemyBatData->src_rect.x = 0;
-                }
-                enemyBatData->pauseStartBits = SDL_GetTicks();
+            if (abs(dy) >= speed) {
+                enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+            } else {
+                enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
             }
-            break;
+        } else if (enemyBatData->state == BAT_MOVING_LEFT) {
+            if (abs(dx) >= speed) {
+                enemyBatData->dst_rect.x -= speed;
+            } else {
+                enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
+            }
+            if (abs(dy) >= speed) {
+                enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+            } else {
+                enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
+            }
+        }
+
+        // Update animation frame
+        enemyBatData->src_rect.x += 32;
+        if (enemyBatData->src_rect.x >= 160) {
+            enemyBatData->src_rect.x = 0;
+        }
+        enemyBatData->pauseStartBits = SDL_GetTicks();
     }
+}
+void follow_path2(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **graph, Map *map, Perso *perso) {
+    int interval = 130;   // Animation interval in milliseconds
+    int speed = 32;       // Movement speed
+    Node *goal = &graph[2][144];
+    Node *start = &graph[8][1];
+    Node *path = a_star(graph, map, goal, start);
+    SDL_Rect dst_rectFixed = {enemyBatData->dst_rect.x - map->x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h};
+    int path_length = len_nodes(path);
+
+    // Find the current target node in the path
+    int i;
+    for (i = 0; i < path_length; i++) {
+        if ((enemyBatData->dst_rect.x < path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_RIGHT) ||
+            (enemyBatData->dst_rect.x > path[i].x * map->pix_rect && enemyBatData->state == BAT_MOVING_LEFT)) {
+            break;
+        }
+    }
+
+    // Play sound effect and adjust volume based on distance to the player
+    int channel = Mix_PlayChannel(-1, musicEnemyBat, 0);
+    double distance = fabs(perso->x * map->pix_rect - enemyBatData->dst_rect.x);
+    if (distance > MAX_HEARING_DISTANCE) {
+        Mix_Volume(channel, MIN_VOLUME);
+    } else {
+        double attenuation = 5.0 / (distance - 100); // Adjust the attenuation formula as needed
+        int volume = (int)(MAX_VOLUME * attenuation);
+        Mix_Volume(channel, volume);
+        printf("Adjusting volume to %d on channel %d based on distance %f\n", volume, channel, distance);
+    }
+
+    // Render the bat sprite based on its state (direction)
+    if (enemyBatData->state == BAT_MOVING_RIGHT) {
+        SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
+    } else if (enemyBatData->state == BAT_MOVING_LEFT) {
+        SDL_RenderCopy(renderer, textureBat, &enemyBatData->src_rect, &dst_rectFixed);
+    }
+
+    // Calculate the difference in position to the current target node
+    int dx = path[i].x * map->pix_rect - enemyBatData->dst_rect.x;
+    int dy = path[i].y * map->pix_rect - enemyBatData->dst_rect.y;
+    printf("dx: %d\n", dx);
+
+    // Move the bat towards the target node
+    if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval) {
+        if (enemyBatData->state == BAT_MOVING_RIGHT) {
+            if (enemyBatData->dst_rect.x / map->pix_rect >= path[i].x) {
+                enemyBatData->state = BAT_MOVING_LEFT;
+            }
+            if (abs(dx) >= speed) {
+                enemyBatData->dst_rect.x += speed;
+            } else {
+                enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
+            }
+            if (abs(dy) >= speed) {
+                enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+            } else {
+                enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
+            }
+        } else if (enemyBatData->state == BAT_MOVING_LEFT) {
+            if (abs(dx) >= speed) {
+                enemyBatData->dst_rect.x -= speed;
+            } else {
+                enemyBatData->dst_rect.x = path[i].x * map->pix_rect;
+            }
+            if (abs(dy) >= speed) {
+                enemyBatData->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+            } else {
+                enemyBatData->dst_rect.y = path[i].y * map->pix_rect;
+            }
+        }
+
+        // Update animation frame
+        enemyBatData->src_rect.x += 32;
+        if (enemyBatData->src_rect.x >= 160) {
+            enemyBatData->src_rect.x = 0;
+        }
+        enemyBatData->pauseStartBits = SDL_GetTicks();
+    }
+    free(path);
 }

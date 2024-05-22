@@ -38,4 +38,5 @@ int len_nodes(Node array[MAX_NODES]);
 
 void invert_array(Node arr[], int n);
 Node* invert_node_array(const Node *array, int length);
+void free_graph(Node **graph, Map *map);
 #endif

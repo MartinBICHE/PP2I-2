@@ -39,7 +39,7 @@ void savePosition(const char *filename, Perso *perso){
 void loadPosition(const char *filename, Perso *perso){
     FILE *file = fopen(filename, "rb");
     if (file != NULL){
-        if (1 != fread(perso, sizeof(Perso), 1, file));
+        if (1 != fread(perso, sizeof(Perso), 1, file))
         fclose(file);
     }
 }
@@ -53,5 +53,11 @@ void checkCheckpoint(CheckpointList *list, Perso *perso, const char *filename) {
             printf("%f\n", perso->x);
         }
     }
+}
+
+
+void free_checkpoints(CheckpointList *list){
+    free(list->xPositions);
+    free(list);
 }
 

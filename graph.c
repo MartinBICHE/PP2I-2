@@ -46,6 +46,20 @@ Node **create_graph(Map *map){
     return graph;
 }
 /* donne des memory leaks cette chose, à règler après */
+void free_graph(Node **graph, Map *map) {
+    if (graph == NULL) {
+        return;
+    }
+    for (int i = 0; i < map->height; i++) {
+        for (int j = 0; j < map->width; j++) {
+            if (graph[i][j].neighbors != NULL){
+                free(graph[i][j].neighbors);
+            }
+        }
+        free(graph[i]);  // Free each row
+    }
+    free(graph);  // Free the graph itself
+}
 
 
 void print_graph(Node **graph, Map *map) {
@@ -104,63 +118,6 @@ Node *reconstruct_path(Node *end_node) {
     return path; 
 }
 
-// A* algorithm
-Node *a_star(Node **graph, Map *map, Node *start_node, Node *goal_node) {
-    int initialCapacity = 1500;
-    int open_list_size = 0;
-    int closed_list_size = 0;
-    Node *array = calloc(MAX_NODES, sizeof(Node));
-    Node **open_list = (Node **)malloc(initialCapacity * sizeof(Node *));
-    Node **closed_list = (Node **)malloc(initialCapacity* sizeof(Node *));
-
-    start_node->g_cost = 0;
-    start_node->h_cost = euclidean_distance(start_node, goal_node);
-    open_list[open_list_size++] = start_node;
-    int path_size = 0;
-    while (open_list_size > 0) {
-        Node *current_node = find_lowest_cost_node(open_list, open_list_size);
-        if (current_node->x == goal_node->x && current_node->y == goal_node->y) {
-            while (current_node != start_node) {
-                array[path_size++] = *current_node;
-                current_node = current_node->parent;
-            }
-            return array;
-        }
-             /* printf("\n"); */
-        /* printf("g_cost: %d, h_cost: %d, x: %d, y: %d\n", current_node->g_cost, current_node->h_cost, current_node->x, current_node->y); */
-
-        for (int i = 0; i < current_node->num_neighbors; i++) {
-            Node *neighbor = current_node->neighbors[i];
-            int tentative_g_cost = current_node->g_cost + current_node->cost;
-
-            if (!node_in_list(closed_list, closed_list_size, neighbor) && (tentative_g_cost < neighbor->g_cost || !node_in_list(open_list, open_list_size, neighbor)))
-            {
-                neighbor->parent = current_node;
-                neighbor->g_cost = tentative_g_cost;
-                neighbor->h_cost = euclidean_distance(neighbor, goal_node);
-
-                if (!node_in_list(open_list, open_list_size, neighbor)) {
-                    open_list[open_list_size++] = neighbor;
-                }
-            }
-        }
-
-        closed_list[closed_list_size++] = current_node;
-        for (int i = 0; i < open_list_size; i++) {
-            if (open_list[i] == current_node) {
-                for (int j = i; j < open_list_size - 1; j++) {
-                    open_list[j] = open_list[j + 1];
-                }
-                open_list_size--;
-                break;
-            }
-        }
-    }
-
-    free(open_list);
-    free(closed_list);
-    return NULL;
-}
 
 void print_node(Node *node) {
     if (node == NULL) {
@@ -202,6 +159,69 @@ int len_nodes(Node array[MAX_NODES]){
     return len;
 }
 
+Node *a_star(Node **graph, Map *map, Node *start_node, Node *goal_node) {
+    if (!goal_node ->walkable || !start_node->walkable){
+        puts("Error: the goal or the start is not walkable");
+        exit(-1);
+    }
+    int initialCapacity = 1500;
+    int open_list_size = 0;
+    int closed_list_size = 0;
+    Node *array = calloc(MAX_NODES, sizeof(Node));
+    Node **open_list = (Node **)malloc(MAX_NODES * sizeof(Node *));
+    Node **closed_list = (Node **)malloc(MAX_NODES* sizeof(Node *));
+
+    start_node->g_cost = 0;
+    start_node->h_cost = euclidean_distance(start_node, goal_node);
+    open_list[open_list_size++] = start_node;
+    int path_size = 0;
+    while (open_list_size > 0) {
+        Node *current_node = find_lowest_cost_node(open_list, open_list_size);
+        if (current_node->x == goal_node->x && current_node->y == goal_node->y) {
+            while (current_node != start_node) {
+                array[path_size++] = *current_node;
+                current_node = current_node->parent;
+
+            }
+            free(open_list);
+            free(closed_list);
+            return array;
+        }
+             /* printf("\n"); */
+        /* printf("g_cost: %d, h_cost: %d, x: %d, y: %d\n", current_node->g_cost, current_node->h_cost, current_node->x, current_node->y); */
+
+        for (int i = 0; i < current_node->num_neighbors; i++) {
+            Node *neighbor = current_node->neighbors[i];
+            int tentative_g_cost = current_node->g_cost + current_node->cost;
+
+            if (!node_in_list(closed_list, closed_list_size, neighbor) && (tentative_g_cost < neighbor->g_cost || !node_in_list(open_list, open_list_size, neighbor)))
+            {
+                neighbor->parent = current_node;
+                neighbor->g_cost = tentative_g_cost;
+                neighbor->h_cost = euclidean_distance(neighbor, goal_node);
+
+                if (!node_in_list(open_list, open_list_size, neighbor)) {
+                    open_list[open_list_size++] = neighbor;
+                }
+            }
+        }
+
+        closed_list[closed_list_size++] = current_node;
+        for (int i = 0; i < open_list_size; i++) {
+            if (open_list[i] == current_node) {
+                for (int j = i; j < open_list_size - 1; j++) {
+                    open_list[j] = open_list[j + 1];
+                }
+                open_list_size--;
+                break;
+            }
+        }
+    }
+
+    free(open_list);
+    free(closed_list);
+    return NULL;
+}
 
 
 

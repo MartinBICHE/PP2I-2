@@ -12,3 +12,4 @@ void loadPosition(const char *filename, Perso *perso);
 void initCheckpointList(CheckpointList *list);
 void addCheckpoint(CheckpointList *list, int position);
 void checkCheckpoint(CheckpointList *list, Perso *perso, const char *filename);
+void free_checkpoints(CheckpointList *list);

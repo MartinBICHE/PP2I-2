@@ -5,6 +5,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include "graph.h"
+#include "music.h"
 
 enum EnemyBatState{
     BAT_MOVING_RIGHT,
@@ -39,5 +40,6 @@ void enemyBat_mouvement2(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Nod
 /* void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], int path_length, Map *map); */
 void move_enemy_smoothly(SDL_Renderer *renderer, EnemyBatData *enemy, Node **path, int path_length, float speed, Map *map);
 void move_enemy_to_node(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node *node, Map *map);
-void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map);
+void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map, Perso *perso);
+void follow_path2(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **graph, Map *map, Perso *perso);
 #endif

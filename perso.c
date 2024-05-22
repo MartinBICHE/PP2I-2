@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_events.h>
-#include "const.h"
 #include "perso.h"
 
 
@@ -347,6 +340,5 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         }
     }
 }
-
 
 

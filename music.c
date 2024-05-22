@@ -38,3 +38,4 @@ int free_music(){
     Mix_FreeChunk(musicEnemyBatAttack);
     return 0;
 }
+
