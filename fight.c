@@ -6,10 +6,11 @@
 #include <time.h>
 #include "const.h"
 #include "fight.h"
+#include "menu.h"
 
 /* Fonction de gestion du personnage */
 
-int fightMovement(SDL_Renderer *renderer, SDL_Event event, PersoFight *player) {
+int fightMovement(SDL_Renderer *renderer, PersoFight *player) {
     static int offset = 0;
     static int line = 0;
 
@@ -37,7 +38,7 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, PersoFight *player) {
     int spriteHeight = spriteFullHeight / 4; 
     int spriteWidth = spriteFullWidth / 12;
 
-    const int INPUT_DELAY_MS = 7; 
+    const int INPUT_DELAY_MS = 3; 
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
     static clock_t lastInputTime = 0;
     clock_t currentTime = clock();
@@ -82,11 +83,10 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, PersoFight *player) {
 void takeDamage(AttackFight *attack, PersoFight *player) {
     if (player->x <= attack->x + TIERWIDTH && player->x >= attack->x && player->y <= attack->y + QUARTERHEIGHT && player->y >= attack->y && player->iframe == 0) {
         player->health -= 1;
-        player->iframe = 200;
+        player->iframe = 0;
     }
     if (player->health == 0) {
         printf("You died\n");
-        exit(0);
     }
 }
 
@@ -376,24 +376,37 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
             attack6->hitPoint = 1;
             boss -> phase = 0;
         }
-        printf("Attack 1 boss delay: %d\n", boss->attack1Delay);
-        printf("Attack 2 boss delay: %d\n", boss->attack2Delay);
-        printf("Attack 3 boss delay: %d\n", boss->attack3Delay);
-        printf("Attack 1 : %d\n", attackDelay1Phase3);
-        printf("Attack 2 : %d\n", attackDelay2Phase3);
-        printf("Attack 3 : %d\n", attackDelay3Phase3);
-        printf("Attack delay 1 : %d\n", attack1->delay);
-        printf("Attack delay 2 : %d\n", attack2->delay);
-        printf("Attack delay 3 : %d\n", attack3->delay);
-        printf("Attack delay 4 : %d\n", attack4->delay);
-        printf("Attack delay 5 : %d\n", attack5->delay);
-        printf("Attack delay 6 : %d\n", attack6->delay);
+        // printf("Attack 1 boss delay: %d\n", boss->attack1Delay);
+        // printf("Attack 2 boss delay: %d\n", boss->attack2Delay);
+        // printf("Attack 3 boss delay: %d\n", boss->attack3Delay);
+        // printf("Attack 1 : %d\n", attackDelay1Phase3);
+        // printf("Attack 2 : %d\n", attackDelay2Phase3);
+        // printf("Attack 3 : %d\n", attackDelay3Phase3);
+        // printf("Attack delay 1 : %d\n", attack1->delay);
+        // printf("Attack delay 2 : %d\n", attack2->delay);
+        // printf("Attack delay 3 : %d\n", attack3->delay);
+        // printf("Attack delay 4 : %d\n", attack4->delay);
+        // printf("Attack delay 5 : %d\n", attack5->delay);
+        // printf("Attack delay 6 : %d\n", attack6->delay);
 
-    } else if (boss->phase == 0) {
-        if (boss->health == 0) {
-            printf("You won\n");
-            exit(0);
-        }
     }
     return 0;
+}
+
+
+void resetGameplay2(bossFight *boss, AttackFight *nullAttack1, AttackFight *nullAttack2, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, AttackFight *attack4, AttackFight *attack5, AttackFight *attack6) {
+    resetAttack(attack1, 3*boss -> delay);
+    resetAttack(attack2, 3*boss -> delay);
+    resetAttack(attack3, 3*boss -> delay);
+    resetAttack(attack4, 3*boss -> delay);
+    resetAttack(attack5, 3*boss -> delay);
+    resetAttack(attack6, 3*boss -> delay);
+    resetAttack(nullAttack1, 3*boss -> delay);
+    resetAttack(nullAttack2, 3*boss -> delay);
+    attack1->hitPoint = 1;
+    attack2->hitPoint = 1;
+    attack3->hitPoint = 1;
+    attack4->hitPoint = 1;
+    attack5->hitPoint = 1;
+    attack6->hitPoint = 1;
 }

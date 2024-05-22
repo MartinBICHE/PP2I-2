@@ -3,7 +3,7 @@
 
 /* Fonction de gestion du personnage */
 
-int fightMovement(SDL_Renderer*, SDL_Event, PersoFight*);
+int fightMovement(SDL_Renderer*, PersoFight*);
 void takeDamage(AttackFight*, PersoFight*);
 void invincibility(PersoFight*);
 void damageBoss(AttackFight*, PersoFight*, bossFight*);
@@ -27,7 +27,7 @@ int threeTimedAttack(SDL_Renderer*, PersoFight*, AttackFight*, AttackFight*, Att
 /* Implémentation des combats de boss */
 
 int fightBoss(SDL_Renderer*, bossFight*, PersoFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*);
-
+void resetGameplay2(bossFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*, AttackFight*);
 
 
 #endif
