@@ -17,6 +17,6 @@ float max(float, float);
 float min(float, float);
 void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*);
 void jump(Perso*, Map*);
-
+void changeGravity(void);
 
 #endif
