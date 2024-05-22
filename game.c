@@ -4,6 +4,7 @@
 #include "projectile.h"
 #include "boss.h"
 #include "perso.h"
+#include "fight.h"
 
 void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const Uint8 *state) {
     if (!afficherImage && !isBossMap) {
@@ -67,4 +68,10 @@ void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const
         }
         updateProjectile(&projectiles[0],perso,perso->x*map->pix_rect, perso->y*map->pix_rect, map);
     }
+}
+
+
+void game2(SDL_Renderer *renderer, PersoFight *playerInFight, bossFight *boss, AttackFight *nullAttack1, AttackFight *nullAttack2, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, AttackFight *attack4, AttackFight *attack5, AttackFight *attack6) {
+    fightBoss(renderer, boss, playerInFight, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+    fightMovement(renderer, playerInFight);
 }

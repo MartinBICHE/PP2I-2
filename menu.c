@@ -248,9 +248,9 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
     cleanupProjectiles();
     freeProjectileTexture();
     closeSDL_mixer();
-    *perso = NULL;
-    *map = NULL;
-    *boss = NULL;
+    free(*perso);
+    destroyMap(*map); 
+    free(*boss);
 
     // Réinitialisez les variables globales
     running = true;
@@ -296,7 +296,4 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
     }
 
     *perso = create_perso(*map);
-    if (isBossMap) {
-        *boss = create_boss(*map);
-    }
 }

@@ -62,7 +62,6 @@ extern const Uint8 *state;
 // #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2;
 // #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2;
 
-
 #define WINHEIGHT 720 // en pixels
 #define WINWIDTH 1260 // en pixels
 #define TIERWIDTH WINWIDTH/3
@@ -129,7 +128,33 @@ typedef struct _Perso {
 extern Perso* perso;
 extern Map* map;
 
-// Structure de données représentant un projectile
+/* Struct dédié au gameplay 2, on les reconnait au label fight */
+
+typedef struct _PersoFight {
+    float x; // Position du joueur
+    float y; // Position du joueur
+    int health; // Points de vie du joueur
+    int iframe; // Temps d'invincibilité après avoir été touché
+} PersoFight;
+
+typedef struct _AttackFight {
+    int x; // Position de l'attaque
+    int y;
+    int warning; // Position de l'attaque
+    int delay; // Temps avant la prochaine attaque
+    int hitPoint; // Si l'attaque est un point pour infliger des dégats au boss
+} AttackFight;
+
+typedef struct _bossFight {
+    int health; // Points de vie du boss
+    int phase; // Chaque phase a des patterns différent et des vitesses différentes
+    int delay; // Temps avant la prochaine attaque
+    int attack1Delay;
+    int attack2Delay;
+    int attack3Delay;
+    int speed;  // Le vitesse d'enchainement des attaques
+} bossFight;
+
 typedef struct {
     float x; 
     float y;
@@ -140,4 +165,5 @@ typedef struct {
 } Projectile;
 
 extern Projectile projectiles[MAX_PROJECTILES]; // Tableau pour stocker les projectiles actifs
+
 #endif

@@ -4,6 +4,7 @@
 #include "enemy1.h"
 
 
+
 Perso *create_perso(Map*);
 void loadPersoTexture(SDL_Renderer*, SDL_Texture**, char*);
 int display_perso(SDL_Renderer*, Perso*, Map*, SDL_Texture*, int);

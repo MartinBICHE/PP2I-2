@@ -36,6 +36,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// #include "pendule.h"
+#include "textures.h"
+#include "fonts.h"
+#include "health.h"
+#include "enemyFleche.h"
+#include "enemyBat.h"
+#include "fight.h"
+
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -80,10 +88,36 @@ int main(int argc, char **argv) {
     SDL_Window *window;
     SDL_Renderer *renderer;
     initSDL(&window, &renderer);
+    // const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
-	Perso *playerInFight = (Perso*)malloc(sizeof(Perso));
-	playerInFight->y = QUARTERHEIGHT-SPRITESIZE/2;
-	playerInFight->x = TIERWIDTH/2-SPRITESIZE/2;
+    PersoFight *playerInFight = (PersoFight*)malloc(sizeof(PersoFight));
+	playerInFight->y = QUARTERHEIGHT-1.5*SPRITESIZE/2;
+	playerInFight->x = TIERWIDTH/2-1.5*SPRITESIZE/2;
+	playerInFight->health = 9;
+	playerInFight->iframe = 0;
+
+	/* Création du boss */
+
+	bossFight *bossDeath = (bossFight*)malloc(sizeof(bossFight));
+	bossDeath->health = 9;
+	bossDeath->phase = 1;
+	bossDeath->delay = 200;
+	bossDeath->attack1Delay = 3*bossDeath->delay;
+	bossDeath->attack2Delay = 3*bossDeath->delay;
+	bossDeath->attack3Delay = 3*bossDeath->delay;
+	bossDeath->speed = 2;
+
+	/* Déclaration des attaques pour le gameplay 2 */
+
+	AttackFight *nullAttack1 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
+	AttackFight *nullAttack2 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
+	AttackFight *attack1 = initAttack(0, 2*QUARTERHEIGHT, bossDeath);
+	AttackFight *attack2 = initAttack(TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
+	AttackFight *attack3 = initAttack(2*TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
+	AttackFight *attack4 = initAttack(0, 0, bossDeath);
+	AttackFight *attack5 = initAttack(TIERWIDTH, 0, bossDeath);
+	AttackFight *attack6 = initAttack(2*TIERWIDTH, 0, bossDeath);
+    
     Map *map = initMap("map2");
 	Perso *perso = create_perso(map);
     Boss *boss = NULL;
@@ -120,8 +154,9 @@ again :
     retourMenu = false;
     startGame = false;
     prevShowMenu = true;
-
-    resetGame(&window, &renderer, &map, &perso, &boss);
+    if (perso -> health == 0) {
+        revive(perso); // revive ne marche pas créer une fonction resetGame qui renvoie au point de départ
+    }
     // Boucle principale du menu
     quit = false;
     while (!quit) {
@@ -146,47 +181,71 @@ again :
                     } else if (e.key.keysym.sym == SDLK_g && !afficherImage) {
                         boutonGTime = SDL_GetTicks();
                         isBossMap = true;
+                        destroyMap(map);
+                        free(perso);
                         map = initMap("mapBoss1");
                         perso = create_perso(map);
                         boss = create_boss(map);
                         lastGravityChange = currentTime1;
                         lastProjectileLoad = currentTime1;
                         lastBossMoveTime = currentTime1;
+                    } else if (e.key.keysym.sym == SDLK_p && !afficherImage) {
+                        perso -> health = 0;
                     }
-
-                    } if (retourMenu) {
+                    }   
+                    if (retourMenu) {
                         goto again;
                     } 
+                    
 
-                    game(enemyStateData,boss,map,perso,state);
+                
 
                 // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
-
-                if (drawBackground(renderer, bgTextures, 5, map)) {
-                    printf("Error drawing the background");
-                    exit(-1);
-                }
-                if (drawMap(renderer, map, tileTextures)) {
-                    printf("Error drawing the map");
-                    exit(-1);
-                }
-                // if (fightMovement(renderer, event, playerInFight)) {
-                // 	printf("Error drawing the fight");
-                // 	exit(-1);
-                // }
-                if (display_perso(renderer, perso, map, persoTexture, 0)) {
-                    printf("Error drawing the perso");
-                    exit(-1);
-                }
-                if (!isBossMap) {
-                    enemy1_movement(renderer, &enemyStateData, map);
-                }
-                if (isBossMap) {
-                    displayBoss(renderer, boss, map);
-                    if (showAttentionImage) {
-                        renderImage(renderer,"./asset/UI/attention.png",(WINWIDTH / 2 - ImageAttentionWidth / 2),(WINHEIGHT / 2 - ImageAttentionHeight / 2), ImageAttentionWidth, ImageAttentionHeight);
+                if (perso-> health > 0) {
+                    game(enemyStateData,boss,map,perso,state);
+                    if (drawBackground(renderer, bgTextures, 5, map)) {
+                        printf("Error drawing the background");
+                        exit(-1);
                     }
-                    renderProjectiles(renderer);
+                    if (drawMap(renderer, map, tileTextures)) {
+                        printf("Error drawing the map");
+                        exit(-1);
+                    }
+                    if (display_perso(renderer, perso, map, persoTexture, 0)) {
+                        printf("Error drawing the perso");
+                        exit(-1);
+                    }
+                    if (!isBossMap) {
+                        enemy1_movement(renderer, &enemyStateData, map);
+                    }
+                    if (isBossMap) {
+                        displayBoss(renderer, boss, map);
+                        if (showAttentionImage) {
+                            renderImage(renderer,"./asset/UI/attention.png",(WINWIDTH / 2 - ImageAttentionWidth / 2),(WINHEIGHT / 2 - ImageAttentionHeight / 2), ImageAttentionWidth, ImageAttentionHeight);
+                        }
+                        renderProjectiles(renderer);
+                    }
+                    renderStatusHealth(renderer,perso);
+                } else {
+                    
+                    game2(renderer, playerInFight, bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+                    renderStatusHealthFight(renderer,playerInFight);
+                    invincibility(playerInFight);
+                    if (bossDeath->health <= 0) {
+                        revive(perso);
+                        bossDeath->health = 9;
+                        playerInFight->health = 9;
+                        bossDeath->phase = 1;
+                        resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+                    }
+                    if (playerInFight -> health == 0) {
+                        bossDeath->health = 9;
+                        playerInFight->health = 9;
+                        bossDeath->phase = 1;
+                        resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+                        goto again;
+                    }
+                    printf("health : %d\n", playerInFight->health);
                 }
                 drawMapMenu(renderer);
                     
@@ -197,9 +256,11 @@ again :
                 // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
                 // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
-                renderStatusHealth(renderer,perso);
+                
 
                 SDL_RenderPresent(renderer);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderClear(renderer);
 
                 Uint64 end = SDL_GetTicks();
                 float elapsedMS = (end - start);
@@ -208,10 +269,20 @@ again :
             }
         }
     }
+    quitSDL(&renderer, &window, perso, map, boss);
+	free(nullAttack1);
+    free(nullAttack2);
+	free(attack1);
+	free(attack2);
+	free(attack3);
+	free(attack4);
+	free(attack5);
+	free(attack6);
+    free(playerInFight);
+	free(bossDeath);
     cleanupProjectiles();
-    quitSDL(&renderer, &window, perso, map);
     closeSDL_mixer();
-    free(playerInFight); // à bouger ultérieurment dans init.c
     atexit(SDL_Quit);
     return 0;
+    
 }

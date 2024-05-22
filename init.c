@@ -7,6 +7,8 @@
 #include "textures.h"
 #include "fonts.h"
 #include <SDL2/SDL_mixer.h>
+#include "init.h"
+#include "menu.h"
 
 
 void initSDL(SDL_Window **window, SDL_Renderer **renderer){
@@ -31,7 +33,6 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError());
 		exit(-1);
 	}
-
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
        exit(-1);
@@ -43,7 +44,7 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
     loadFonts();
 }
 
-void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map){
+void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map, Boss *boss){
     SDL_DestroyRenderer(*renderer);
     freeTextures();
     freeFonts();
