@@ -5,6 +5,6 @@
 #include "enemy1.h"
 #include "boss.h"
 
-void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,Uint8 *state);
+void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const Uint8 *state);
 
 #endif /* GAME_H */

@@ -69,6 +69,7 @@ void updateProjectile(Projectile* projectiles, Perso* perso, float targetX, floa
             if (!isValidPosition(map, projectiles[i].x, projectiles[i].y) || checkProjectileCollisionWithPerso(&projectiles[i], perso)) {
                 // Si le projectile touche le personnage, appliquer le recul
                 if (checkProjectileCollisionWithPerso(&projectiles[i], perso)) {
+                    perso -> health -=1;
                     // Calculer la direction du recul
                     float recoil_dx = projectiles[i].vx;
                     float recoil_dy = projectiles[i].vy;

@@ -147,10 +147,12 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
             exit(-1);
         }
     } else if (perso->vx != 0) {
-        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
-        SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
-        if (currentGravity < 0) {
-            SDL_Rect src_rect = {.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
+        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
+        SDL_Rect src_rect;
+        if (currentGravity > 0) {
+            src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
+        } else {
+            src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
         }
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());

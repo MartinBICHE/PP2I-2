@@ -5,7 +5,7 @@
 #include "boss.h"
 #include "perso.h"
 
-void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,Uint8 *state) {
+void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const Uint8 *state) {
     if (!afficherImage && !isBossMap) {
         perso->vx = 0;
         updateCam(perso, map);

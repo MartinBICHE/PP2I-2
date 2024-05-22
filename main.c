@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
     }
 
     // Jouer la musique lorsque le menu s'ouvre
-    playMusic();
+    // playMusic();
 
 again :
 
@@ -196,6 +196,8 @@ again :
                 // SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
                 // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
                 // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
+
+                renderStatusHealth(renderer,perso);
 
                 SDL_RenderPresent(renderer);
 
