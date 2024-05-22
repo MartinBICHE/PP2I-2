@@ -1,7 +1,6 @@
 #Fichiers
 TARGET = demo
-# <<<<<<< HEAD
-SRCS = main.c map.c time.c enemy1.c enemy2.c  enemy3.c perso.c dialog_box.c scroll.c  dialog_box.c checkpoints.c init.c pendule.c textures.c fonts.c health.c enemyFleche.c enemyBat.c fight.c #à completer par vos fichiers
+SRCS = main.c map.c menu.c time.c enemy1.c enemy2.c enemy3.c perso.c dialog_box.c checkpoints.c init.c pendule.c textures.c fonts.c health.c enemyFleche.c enemyBat.c fight.c projectile.c boss.c game.c #à completer par vos fichiers
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
@@ -17,8 +16,12 @@ LDFLAGS +=  -fsanitize=address -lm
 #Libs
 CFLAGS += $(shell pkg-config --cflags sdl2)
 LDFLAGS += $(shell pkg-config --libs sdl2)
-CFLAGS += $(shell pkg-config --cflags SDL2_image)
-LDFLAGS += $(shell pkg-config --libs SDL2_image)
+CFLAGS += $(shell pkg-config --cflags sdl2_image)
+LDFLAGS += $(shell pkg-config --libs sdl2_image)
+CFLAGS += $(shell pkg-config --cflags sdl2_gfx)
+LDFLAGS += $(shell pkg-config --libs  sdl2_gfx)
+CFLAGS += $(shell pkg-config --cflags sdl2_mixer)
+LDFLAGS += $(shell pkg-config --libs  sdl2_mixer)
 # CFLAGS += $(shell pkg-config --cflags SDL2_ttf)   à decommenter si ça fonctionne pour vous et dont à enlèver le -lSDL2_ttf 
 # LDFLAGS += $(shell pkg-config --libs SDL2_tff)
 CFLAGS += $(shell pkg-config --cflags SDL2_mixer)

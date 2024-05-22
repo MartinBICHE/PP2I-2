@@ -2,6 +2,7 @@
 #define MAP_H
 #include <SDL2/SDL.h>
 #include "const.h"
+#include "boss.h"
 
 Map *initMap(char*);
 void updateCam(Perso*, Map*);

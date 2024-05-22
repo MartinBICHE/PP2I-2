@@ -25,7 +25,7 @@ extern SDL_Texture *healthTextures[10];
 
 int loadTextures(SDL_Renderer *renderer);
 
-int freeTextures();
+int freeTextures(void);
 
 
 #endif

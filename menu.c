@@ -1,223 +1,302 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
 #include "menu.h"
-#include "const.h"
+#include "init.h"
 
-// Taille de la fenêtre de chargement
-
-SDL_Window* gLoadingWindow = NULL;
-SDL_Renderer* gLoadingRenderer = NULL;
-
-SDL_Window* gMenuWindow = NULL;
-SDL_Renderer* gMenuRenderer = NULL;
-
-// Déclaration de la musique
 Mix_Music* gMusic = NULL;
+bool musicPaused = false;
+int spriteIndex = 0;
+int spriteScrollDelay = 300;
 
-// Fonction pour initialiser SDL et créer la fenêtre de chargement
-bool initLoadingWindow() {
-    // Initialisation de SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        SDL_Log("Erreur lors de l'initialisation de SDL : %s", SDL_GetError());
-        return false;
+void renderSprite(SDL_Renderer *renderer) {
+    static Uint32 lastScrollTime = 0;
+    Uint32 currentTime = SDL_GetTicks(); 
+    SDL_Surface *spriteSurface = IMG_Load("asset/UI/BackgroundMenu.png");
+    if (!spriteSurface) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in sprite surface init: %s", SDL_GetError());
+        return;
+    }
+    SDL_Texture *spriteTexture = SDL_CreateTextureFromSurface(renderer, spriteSurface);
+    if (!spriteTexture) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in sprite texture init: %s", SDL_GetError());
+        SDL_FreeSurface(spriteSurface);
+        return;
+    }
+    SDL_FreeSurface(spriteSurface);
+
+    int imageWidth, imageHeight;
+    SDL_QueryTexture(spriteTexture, NULL, NULL, &imageWidth, &imageHeight);
+
+    int spriteWidth = imageWidth / NUM_SPRITES;
+    int spriteHeight = imageHeight;
+
+    SDL_Rect spriteRect = {.x = spriteIndex * spriteWidth, .y = 0, .w = spriteWidth, .h = spriteHeight};
+    
+    if (showMenu) {
+        if (currentTime - lastScrollTime >= spriteScrollDelay) {
+            spriteIndex = (spriteIndex + 1) % NUM_SPRITES;
+            lastScrollTime = currentTime; 
+        }
     }
 
-    // Création de la fenêtre de chargement
-    gLoadingWindow = SDL_CreateWindow("Fenêtre de chargement", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, LOADING_WINDOW_WIDTH, LOADING_WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    if (gLoadingWindow == NULL) {
-        SDL_Log("Erreur lors de la création de la fenêtre de chargement : %s", SDL_GetError());
-        return false;
+    SDL_Rect destRect = {.x = 0, .y = 0, .w = WINWIDTH, .h = WINHEIGHT};
+
+    if (SDL_RenderCopy(renderer, spriteTexture, &spriteRect, &destRect) != 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
     }
 
-    // Création du renderer de la fenêtre de chargement
-    gLoadingRenderer = SDL_CreateRenderer(gLoadingWindow, -1, SDL_RENDERER_ACCELERATED);
-    if (gLoadingRenderer == NULL) {
-        SDL_Log("Erreur lors de la création du renderer de la fenêtre de chargement : %s", SDL_GetError());
-        return false;
-    }
-
-    return true;
+    SDL_DestroyTexture(spriteTexture);
 }
 
-// Fonction pour nettoyer et quitter SDL
-void closeLoadingWindow() {
-    SDL_DestroyRenderer(gLoadingRenderer);
-    SDL_DestroyWindow(gLoadingWindow);
-    gLoadingWindow = NULL;
-    gLoadingRenderer = NULL;
-
-    SDL_Quit();
-}
-
-// Fonction pour dessiner le motif de chargement (un cercle avec des nuances de transparence)
-void drawLoading() {
-    static int angle = 0;
-    SDL_SetRenderDrawColor(gLoadingRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(gLoadingRenderer);
-
-    // Dessiner l'arrière-plan
-    SDL_Surface* backgroundSurface = IMG_Load("./asset/background/Foret/menu-1.png");
-    if (backgroundSurface == NULL) {
+void renderImage(SDL_Renderer *renderer, const char* imagePath, int x, int y, int width, int height) {
+    SDL_Surface* imageSurface = IMG_Load(imagePath);
+    if (!imageSurface) {
         SDL_Log("Erreur lors du chargement de l'image : %s", SDL_GetError());
         return;
     }
-    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(gLoadingRenderer, backgroundSurface);
-    if (backgroundTexture == NULL) {
-        SDL_Log("Erreur lors de la création de la texture : %s", SDL_GetError());
-        SDL_FreeSurface(backgroundSurface);
+    
+    SDL_Texture* imageTexture = SDL_CreateTextureFromSurface(renderer, imageSurface);
+    if (!imageTexture) {
+        SDL_Log("Erreur lors de la création de la texture de l'image : %s", SDL_GetError());
+        SDL_FreeSurface(imageSurface);
         return;
     }
-    SDL_RenderCopy(gLoadingRenderer, backgroundTexture, NULL, NULL);
-    SDL_DestroyTexture(backgroundTexture);
-    SDL_FreeSurface(backgroundSurface);
-
-    // Dessiner le cercle avec des nuances de transparence
-    int centerX = LOADING_WINDOW_WIDTH / 2;
-    int centerY = LOADING_WINDOW_HEIGHT / 2;
-    int radius = 30;
-    int thickness = 3;
-    for (int alpha = 255; alpha > 0; alpha -= 20) {
-        SDL_SetRenderDrawColor(gLoadingRenderer, 0x80, 0x80, 0x80, alpha);
-        SDL_RenderDrawLine(gLoadingRenderer, centerX + (radius - thickness / 2) * cos(angle * M_PI / 180.0), centerY + (radius - thickness / 2) * sin(angle * M_PI / 180.0), centerX + (radius + thickness / 2) * cos((angle + 10) * M_PI / 180.0), centerY + (radius + thickness / 2) * sin((angle + 10) * M_PI / 180.0));
-        angle += 3;
-    }
-
-    SDL_RenderPresent(gLoadingRenderer);
+    
+    SDL_Rect imageRect = {x, y, width, height};
+    
+    SDL_RenderCopy(renderer, imageTexture, NULL, &imageRect);
+    
+    SDL_DestroyTexture(imageTexture);
+    SDL_FreeSurface(imageSurface);
 }
 
-// Fonction pour initialiser SDL et créer la fenêtre de menu en plein écran
-bool initMenuWindow() {
-    // Création de la fenêtre de menu en mode plein écran
-    gMenuWindow = SDL_CreateWindow("Menu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, MENU_WINDOW_WIDTH, MENU_WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-    if (gMenuWindow == NULL) {
-        SDL_Log("Erreur lors de la création de la fenêtre de menu : %s", SDL_GetError());
+bool initSDL_mixer(void) {
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        SDL_Log("Erreur lors de l'ouverture de l'audio : %s", Mix_GetError());
         return false;
     }
-
-    // Création du renderer de la fenêtre de menu
-    gMenuRenderer = SDL_CreateRenderer(gMenuWindow, -1, SDL_RENDERER_ACCELERATED);
-    if (gMenuRenderer == NULL) {
-        SDL_Log("Erreur lors de la création du renderer de la fenêtre de menu : %s", SDL_GetError());
-        return false;
-    }
-
     return true;
 }
 
-// Fonction pour nettoyer et quitter SDL
-void closeMenuWindow() {
-    SDL_DestroyRenderer(gMenuRenderer);
-    SDL_DestroyWindow(gMenuWindow);
-    gMenuWindow = NULL;
-    gMenuRenderer = NULL;
-}
-
-// Fonction pour dessiner le menu avec un arrière-plan et des images cliquables
-void drawMenu(int image1Width, int image1Height, int image2Width, int image2Height) {
-    // Effacer l'écran
-    SDL_SetRenderDrawColor(gMenuRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(gMenuRenderer);
-
-    // Charger et dessiner l'arrière-plan
-    SDL_Surface* backgroundSurface = IMG_Load("./asset/background/Foret/menu-2.jpg"); 
-    if (backgroundSurface == NULL) {
-        SDL_Log("Erreur lors du chargement de l'arrière-plan : %s", SDL_GetError());
-        return;
-    }
-    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(gMenuRenderer, backgroundSurface);
-    if (backgroundTexture == NULL) {
-        SDL_Log("Erreur lors de la création de la texture de l'arrière-plan : %s", SDL_GetError());
-        SDL_FreeSurface(backgroundSurface);
-        return;
-    }
-    SDL_Rect backgroundRect = {0, 0, MENU_WINDOW_WIDTH, MENU_WINDOW_HEIGHT};
-    SDL_RenderCopy(gMenuRenderer, backgroundTexture, NULL, &backgroundRect);
-    SDL_DestroyTexture(backgroundTexture);
-    SDL_FreeSurface(backgroundSurface);
-
-    // Charger et dessiner la première image au centre de la fenêtre
-    SDL_Surface* image1Surface = IMG_Load("./asset/background/Foret/bouton-play.png"); 
-    if (image1Surface == NULL) {
-        SDL_Log("Erreur lors du chargement de la première image : %s", SDL_GetError());
-        return;
-    }
-    SDL_Texture* image1Texture = SDL_CreateTextureFromSurface(gMenuRenderer, image1Surface);
-    if (image1Texture == NULL) {
-        SDL_Log("Erreur lors de la création de la texture de la première image : %s", SDL_GetError());
-        SDL_FreeSurface(image1Surface);
-        return;
-    }
-    SDL_Rect image1Rect = {(MENU_WINDOW_WIDTH - image1Width) / 2, (MENU_WINDOW_HEIGHT - image1Height) / 2, image1Width, image1Height};
-    SDL_RenderCopy(gMenuRenderer, image1Texture, NULL, &image1Rect);
-    SDL_DestroyTexture(image1Texture);
-    SDL_FreeSurface(image1Surface);
-
-    // Charger et dessiner la deuxième image en haut à droite de la fenêtre
-    SDL_Surface* image2Surface = IMG_Load("./asset/background/Foret/bouton-paramètre.png");
-    if (image2Surface == NULL) {
-        SDL_Log("Erreur lors du chargement de la deuxième image : %s", SDL_GetError());
-        return;
-    }
-    SDL_Texture* image2Texture = SDL_CreateTextureFromSurface(gMenuRenderer, image2Surface);
-    if (image2Texture == NULL) {
-        SDL_Log("Erreur lors de la création de la texture de la deuxième image : %s", SDL_GetError());
-        SDL_FreeSurface(image2Surface);
-        return;
-    }
-    SDL_Rect image2Rect = {MENU_WINDOW_WIDTH - image2Width, 0, image2Width, image2Height};
-    SDL_RenderCopy(gMenuRenderer, image2Texture, NULL, &image2Rect);
-    SDL_DestroyTexture(image2Texture);
-    SDL_FreeSurface(image2Surface);
-
-    // Mettre à jour l'affichage
-    SDL_RenderPresent(gMenuRenderer);
-}
-
-// Fonction pour initialiser SDL_mixer
-bool initSDL_mixer() {
-    // Initialisation de SDL_mixer
-    if (Mix_Init(MIX_INIT_MP3) < 0) {
-        SDL_Log("Erreur lors de l'initialisation de SDL_mixer : %s", Mix_GetError());
-        return false;
-    }
-
-    // Initialisation de l'audio
-    if (Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048) < 0) {
-        SDL_Log("Erreur lors de l'ouverture de l'audio : %s",Mix_GetError());
-        return false;
-    }
-
-    return true;
-}
-
-// Fonction pour charger la musique
-bool loadMusic() {
-    // Charger la musique
-    gMusic = Mix_LoadMUS("./asset/musique/musique-menu.mp3"); // Remplacez "musique.mp3" par le nom de votre musique
-    if (gMusic == NULL) {
+bool loadMusic(void) {
+    gMusic = Mix_LoadMUS("./asset/musique/musique-menu.mp3");
+    if (!gMusic) {
         SDL_Log("Erreur lors du chargement de la musique : %s", Mix_GetError());
         return false;
     }
-
     return true;
 }
 
-// Fonction pour jouer la musique
-void playMusic() {
-    // Jouer la musique en boucle (-1 indique une lecture infinie)
+void playMusic(void) {
     Mix_PlayMusic(gMusic, -1);
 }
 
-// Fonction pour libérer la musique et quitter SDL_mixer
-void closeSDL_mixer() {
+void closeSDL_mixer(void) {
     Mix_FreeMusic(gMusic);
     gMusic = NULL;
-
     Mix_CloseAudio();
     Mix_Quit();
+}
+
+void toggleMusic(void) {
+    if (Mix_PausedMusic()) {
+        Mix_ResumeMusic();
+        musicPaused = false;
+    } else {
+        Mix_PauseMusic();
+        musicPaused = true;
+    }
+}
+
+void drawMenu(SDL_Renderer *renderer) {
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(renderer);
+    if (showMenu) {
+        renderSprite(renderer);
+        renderImage(renderer, "./asset/UI/play.png", (WINWIDTH / 2 - Image1Width / 2), (WINHEIGHT / 2 - Image1Height / 2), Image1Width, Image1Height);
+        renderImage(renderer, "./asset/UI/option.png", WINWIDTH - Image1Width, 0, Image1Width, Image1Height);
+        renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", 0, 0, Image1Width, Image1Height);
+        SDL_RenderPresent(renderer);
+    } else {
+        renderSprite(renderer);
+        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 5, WINWIDTH / 2, 10};
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &barRect);
+        SDL_Rect cursorRect = {(WINWIDTH - CURSOR_WIDTH) / 2, (WINHEIGHT - CURSOR_HEIGHT) / 2, CURSOR_WIDTH, CURSOR_HEIGHT};
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &cursorRect);
+        SDL_RenderPresent(renderer);
+    }
+}
+
+void drawMapMenu(SDL_Renderer *renderer) {
+    if (afficherImage) {
+        renderImage(renderer, "./asset/UI/bouton-retour-menu.png", (WINWIDTH - ImageRetourMenuWidth) / 2, (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50, ImageRetourMenuWidth, ImageRetourMenuHeight);
+        renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", (WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
+        renderImage(renderer, "./asset/UI/option.png", WINWIDTH - ImageParametrePauseWidth, 0, ImageParametrePauseWidth, ImageParametrePauseHeight);
+        renderImage(renderer, "./asset/UI/bouton-retour-en-arrière.png", 0, 0, ImageRetourArrièreWidth, ImageRetourArrièreHeight);
+    }
+    if (parametre) {
+        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 5, WINWIDTH / 2, 10};
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &barRect);
+        SDL_Rect cursorRect = {(WINWIDTH - CURSOR_WIDTH) / 2, (WINHEIGHT - CURSOR_HEIGHT) / 2, CURSOR_WIDTH, CURSOR_HEIGHT};
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &cursorRect);
+    }
+}
+
+void interactionMenu(SDL_Renderer *renderer) {
+    while (SDL_PollEvent(&e) != 0) {
+        if (e.type == SDL_QUIT) {
+            quit = true;
+        } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+            int mouseX = e.button.x;
+            int mouseY = e.button.y;
+            if (mouseX >= 0 && mouseX <= Image1Width && mouseY >= 0 && mouseY <= Image1Height && showMenu) {
+                quit = true;
+            } else if (mouseX >= ((WINWIDTH - Image1Width) / 2) && mouseX <= ((WINWIDTH - Image1Width) / 2) + Image1Width &&
+                       mouseY >= ((WINHEIGHT - Image1Height) / 2) && mouseY <= ((WINHEIGHT - Image1Height) / 2) + Image1Height && showMenu) {
+                startGame = true;
+            } else if (mouseX >= WINWIDTH - Image1Width && mouseX <= WINWIDTH &&
+                       mouseY >= 0 && mouseY <= Image1Height && showMenu) {
+                showMenu = false;
+            } else if (mouseX >= ((WINWIDTH - ImageRetourMenuWidth) / 2) && mouseX <= ((WINWIDTH - ImageRetourMenuWidth) / 2) + ImageRetourMenuWidth &&
+                       mouseY >= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) && mouseY <= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) + ImageRetourMenuHeight) {
+                showMenu = true;
+            } else if (mouseX >= ((WINWIDTH - ImageQuitterJeuWidth) / 2) && mouseX <= ((WINWIDTH - ImageQuitterJeuWidth) / 2) + ImageQuitterJeuWidth &&
+                       mouseY >= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) && mouseY <= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) + ImageQuitterJeuHeight) {
+                quit = true;
+            } else if (mouseX >= WINWIDTH - Image1Width && mouseX <= WINWIDTH &&
+                       mouseY >= 0 && mouseY <= Image1Height && !showMenu) {
+                showMenu = true;
+            } else if (mouseX >= 0 && mouseX <= Image1Width && mouseY >= 0 && mouseY <= Image1Height && !showMenu) {
+                showMenu = true;
+            } else if (mouseX >= (WINWIDTH - ImageParametrePauseWidth) && mouseX <= WINWIDTH &&
+                       mouseY >= 0 && mouseY <= ImageParametrePauseHeight) {
+                parametre = !parametre;
+                afficherImage = false;
+            }
+        } else if (e.type == SDL_MOUSEMOTION) {
+            if (e.motion.x >= (WINWIDTH - Image1Width) / 2 && e.motion.x <= ((WINWIDTH - Image1Width) / 2) + Image1Width &&
+                e.motion.y >= (WINHEIGHT - Image1Height) / 2 && e.motion.y <= ((WINHEIGHT - Image1Height) / 2) + Image1Height) {
+                spriteScrollDelay = 100;
+            } else {
+                spriteScrollDelay = 300;
+            }
+            if (e.motion.x >= (WINWIDTH - ImageQuitterJeuWidth) / 2 && e.motion.x <= ((WINWIDTH - ImageQuitterJeuWidth) / 2) + ImageQuitterJeuWidth &&
+                e.motion.y >= (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50 && e.motion.y <= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) + ImageQuitterJeuHeight) {
+                showMenu = true;
+            } else if (e.motion.x >= (WINWIDTH - ImageRetourMenuWidth) / 2 && e.motion.x <= ((WINWIDTH - ImageRetourMenuWidth) / 2) + ImageRetourMenuWidth &&
+                       e.motion.y >= (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50 && e.motion.y <= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) + ImageRetourMenuHeight) {
+                showMenu = true;
+            }
+        } else if (e.type == SDL_KEYUP) {
+            if (e.key.keysym.sym == SDLK_ESCAPE && !showMenu) {
+                showMenu = true;
+            }
+        }
+    }
+    if (prevShowMenu != showMenu) {
+        toggleMusic();
+        prevShowMenu = showMenu;
+    }
+    drawMenu(renderer);
+}
+
+void interactionPauseJeu(SDL_Renderer *renderer) {
+    if (e.type == SDL_QUIT) {
+        quit = true;
+    } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+        int mouseX = e.button.x;
+        int mouseY = e.button.y;
+        if (afficherImage) {
+            if (mouseX >= ((WINWIDTH - ImageQuitterJeuWidth) / 2) && mouseX <= ((WINWIDTH - ImageQuitterJeuWidth) / 2) + ImageQuitterJeuWidth &&
+                mouseY >= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) && mouseY <= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) + ImageQuitterJeuHeight) {
+                quit = true;
+            } else if (mouseX >= ((WINWIDTH - ImageRetourMenuWidth) / 2) && mouseX <= ((WINWIDTH - ImageRetourMenuWidth) / 2) + ImageRetourMenuWidth &&
+                       mouseY >= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) && mouseY <= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) + ImageRetourMenuHeight) {
+                retourMenu = !retourMenu;
+                toggleMusic();
+                afficherImage = !afficherImage;
+                isBossMap = false;
+            } else if (mouseX >= (WINWIDTH - ImageParametrePauseWidth) && mouseX <= WINWIDTH &&
+                       mouseY >= 0 && mouseY <= ImageParametrePauseHeight) {
+                parametre = !parametre;
+                afficherImage = false;
+            } else if (mouseX >= 0 && mouseX <= ImageRetourArrièreWidth &&
+                       mouseY >= 0 && mouseY <= ImageRetourArrièreHeight && afficherImage) {
+                afficherImage = !afficherImage;
+                toggleMusic();
+            }
+        }
+    } else if (e.type == SDL_KEYUP) {
+        if (e.key.keysym.sym == SDLK_ESCAPE && !afficherImage && !parametre) {
+            afficherImage = !afficherImage;
+            toggleMusic();
+            parametre = false;
+        } else if (e.key.keysym.sym == SDLK_ESCAPE && afficherImage) {
+            afficherImage = !afficherImage;
+            toggleMusic();
+        } else if (e.key.keysym.sym == SDLK_ESCAPE && parametre) {
+            parametre = !parametre;
+            afficherImage = !afficherImage;
+        }
+    }
+}
+
+void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **perso, Boss **boss) {
+    // Nettoyez les ressources existantes
+    cleanupProjectiles();
+    freeProjectileTexture();
+    closeSDL_mixer();
+    *perso = NULL;
+    *map = NULL;
+    *boss = NULL;
+
+    // Réinitialisez les variables globales
+    running = true;
+    showMenu = true;
+    parametre = false;
+    afficherImage = false;
+    retourMenu = false;
+    startGame = false;
+    prevShowMenu = true;
+    musicToggled = false;
+    currentGravity = ACC;
+    jumpSpeed = JUMPSPEED;
+    showAttentionImage = true;
+
+    // Réinitialisez les projectiles
+    resetProjectiles();
+
+    if (!loadProjectileTexture(*renderer)) {
+        SDL_Log("Erreur lors du chargement de la texture du projectile.");
+        exit(1);
+    }
+
+    // Initialiser SDL_mixer et charger la musique
+    if (!initSDL_mixer()) {
+        SDL_Log("Erreur lors de l'initialisation de SDL_mixer.");
+        exit(1);
+    }
+
+    if (!loadMusic()) {
+        SDL_Log("Erreur lors du chargement de la musique.");
+        closeSDL_mixer();
+        exit(1);
+    }
+
+    // Jouer la musique du menu
+    playMusic();
+
+    // Initialiser la carte, le personnage et le boss en fonction de la valeur de isBossMap
+    if (isBossMap) {
+        *map = initMap("mapBoss1");
+    } else {
+        *map = initMap("map2");
+    }
+
+    *perso = create_perso(*map);
+    if (isBossMap) {
+        *boss = create_boss(*map);
+    }
 }
