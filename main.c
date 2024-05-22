@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "pendule.h"
+// #include "pendule.h"
 #include "textures.h"
 #include "fonts.h"
 #include "health.h"
@@ -52,9 +52,34 @@ int main(int argc, char **argv) {
 
     // const SDL_Color RED = {.r = 255, .g = 0, .b = 0, .a = 0};
 
-    Perso *playerInFight = (Perso *)malloc(sizeof(Perso));
-    playerInFight->y = QUARTERHEIGHT - SPRITESIZE / 2;
-    playerInFight->x = TIERWIDTH / 2 - SPRITESIZE / 2;
+    PersoFight *playerInFight = (PersoFight*)malloc(sizeof(PersoFight));
+	playerInFight->y = QUARTERHEIGHT-1.5*SPRITESIZE/2;
+	playerInFight->x = TIERWIDTH/2-1.5*SPRITESIZE/2;
+	playerInFight->health = 10;
+	playerInFight->iframe = 0;
+
+	/* Création du boss */
+
+	bossFight *boss = (bossFight*)malloc(sizeof(bossFight));
+	boss->health = 9;
+	boss->phase = 1;
+	boss->delay = 200;
+	boss->attack1Delay = 3*boss->delay;
+	boss->attack2Delay = 3*boss->delay;
+	boss->attack3Delay = 3*boss->delay;
+	boss->speed = 4;
+
+	/* Déclaration des attaques pour le gameplay 2 */
+
+	AttackFight *nullAttack1 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *nullAttack2 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack1 = initAttack(0, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack2 = initAttack(TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack3 = initAttack(2*TIERWIDTH, 2*QUARTERHEIGHT, boss);
+	AttackFight *attack4 = initAttack(0, 0, boss);
+	AttackFight *attack5 = initAttack(TIERWIDTH, 0, boss);
+	AttackFight *attack6 = initAttack(2*TIERWIDTH, 0, boss);
+    
     Map *map = initMap("map2");
     Perso *perso = create_perso(map);
 
@@ -93,14 +118,18 @@ int main(int argc, char **argv) {
             printf("Error drawing the map");
             exit(-1);
         }
-        // if (fightMovement(renderer, event, playerInFight)) {
-        // 	printf("Error drawing the fight");
-        // 	exit(-1);
-        // }
-        if (display_perso(renderer, perso, map, persoTexture, 0)) { // 1 pour afficher la hitbox
-            printf("Error drawing the perso");
-            exit(-1);
+        if (fightBoss(renderer, boss, playerInFight, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6)) {
+            printf("Error playing boss fight");
+			exit(-1);
+		}
+        if (fightMovement(renderer, event, playerInFight)) {
+        	printf("Error drawing the fight");
+        	exit(-1);
         }
+        // if (display_perso(renderer, perso, map, persoTexture, 0)) { // 1 pour afficher la hitbox
+        //     printf("Error drawing the perso");
+        //     exit(-1);
+        // }
         enemy1_movement(renderer, &enemyStateData, map);
         
         SDL_RenderPresent(renderer);
@@ -111,16 +140,18 @@ int main(int argc, char **argv) {
         }
 
     quitSDL(&renderer, &window, perso, map);
-	// free(nullAttack1);
-    // free(nullAttack2);
-	// free(attack1);
-	// free(attack2);
-	// free(attack3);
-	// free(attack4);
-	// free(attack5);
-	// free(attack6);
-    // free(playerInFight);
-	// free(boss);
+	free(nullAttack1);
+    free(nullAttack2);
+	free(attack1);
+	free(attack2);
+	free(attack3);
+	free(attack4);
+	free(attack5);
+	free(attack6);
+    free(playerInFight);
+	free(boss);
     atexit(SDL_Quit);
     return 0;
 }
+
+

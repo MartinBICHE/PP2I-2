@@ -37,7 +37,7 @@ int fightMovement(SDL_Renderer *renderer, SDL_Event event, PersoFight *player) {
     int spriteHeight = spriteFullHeight / 4; 
     int spriteWidth = spriteFullWidth / 12;
 
-    const int INPUT_DELAY_MS = 3; 
+    const int INPUT_DELAY_MS = 7; 
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
     static clock_t lastInputTime = 0;
     clock_t currentTime = clock();
@@ -358,9 +358,9 @@ int fightBoss(SDL_Renderer *renderer, bossFight *boss, PersoFight *player, Attac
                 boss -> attack1Delay = 3*boss->delay;
                 boss -> attack2Delay = 3*boss->delay;
                 boss -> attack3Delay = 3*boss->delay;
-                attackDelay1Phase3 = boss-> attack1Delay / 6;
-                attackDelay2Phase3 = boss-> attack2Delay / 6;
-                attackDelay3Phase3 = boss-> attack3Delay / 6;
+                attackDelay1Phase3 = boss-> attack1Delay ;
+                attackDelay2Phase3 = boss-> attack2Delay ;
+                attackDelay3Phase3 = boss-> attack3Delay ;
                 resetAttack(attack1, boss->delay);
                 resetAttack(attack2, boss->delay);
                 resetAttack(attack3, boss->delay);
