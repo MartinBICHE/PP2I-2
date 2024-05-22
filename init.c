@@ -7,12 +7,20 @@
 #include "textures.h"
 #include "fonts.h"
 #include <SDL2/SDL_mixer.h>
+#include "init.h"
+#include "menu.h"
+
 
 void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init : %s", SDL_GetError());
 		exit(-1);
 	}
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        SDL_Log("Erreur lors de l'initialisation de SDL : %s", SDL_GetError());
+        exit(-1);
+    }
 
 	*window = SDL_CreateWindow("SDL window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WINWIDTH, WINHEIGHT, SDL_WINDOW_SHOWN);
 	if (!window) {
@@ -25,7 +33,6 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in renderer init : %s", SDL_GetError());
 		exit(-1);
 	}
-
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
        exit(-1);
@@ -39,7 +46,6 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 
     loadTextures(*renderer);
     loadFonts();
-
 }
 
 void loadSounds(Mix_Chunk **sounds){
@@ -56,7 +62,8 @@ void loadSounds(Mix_Chunk **sounds){
     Mix_VolumeChunk(sounds[1], MIX_MAX_VOLUME/2);
 }
 
-void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map){
+
+void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map, Boss *boss){
     SDL_DestroyRenderer(*renderer);
     freeTextures();
     freeFonts();
