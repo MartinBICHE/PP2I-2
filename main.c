@@ -36,7 +36,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include "pendule.h"
 #include "textures.h"
 #include "fonts.h"
 #include "health.h"
@@ -136,28 +135,10 @@ int main(int argc, char **argv) {
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
 
     loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
-
     EnemyStateData enemyStateData;
     initEnemy1(600, 660, &enemyStateData);
 
-    Enemy3 enemy3;
-    initEnemy3(&enemy3, 660, 620, 900);
 
-     Node **graph = create_graph(map);
-     Node *goal = &graph[13][16];
-    Node *startA = &graph[10][2];
-    Node *list = a_star(graph, map, goal, startA);
-    /* loadPosition("temp.sav", perso); */
-    Enemy2 enemy;
-    initEnemy2(&enemy, startA, goal, map);
-
-    /* EnemyBatData enemyBatData; */
-    /* initEnemyBat(&enemyBatData, 100, 0,  1000, goal, startA, map); */
-    EnemyFlecheData enemyFlecheData;
-    initEnemyFleche(&enemyFlecheData, 670, 640);
-
-    EnemyPenduleData enemyPenduleData;
-    initEnemyPendule(&enemyPenduleData, 200, 260);
 
     // Initialiser SDL_mixer
     /* if (!initSDL_mixer()) { */
@@ -243,20 +224,6 @@ again :
                         exit(-1);
                     }
                     if (!isBossMap) {
-                        /* enemy1_movement(renderer, &enemyStateData, map); */
-                        /* enemy1Attack(&enemyStateData, perso, map); */
-                        /* updatePersoEnemy1(perso, map, &enemyStateData); */
-                        /* enemy2_follow(renderer, &enemy, graph, map); */
-                        /* updatePersoEnemy2(perso, map, &enemy); */
-                        /* enemy2Attack(&enemy, perso, map); */
-                        enemy3_movement(renderer, &enemy3, map);
-                        updatePersoEnemy3(perso, map, &enemy3);
-                        enemy3Attack(&enemy3, perso, map);
-                        enemyFleche_mouvement(renderer, &enemyFlecheData, map);
-                        updatePersoEnemyFleche(perso, map, &enemyFlecheData);
-                        flecheAttack(&enemyFlecheData, perso, map);
-                        enemyPendule_mouvement(renderer, &enemyPenduleData, map);
-                        penduleAttack(&enemyPenduleData, perso, map);
                     }
                     if (isBossMap) {
                         displayBoss(renderer, boss, map);
@@ -310,8 +277,6 @@ again :
         }
     }
     quitSDL(&renderer, &window, perso, map, boss);
-    /* free(list); */
-    /* free(graph); */
 	free(nullAttack1);
     free(nullAttack2);
 	free(attack1);
