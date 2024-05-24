@@ -298,3 +298,32 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
 
     *perso = create_perso(*map);
 }
+
+
+void gameOver1(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Map *map) { // cette fonction joue une "cinématique" de game over et est joué entre les gameplay 1 et 2 quand le perso meurt
+    printf("game over\n");
+    SDL_Surface *gameOverSurface = IMG_Load("asset/aseprite/Sprite-0002.png");
+    if (!gameOverSurface){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init game over surface : %s", SDL_GetError());
+		exit(-1);
+	}
+    SDL_Texture *gameOverTexture = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
+    if (!gameOverTexture){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init game over texture : %s", SDL_GetError());
+		exit(-1);
+	}
+
+    int n1 = 60; // nombre de frames de la cinématique
+    SDL_SetRenderDrawColor(renderer, 200, 200, 200, 0);
+    for (int i = 0; i < n1; i++) {
+        drawBackground(renderer, bgTextures, layer, map);
+        SDL_SetTextureAlphaMod(gameOverTexture, (i*255)/n1);
+        SDL_RenderCopy(renderer, gameOverTexture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(16.66f);
+    }
+
+
+    SDL_FreeSurface(gameOverSurface);
+    SDL_DestroyTexture(gameOverTexture);
+}

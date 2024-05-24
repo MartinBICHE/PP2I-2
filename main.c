@@ -198,10 +198,11 @@ again :
                     } else if (e.key.keysym.sym == SDLK_p && !afficherImage) {
                         perso -> health = 0;
                     }
-                    }   
-                    if (retourMenu) {
-                        goto again;
-                    } 
+                    
+                }   
+                if (retourMenu) {
+                    goto again;
+                } 
                     
 
                 
@@ -232,6 +233,10 @@ again :
                         renderProjectiles(renderer);
                     }
                     renderStatusHealth(renderer,perso);
+
+                    if (perso->health == 0) {
+                        gameOver1(renderer, bgTextures, 5, map);
+                    }
                 } else {
                     
                     game2(renderer, playerInFight, bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
@@ -251,7 +256,7 @@ again :
                         resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
                         goto again;
                     }
-                    printf("health : %d\n", playerInFight->health);
+                    // printf("health : %d\n", playerInFight->health);
                 }
                 drawMapMenu(renderer);
                     
