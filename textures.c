@@ -24,6 +24,7 @@ SDL_Texture* textureHealth9 = NULL;
 SDL_Texture* textureFleche = NULL;
 SDL_Texture* textureBat = NULL;
 SDL_Texture* textureBatAttack = NULL;
+SDL_Texture* textureEnemy3Attack = NULL;
 
 SDL_Texture *healthTextures[10];
 
@@ -53,6 +54,7 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_Surface *surfaceFleche = IMG_Load("asset/spritesheet/fleche.png");
     SDL_Surface *surfaceBat = IMG_Load("asset/spritesheet/bat.png");
     SDL_Surface *surfaceBatAttack = IMG_Load("asset/spritesheet/batAttack.png");
+    SDL_Surface *surfaceEnemy3Attack = IMG_Load("asset/spritesheet/ennemy3Attack.png");
     if (!surfaceEnemy1 || !surfacePapirus || !surfaceScroll || !surfaceEnemy3 || !surfacePendule ){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init surfaceEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
 		exit(-1);
@@ -78,6 +80,7 @@ int loadTextures(SDL_Renderer *renderer){
     textureFleche = SDL_CreateTextureFromSurface(renderer, surfaceFleche);
     textureBat = SDL_CreateTextureFromSurface(renderer, surfaceBat);
     textureBatAttack = SDL_CreateTextureFromSurface(renderer, surfaceBatAttack);
+    textureEnemy3Attack = SDL_CreateTextureFromSurface(renderer, surfaceEnemy3Attack);
 
     if (!textureEnemy1 || !texturePapirus || !textureScroll || !textureEnemy3 || !texturePendule){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init textureEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
@@ -116,11 +119,12 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_FreeSurface(surfaceFleche);
     SDL_FreeSurface(surfaceBat);
     SDL_FreeSurface(surfaceBatAttack);
+    SDL_FreeSurface(surfaceEnemy3Attack);
 
     return 0;
 }
 
-int freeTextures(){
+int freeTextures(void){
 
     SDL_DestroyTexture(textureEnemy1);
     SDL_DestroyTexture(textureEnemy2);
@@ -143,6 +147,7 @@ int freeTextures(){
     SDL_DestroyTexture(textureBat);
     SDL_DestroyTexture(textureFleche);
     SDL_DestroyTexture(textureBatAttack);
+    SDL_DestroyTexture(textureEnemy3Attack);
 
     textureEnemy1 = NULL;
     textureEnemy2 = NULL;
@@ -164,6 +169,7 @@ int freeTextures(){
     textureFleche = NULL;
     textureBat = NULL;
     textureBatAttack = NULL;
+    textureEnemy3Attack = NULL;
 
     return 0;
 }

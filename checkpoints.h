@@ -1,3 +1,5 @@
+#ifndef CHECKPOINTS_H
+#define CHECKPOINTS_H
 #include "const.h"
 
 struct _CheckpointList{
@@ -13,3 +15,5 @@ void initCheckpointList(CheckpointList *list);
 void addCheckpoint(CheckpointList *list, int position);
 void checkCheckpoint(CheckpointList *list, Perso *perso, const char *filename);
 void free_checkpoints(CheckpointList *list);
+
+#endif

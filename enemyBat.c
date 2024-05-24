@@ -434,7 +434,3 @@ void enemyBat_follow(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **
         /* free(path); */
 }
 
-
-
-
-

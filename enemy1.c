@@ -105,7 +105,7 @@ void initEnemy1(int x, int y, EnemyStateData *enemyStateData) {
 
 void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map) {
   int intervalAttack = 1000;
-  if (hitbox_enemy(perso, map, enemyStateData)){
+  if (hitbox_enemy1(perso, map, enemyStateData)){
       if (SDL_GetTicks() - enemyStateData->pauseAttack >= intervalAttack){
           if (perso->health > 0){
               perso->health -= 1;
@@ -116,4 +116,40 @@ void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map) {
   }
 }
 
-/* ajouter une contrainte sur le health pour que ça soit inf à 9 */
+int hitbox_enemy1(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
+    SDL_Rect enemyHitbox = enemyStateData->dst_rect;
+    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
+    enemyHitbox.x -= margin;
+    enemyHitbox.y -= margin;
+    enemyHitbox.w += 2 * margin;
+    enemyHitbox.h += 2 * margin;
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
+        return 1;
+    }
+    return 0;
+}
+
+void updatePersoEnemy1(Perso *perso, Map *map, EnemyStateData *enemyStateData){
+    if (!isBossMap){
+        if (enemyStateData->state != PAUSE_BOTTOM){
+            if (hitbox_enemy1(perso, map, enemyStateData)){
+                float dx = perso->vx * DT;
+                float dy = perso->vy * DT;
+                if (dx > 0) { // Le personnage se déplace vers la droite
+                    perso->vx = max(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox de l'ennemi (côté gauche)
+                    perso->x = enemyStateData->dst_rect.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
+                } else if (dx < 0) { // Le personnage se déplace vers la gauche
+                    perso->vx = min(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox de l'ennemi (côté droit)
+                    perso->x = (enemyStateData->dst_rect.x + enemyStateData->dst_rect.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
+                }
+                if (dy > 0) { // Le personnage se déplace vers le bas
+                    // Faire rebondir le personnage au dessus de l'ennemi
+                    perso->vy = -JUMPSPEED;
+                }
+            }
+        }
+    }
+}

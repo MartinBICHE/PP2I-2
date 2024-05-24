@@ -4,8 +4,8 @@
 
 
 void renderStatusHealth(SDL_Renderer *renderer, Perso *perso);
-void handleDeath(Perso *perso, const char *filename);
-
+void renderStatusHealthFight(SDL_Renderer *renderer, PersoFight *perso);
+void revive(Perso *perso);
 
 
 #endif

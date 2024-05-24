@@ -1,5 +1,3 @@
-#ifndef CHECKPOINTS_H
-#define CHECKPOINTS_H
 #include "const.h"
 #include <stdio.h>
 #include "checkpoints.h"
@@ -63,4 +61,3 @@ void free_checkpoints(CheckpointList *list){
     free(list);
 }
 
-#endif

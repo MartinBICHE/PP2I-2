@@ -61,3 +61,27 @@ void initEnemyPendule(EnemyPenduleData *enemyPenduleData, int x, int y) {
   enemyPenduleData->pauseMusic = 0;
 }
 
+int hitbox_enemyPendule(Perso *perso, Map *map, EnemyPenduleData *enemy){
+    SDL_Rect enemyHitbox = enemy->dst_rect;
+    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
+    enemyHitbox.x -= margin;
+    enemyHitbox.y -= margin;
+    enemyHitbox.w += margin;
+    enemyHitbox.h -= 1*margin;
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
+        return 1;
+    }
+    return 0;
+}
+
+void penduleAttack(EnemyPenduleData *enemy, Perso *perso, Map *map){
+    int intervalAttack = 1000;
+    if (hitbox_enemyPendule(perso, map, enemy)){
+        if (SDL_GetTicks() - enemy->pauseAttack >= intervalAttack && perso->health >= 0){
+            perso->health -= 1;
+            enemy->pauseAttack = SDL_GetTicks();
+        }
+    }
+}
+

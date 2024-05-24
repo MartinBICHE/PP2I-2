@@ -1,4 +1,5 @@
 #include "enemy2.h"
+#include "perso.h"
 
 
 
@@ -15,7 +16,7 @@
 
 void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map){
     int interval = 130;   
-    int speed = 20;      
+    int speed = 10;      
       Node *path;
     if (enemy->state == EYE_MOVING_RIGHT) {
         path = a_star(graph, map, enemy->goal, enemy->start);
@@ -102,21 +103,6 @@ void initEnemy2(Enemy2 *enemy, Node *start, Node *goal, Map *map){
     enemy->pauseAttack = 0;
 }
 
-int hitbox_enemy2(Perso *perso, Map *map, Enemy2 *enemy) {
-    SDL_Rect enemyHitbox = enemy->dst_rect;
-    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
-    enemyHitbox.x -= margin;
-    enemyHitbox.y -= margin;
-    enemyHitbox.w += 2 * margin;
-    enemyHitbox.h += 2 * margin;
-    SDL_Rect intersection;
-    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
-        return 1;
-    }
-    return 0;
-}
-
-
 void enemy2Attack(Enemy2 *enemy, Perso *perso, Map *map) {
   int intervalAttack = 1000;
   if (hitbox_enemy2(perso, map, enemy)){
@@ -128,5 +114,41 @@ void enemy2Attack(Enemy2 *enemy, Perso *perso, Map *map) {
           }
       }
   }
+}
+
+int hitbox_enemy2(Perso *perso, Map *map, Enemy2 *enemy) {
+    SDL_Rect enemyHitbox = enemy->dst_rect;
+    int margin = 30; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
+    enemyHitbox.x -= margin;
+    enemyHitbox.y -= margin;
+    enemyHitbox.w += round(1.0 * margin);
+    enemyHitbox.h += round(1.0 * margin);
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
+        return 1;
+    }
+    return 0;
+}
+
+void updatePersoEnemy2(Perso *perso, Map *map, Enemy2 *enemy){
+    if (!isBossMap){
+        if (hitbox_enemy2(perso, map, enemy)){
+            float dx = perso->vx * DT;
+            float dy = perso->vy * DT;
+            if (dx > 0) { // Le personnage se déplace vers la droite
+                perso->vx = max(perso->vx, 0.0f);
+                // Position juste avant le début de la hitbox de l'ennemi (côté gauche)
+                perso->x = enemy->dst_rect.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
+            } else if (dx < 0) { // Le personnage se déplace vers la gauche
+                perso->vx = min(perso->vx, 0.0f);
+                // Position juste avant le début de la hitbox de l'ennemi (côté droit)
+                perso->x = (enemy->dst_rect.x + enemy->dst_rect.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
+            }
+            if (dy > 0) { // Le personnage se déplace vers le bas
+                // Faire rebondir le personnage au dessus de l'ennemi
+                perso->vy = -JUMPSPEED;
+        }
+        }
+    }
 }
 
