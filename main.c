@@ -153,7 +153,7 @@ int main(int argc, char **argv) {
     loadSounds(sounds);
 
     // Jouer la musique lorsque le menu s'ouvre
-    // playMusic();
+    playMusic();
 
 again :
 
