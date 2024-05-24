@@ -50,7 +50,7 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Event e;
 SDL_Texture *bgTextures[6];
-Mix_Chunk *sounds[2];
+Mix_Chunk *sounds[4];
 SDL_Texture *persoTexture;
 SDL_Texture *tileTextures;
 SDL_Texture* projectileTexture = NULL;
@@ -132,7 +132,7 @@ int main(int argc, char **argv) {
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
     loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
-    loadSounds(sounds);
+    
 
     EnemyStateData enemyStateData;
     initEnemy1(300, 460, &enemyStateData);
@@ -149,6 +149,8 @@ int main(int argc, char **argv) {
         closeSDL_mixer();
         return 1;
     }
+
+    loadSounds(sounds);
 
     // Jouer la musique lorsque le menu s'ouvre
     // playMusic();
@@ -206,7 +208,7 @@ again :
 
                 // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
                 if (perso-> health > 0) {
-                    game(enemyStateData,boss,map,perso,state);
+                    game(enemyStateData, boss, map, perso, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
                         printf("Error drawing the background");
                         exit(-1);

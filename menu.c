@@ -69,7 +69,7 @@ void renderImage(SDL_Renderer *renderer, const char* imagePath, int x, int y, in
 }
 
 bool initSDL_mixer(void) {
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 6, 2048) < 0) {
         SDL_Log("Erreur lors de l'ouverture de l'audio : %s", Mix_GetError());
         return false;
     }

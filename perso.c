@@ -87,7 +87,7 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
     SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
 
     if (perso->dash_duration == 10) {
-        int channel = Mix_PlayChannel(-1, sounds[1], 0);
+        int channel = Mix_PlayChannel(-1, sounds[2], 0);
         if(channel == -1) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing dashing sound: %s", Mix_GetError());
             exit(-1);
@@ -156,8 +156,14 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         }
 
     } else if (perso->vx != 0) { // perso en train de marcher
-        if (perso->spriteOffset == 24 || perso->spriteOffset == 60) {
+        if (perso->spriteOffset == 24) {
             int channel = Mix_PlayChannel(-1, sounds[0], 0);
+            if(channel == -1) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing walking sound: %s", Mix_GetError());
+                exit(-1);
+            }
+        } else if (perso->spriteOffset == 60) {
+            int channel = Mix_PlayChannel(-1, sounds[1], 0);
             if(channel == -1) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing walking sound: %s", Mix_GetError());
                 exit(-1);
@@ -350,7 +356,7 @@ void updatePersoDashing(Perso *perso, Map *map) {
 }
 
 
-void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const Uint8 *state) {
+void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const Uint8 *state, Mix_Chunk **sounds) {
     perso->jump_delay = max(perso->jump_delay - 1, 0);
     perso->dash_duration = max(perso->dash_duration - 1, 0);
     perso->dash_delay = max(perso->dash_delay - 1, 0);
@@ -387,8 +393,16 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         int i = floor(perso->y);
         int j = floor(perso->x);
         perso->vy += currentGravity*DT;
+        int v = 17; // vitesse à partir de laquelle le son "crack" est joué quand le perso s'écrase au sol
         if (currentGravity > 0) {
             if (hitbox_bottom(perso, map)) {
+                if (perso->vy > v) {
+                    int channel = Mix_PlayChannel(-1, sounds[3], 0);
+                    if(channel == -1) {
+                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing crack sound: %s", Mix_GetError());
+                        exit(-1);
+                    }
+                }
                 perso->vy = min(perso->vy, 0.0f);
                 perso->y = i + 1 - PERSO_HEIGHT/2.0f;
                 perso->jumps = 1;
@@ -403,6 +417,13 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
                 perso->y = i + 1 - PERSO_HEIGHT/2.0f;
             }
             if (hitbox_top(perso, map)) {
+                if (perso->vy > v) {
+                    int channel = Mix_PlayChannel(-1, sounds[3], 0);
+                    if(channel == -1) {
+                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing crack sound: %s", Mix_GetError());
+                        exit(-1);
+                    }
+                }
                 perso->vy = max(perso->vy, 0.0f);
                 perso->y = i + PERSO_HEIGHT/2.0f;
                 perso->jumps = 1;

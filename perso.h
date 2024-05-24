@@ -16,7 +16,7 @@ int hitbox_right(Perso*, Map*);
 int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData);
 float max(float, float);
 float min(float, float);
-void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*);
+void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*, Mix_Chunk**);
 void jump(Perso*, Map*);
 void changeGravity(void);
 

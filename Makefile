@@ -12,7 +12,7 @@ LDFLAGS = -lm
 #Debug 
 CFLAGS += -g
 CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-LDFLAGS +=  -fsanitize=address -lm
+LDFLAGS +=  -fsanitize=address 
 
 #Libs
 CFLAGS += $(shell pkg-config --cflags sdl2)

@@ -37,11 +37,7 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
        exit(-1);
     }
-    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 6, 2048) < 0) {
-        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
-        exit(-1);
-    }
-    
+
     TTF_Init();
 
     loadTextures(*renderer);
@@ -49,17 +45,28 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
 }
 
 void loadSounds(Mix_Chunk **sounds){
-    sounds[0] = Mix_LoadWAV("./asset/sounds/walk.wav");
+    sounds[0] = Mix_LoadWAV("./asset/sounds/walk1.wav");
     if (sounds[0] == NULL) {
-        printf("Failed to load walking sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        printf("Failed to load walking sound 1 effect! SDL_mixer Error: %s\n", Mix_GetError());
         exit(-1);
     }
-    sounds[1] = Mix_LoadWAV("./asset/sounds/dash.wav");
+    sounds[1] = Mix_LoadWAV("./asset/sounds/walk2.wav");
     if (sounds[1] == NULL) {
+        printf("Failed to load walking sound 2 effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
+    Mix_VolumeChunk(sounds[1], MIX_MAX_VOLUME/3);
+    sounds[2] = Mix_LoadWAV("./asset/sounds/dash.wav");
+    if (sounds[2] == NULL) {
         printf("Failed to load dashing sound effect! SDL_mixer Error: %s\n", Mix_GetError());
         exit(-1);
     }
-    Mix_VolumeChunk(sounds[1], MIX_MAX_VOLUME/2);
+    Mix_VolumeChunk(sounds[2], MIX_MAX_VOLUME/3);
+    sounds[3] = Mix_LoadWAV("./asset/sounds/true_crack.wav");
+    if (sounds[3] == NULL) {
+        printf("Failed to load crack sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
 }
 
 
