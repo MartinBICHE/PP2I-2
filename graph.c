@@ -103,20 +103,6 @@ bool node_in_list(Node **list, int list_size, Node *node) {
     return false;
 }
 
-Node *reconstruct_path(Node *end_node) {
-    Node *current_node = end_node;
-    Node *path = NULL; 
-    Node *temp;
-
-    while (current_node != NULL) {
-        temp = path;
-        path = current_node;
-        path->parent = temp; 
-        current_node = current_node->parent;
-    }
-
-    return path; 
-}
 
 
 void print_node(Node *node) {
@@ -160,8 +146,14 @@ int len_nodes(Node array[MAX_NODES]){
 }
 
 Node *a_star(Node **graph, Map *map, Node *start_node, Node *goal_node) {
-    if (!goal_node ->walkable || !start_node->walkable){
-        puts("Error: the goal or the start is not walkable");
+    if (!goal_node ->walkable ){
+        puts("Error: the goal is not walkable");
+        print_node(goal_node);
+        exit(-1);
+    }
+    if (!start_node ->walkable ){
+        puts("Error:  start is not walkable");
+        print_node(start_node);
         exit(-1);
     }
     int initialCapacity = 1500;
@@ -220,6 +212,28 @@ Node *a_star(Node **graph, Map *map, Node *start_node, Node *goal_node) {
 
     free(open_list);
     free(closed_list);
+    return NULL;
+}
+
+int directions[4][2] = {
+    {-1, 0}, // up
+    {1, 0},  // down
+    {0, -1}, // left
+    {0, 1}   // right
+};
+
+Node* get_nearest_walkable_neighbor(Node** graph, Map *map, int xPos, int yPos) {
+    for (int i = 0; i < 4; ++i) {
+        int newX = xPos + directions[i][1];
+        int newY = yPos + directions[i][0];
+        
+        if (newX >= 0 && newX < map->width && newY >= 0 && newY < map->height) {
+            Node* neighbor = &graph[newY][newX];
+            if (neighbor->walkable) {
+                return neighbor;
+            }
+        }
+    }
     return NULL;
 }
 

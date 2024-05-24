@@ -15,7 +15,7 @@
 
 void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map){
     int interval = 130;   
-    int speed = 32;      
+    int speed = 20;      
       Node *path;
     if (enemy->state == EYE_MOVING_RIGHT) {
         path = a_star(graph, map, enemy->goal, enemy->start);
@@ -73,7 +73,7 @@ void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map
         }
 
         enemy->src_rect.x += 64;
-        if (enemy->src_rect.x >= 160) {
+        if (enemy->src_rect.x >= 512) {
             enemy->src_rect.x = 0;
         }
         enemy->pauseStartBits = SDL_GetTicks();

@@ -1,40 +1,4 @@
 #include "main.h"
-#include "checkpoints.h"
-#include "const.h"
-#include "dialog_box.h"
-#include "enemy1.h"
-#include "enemy2.h"
-#include "enemy3.h"
-#include "enemyBat.h"
-#include "enemyFleche.h"
-#include "fight.h"
-#include "fonts.h"
-#include "health.h"
-#include "init.h"
-#include "map.h"
-#include "pendule.h"
-#include "perso.h"
-#include "scroll.h"
-#include "textures.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_keycode.h>
-#include <SDL2/SDL_log.h>
-#include <SDL2/SDL_pixels.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_surface.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_video.h>
-#include <math.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <SDL2/SDL_mixer.h>
-#include "music.h"
-#include "graph.h"
 
 SDL_Texture *bgTextures[6];
 SDL_Texture *tileTextures, *persoTexture;
@@ -72,19 +36,16 @@ int main(int argc, char **argv) {
     EnemyStateData enemyStateData;
     initEnemy1(600, 660, &enemyStateData);
 
-    EnemyBatData enemyBatData;
-    initEnemyBat(&enemyBatData, 0, 0,  1000);
-
-
-
-
      Node **graph = create_graph(map);
-     Node *goal = &graph[13][24];
-    Node *startA = &graph[10][15];
+     Node *goal = &graph[13][134];
+    Node *startA = &graph[10][2];
     Node *list = a_star(graph, map, goal, startA);
-    loadPosition("temp.sav", perso);
+    /* loadPosition("temp.sav", perso); */
     Enemy2 enemy;
     initEnemy2(&enemy, startA, goal, map);
+
+    EnemyBatData enemyBatData;
+    initEnemyBat(&enemyBatData, 100, 0,  1000, goal, startA, map);
 
     while (running) {
 
@@ -125,13 +86,16 @@ int main(int argc, char **argv) {
         /* Node *listB = a_star(graph, map, &goalEnemy, startA); */
 
         /* follow_path(renderer, &enemyBatData, list, map, perso); */
-        enemy1_movement(renderer, &enemyStateData, map);
+        /* enemy1_movement(renderer, &enemyStateData, map); */
         /* enemy1Attack(&enemyStateData, perso, map); */
+        /* enemyBat_mouvement(renderer, &enemyBatData, map, perso); */
+        /* batAttack(&enemyBatData, perso, map); */
         renderStatusHealth(renderer, perso);
         /* follow_path2(renderer, &enemyBatData, graph, map, perso); */
          handleDeath(perso, "temp.sav");
-         enemy2_follow(renderer, &enemy, graph, map);
-         enemy2Attack(&enemy, perso, map);
+         /* enemy2_follow(renderer, &enemy, graph, map); */
+         /* enemy2Attack(&enemy, perso, map); */
+         enemyBat_follow(renderer, &enemyBatData, graph, map, perso);
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetTicks();
