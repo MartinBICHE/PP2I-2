@@ -320,7 +320,7 @@ void gameOver1(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Ma
         SDL_SetTextureAlphaMod(gameOverTexture, (i*255)/n1);
         SDL_RenderCopy(renderer, gameOverTexture, NULL, NULL);
         SDL_RenderPresent(renderer);
-        SDL_Delay(16.66f);
+        SDL_Delay(16);
     }
 
 

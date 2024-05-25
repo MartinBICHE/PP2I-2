@@ -14,6 +14,7 @@ Perso *create_perso(Map *map) {
     res->health = 9;
     res->jumps = 2;
     res->jump_delay = 0;
+    res->dashes = 2;
     res->dash_duration = 0;
     res->dash_speed = 21.0f;
     res->dash_delay = 0;
@@ -164,11 +165,11 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         }
         perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
         SDL_Rect src_rect;
-        if (currentGravity > 0) {
+        // if (currentGravity > 0) {
             src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
-        } else {
-            src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
-        }
+        // } else {
+        //     src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
+        // }
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
             exit(-1);
@@ -363,9 +364,10 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         
             if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
         }
-        if (state[SDL_SCANCODE_J] && perso->dash_delay == 0) {
+        if (state[SDL_SCANCODE_J] && perso->dash_delay == 0 && perso->dashes > 0) {
+            perso->dashes--;
             perso->dash_duration = 11;
-            perso->dash_delay = 25;
+            perso->dash_delay = 30;
         }
         
         int i = floor(perso->y);
@@ -383,7 +385,6 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
                 }
                 perso->vy = min(perso->vy, 0.0f);
                 perso->y = i + 1 - PERSO_HEIGHT/2.0f;
-                perso->jumps = 1;
             }
             if (hitbox_top(perso, map)) {
                 perso->vy = max(perso->vy, 0.0f);
@@ -420,6 +421,7 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         updateHitbox(perso, map);
         if (hitbox_bottom(perso, map)) {
             perso->jumps = 2;
+            perso->dashes = 2;
         }
     }
 }
