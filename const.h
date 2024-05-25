@@ -84,7 +84,7 @@ extern float projectileSpeed;
 #define MAX_ROTATION_ANGLE 0.02f // Limite de rotation par mise à jour en radians
 // #define INVINCIBILITY_FRAMES 1000
 
-#define GRAVITY_CHANGE_INTERVAL 10000
+#define GRAVITY_CHANGE_INTERVAL 30000
 #define PROJECTILE_LOAD_INTERVAL 5000
 #define BOSS_MOVE_INTERVAL 2000
 #define BOSS_ANGRY_MOVE_INTERVAL 1000
