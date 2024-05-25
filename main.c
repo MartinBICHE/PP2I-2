@@ -252,7 +252,6 @@ again :
                         resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
                         goto again;
                     }
-                    printf("health : %d\n", playerInFight->health);
                 }
                 drawMapMenu(renderer);
                     
@@ -287,6 +286,8 @@ again :
 	free(attack6);
     free(playerInFight);
 	free(bossDeath);
+    free(checkpointList->xPositions);
+    free(checkpointList);
     cleanupProjectiles();
     /* closeSDL_mixer(); */
     atexit(SDL_Quit);
