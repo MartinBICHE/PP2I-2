@@ -55,3 +55,9 @@ void checkCheckpoint(CheckpointList *list, Perso *perso, const char *filename) {
     }
 }
 
+
+void free_checkpoints(CheckpointList *list){
+    free(list->xPositions);
+    free(list);
+}
+

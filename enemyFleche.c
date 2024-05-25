@@ -5,12 +5,15 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_mixer.h>
+#include "music.h"
 
-/* enemyFleche_mouvement(renderer, &enemyFlecheData, x_cam); */
+/* enemyFleche_mouvement(renderer, &enemyFlecheData, map); */
 /* EnemyFlecheData enemyFlecheData; */
 /* initEnemyFleche(&enemyFlecheData, x(à définir), y(à définir)); */
+/* flecheAttack(EnemyFlecheData *enemyFlecheData, Perso *perso, Map *map)  pour l'attaque*/
+        /* renderStatusHealth(renderer, perso); pour voir l'impact sur la santé */
 
-void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData, float x_cam) {
+void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData, Map *map) {
   int interval = 200;
   int pauseInterval = 3000;
 
@@ -48,7 +51,7 @@ void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheD
     break;
   }
   SDL_Rect dst_rectFixed = {
-      enemyFlecheData->dst_rect.x - x_cam, enemyFlecheData->dst_rect.y,
+      enemyFlecheData->dst_rect.x - map->x_cam, enemyFlecheData->dst_rect.y,
       enemyFlecheData->dst_rect.w, enemyFlecheData->dst_rect.h};
   SDL_RenderCopy(renderer, textureFleche, &enemyFlecheData->src_rect,
                  &dst_rectFixed);
@@ -63,24 +66,57 @@ void initEnemyFleche(EnemyFlecheData *enemyFlecheData, int x, int y) {
   enemyFlecheData->dst_rect.x = x;
   enemyFlecheData->dst_rect.y = y;
   enemyFlecheData->dst_rect.w = 64 * 3;
-  enemyFlecheData->dst_rect.h = 64 * 3;
+  enemyFlecheData->dst_rect.h = 64 * 1;
 
   enemyFlecheData->state = FLECHE_MOVING_UP;
   enemyFlecheData->pauseStartBits = 0;
   enemyFlecheData->pauseAttack = 0;
   enemyFlecheData->attackCounter = 0;
+  enemyFlecheData->pauseMusic = 0;
 }
 
 void flecheAttack(EnemyFlecheData *enemyFlecheData, Perso *perso, Map *map) {
-  int pad = 49;
   int intervalAttack = 1000;
-  if ((perso->x * map->pix_rect - pad <= enemyFlecheData->dst_rect.x + 3 * 64) &&
-      (perso->x * map->pix_rect - pad >= enemyFlecheData->dst_rect.x)) {
-      if (enemyFlecheData->state != FLECHE_PAUSE_BOTTOM && perso->health > 0){
-              if (SDL_GetTicks() - enemyFlecheData->pauseAttack >= intervalAttack){
-                  perso->health -= 1;
-                  enemyFlecheData->pauseAttack = SDL_GetTicks();
-              }
-          }
+  if (hitbox_enemyFleche(perso, map, enemyFlecheData) && enemyFlecheData->state != FLECHE_PAUSE_BOTTOM){
+      if (SDL_GetTicks() - enemyFlecheData->pauseAttack >= intervalAttack && perso->health >= 0){
+          perso->health -= 1;
+          enemyFlecheData->pauseAttack = SDL_GetTicks();
       }
+        }
+  }
+
+int hitbox_enemyFleche(Perso *perso, Map *map, EnemyFlecheData *enemy) {
+    SDL_Rect enemyHitbox = enemy->dst_rect;
+    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
+    enemyHitbox.x -= margin;
+    enemyHitbox.y -= margin;
+    enemyHitbox.w += margin;
+    enemyHitbox.h -= 1*margin;
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
+        return 1;
+    }
+    return 0;
+}
+
+void updatePersoEnemyFleche(Perso *perso, Map *map, EnemyFlecheData *enemy){
+    if (!isBossMap){
+        if (hitbox_enemyFleche(perso, map, enemy) && enemy->state != FLECHE_PAUSE_BOTTOM){
+            float dx = perso->vx * DT;
+            float dy = perso->vy * DT;
+            if (dx > 0) { // Le personnage se déplace vers la droite
+                perso->vx = max(perso->vx, 0.0f);
+                // Position juste avant le début de la hitbox de l'ennemi (côté gauche)
+                perso->x = enemy->dst_rect.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
+            } else if (dx < 0) { // Le personnage se déplace vers la gauche
+                perso->vx = min(perso->vx, 0.0f);
+                // Position juste avant le début de la hitbox de l'ennemi (côté droit)
+                perso->x = (enemy->dst_rect.x + enemy->dst_rect.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
+            }
+               if (dy > 0 ) { // The character is moving downwards and hasn't jumped yet
+                // Make the character bounce above the enemy
+                perso->vy = -JUMPSPEED;
+            }
+        }
+    }
 }

@@ -37,7 +37,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include "pendule.h"
 #include "textures.h"
 #include "fonts.h"
 #include "health.h"
@@ -86,6 +85,8 @@ Projectile projectiles[MAX_PROJECTILES] = {
     {0.0f, 0.0f, 0.0f, 0.0f, false}  // Projectile 3
 };
 
+
+
 int main(int argc, char **argv) {
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -124,31 +125,36 @@ int main(int argc, char **argv) {
 	Perso *perso = create_perso(map);
     Boss *boss = NULL;
 
+    CheckpointList *checkpointList = malloc(sizeof(CheckpointList));
+    initCheckpointList(checkpointList);
+
     const Uint8 *state = SDL_GetKeyboardState(NULL);
 
     int running = 1;
 
+
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
-    loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+    // loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
-    
 
     EnemyStateData enemyStateData;
-    initEnemy1(300, 460, &enemyStateData);
+    initEnemy1(600, 660, &enemyStateData);
+
+
 
     // Initialiser SDL_mixer
-    if (!initSDL_mixer()) {
-        SDL_Log("Erreur lors de l'initialisation de SDL_mixer.");
-        return 1;
-    }
+    /* if (!initSDL_mixer()) { */
+    /*     SDL_Log("Erreur lors de l'initialisation de SDL_mixer."); */
+    /*     return 1; */
+    /* } */
 
-    // Charger la musique
-    if (!loadMusic()) {
-        SDL_Log("Erreur lors du chargement de la musique.");
-        closeSDL_mixer();
-        return 1;
-    }
+    /* // Charger la musique */
+    /* if (!loadMusic()) { */
+    /*     SDL_Log("Erreur lors du chargement de la musique."); */
+    /*     closeSDL_mixer(); */
+    /*     return 1; */
+    /* } */
 
     loadSounds(sounds);
 
@@ -223,7 +229,6 @@ again :
                         exit(-1);
                     }
                     if (!isBossMap) {
-                        enemy1_movement(renderer, &enemyStateData, map);
                     }
                     if (isBossMap) {
                         displayBoss(renderer, boss, map);
@@ -256,7 +261,6 @@ again :
                         resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
                         goto again;
                     }
-                    // printf("health : %d\n", playerInFight->health);
                 }
                 drawMapMenu(renderer);
                     
@@ -291,8 +295,10 @@ again :
 	free(attack6);
     free(playerInFight);
 	free(bossDeath);
+    free(checkpointList->xPositions);
+    free(checkpointList);
     cleanupProjectiles();
-    closeSDL_mixer();
+    /* closeSDL_mixer(); */
     atexit(SDL_Quit);
     return 0;
     
