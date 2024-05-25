@@ -419,7 +419,7 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         perso->y += perso->vy*DT;
         perso->x += perso->vx*DT;
         updateHitbox(perso, map);
-        if (hitbox_bottom(perso, map)) {
+        if ((hitbox_bottom(perso, map) && currentGravity > 0) || (hitbox_top(perso, map) && currentGravity < 0)) {
             perso->jumps = 2;
             perso->dashes = 2;
         }

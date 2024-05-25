@@ -240,7 +240,7 @@ again :
                     renderStatusHealth(renderer,perso);
 
                     if (perso->health == 0) {
-                        gameOver1(renderer, bgTextures, 5, map);
+                        gameOver(renderer, bgTextures, 5, map, '?');
                     }
                 } else {
                     
@@ -259,6 +259,7 @@ again :
                         playerInFight->health = 9;
                         bossDeath->phase = 1;
                         resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+                        gameOver(renderer, bgTextures, 5, map, '!');
                         goto again;
                     }
                 }
