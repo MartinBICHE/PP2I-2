@@ -7,13 +7,21 @@ bool musicPaused = false;
 int spriteIndex = 0;
 int spriteScrollDelay = 300;
 int volumeLevel = MAX_VOLUME / 2; // Volume initial à 50%
+int sfxVolumeLevel = MAX_VOLUME / 2; // Volume initial pour les bruitages à 50%
 SDL_Rect cursorRect;
+SDL_Rect cursorRectSFX;
+Mix_Chunk* sounds[4];
 
-void initCursorRect(void) {
+void initCursorRects(void) {
     cursorRect.x = WINWIDTH / 4 + (volumeLevel * (WINWIDTH / 2)) / MAX_VOLUME - CURSOR_WIDTH / 2;
-    cursorRect.y = WINHEIGHT / 2 - CURSOR_HEIGHT / 2;
+    cursorRect.y = WINHEIGHT / 2 - CURSOR_HEIGHT - 15; // Volume de la musique
     cursorRect.w = CURSOR_WIDTH;
     cursorRect.h = CURSOR_HEIGHT;
+
+    cursorRectSFX.x = WINWIDTH / 4 + (sfxVolumeLevel * (WINWIDTH / 2)) / MAX_VOLUME - CURSOR_WIDTH / 2;
+    cursorRectSFX.y = WINHEIGHT / 2 + CURSOR_HEIGHT + 15; // Volume des bruitages
+    cursorRectSFX.w = CURSOR_WIDTH;
+    cursorRectSFX.h = CURSOR_HEIGHT;
 }
 
 void renderSprite(SDL_Renderer *renderer) {
@@ -117,16 +125,62 @@ void toggleMusic(void) {
     }
 }
 
-void handleVolumeCursor(SDL_Event *e) {
-    if (e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEMOTION && parametre) {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
+void loadSounds(Mix_Chunk **sounds) {
+    sounds[0] = Mix_LoadWAV("./asset/sounds/walk1.wav");
+    if (sounds[0] == NULL) {
+        printf("Failed to load walking sound 1 effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
+    sounds[1] = Mix_LoadWAV("./asset/sounds/walk2.wav");
+    if (sounds[1] == NULL) {
+        printf("Failed to load walking sound 2 effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
+    sounds[2] = Mix_LoadWAV("./asset/sounds/dash.wav");
+    if (sounds[2] == NULL) {
+        printf("Failed to load dashing sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
+    sounds[3] = Mix_LoadWAV("./asset/sounds/true_crack.wav");
+    if (sounds[3] == NULL) {
+        printf("Failed to load crack sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        exit(-1);
+    }
+    
+    // Appliquer le volume initial aux bruitages
+    for (int i = 0; i < 4; i++) {
+        Mix_VolumeChunk(sounds[i], sfxVolumeLevel);
+    }
+}
 
-        // Vérifiez si le curseur est sur la barre de volume
-        if (x >= WINWIDTH / 4 && x <= WINWIDTH * 3 / 4 && y >= WINHEIGHT / 2 - 15 && y <= WINHEIGHT / 2 + 15) {
-            cursorRect.x = x - CURSOR_WIDTH / 2;
-            volumeLevel = ((x - WINWIDTH / 4) * MAX_VOLUME) / (WINWIDTH / 2);
-            Mix_VolumeMusic(volumeLevel);
+
+void handleVolumeCursor(SDL_Event *e) {
+    if (e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEMOTION) {
+        if (e->button.button == SDL_BUTTON_LEFT) {
+            int mouseX = e->button.x;
+            int mouseY = e->button.y;
+
+            // Gérer le curseur de volume pour la musique
+            if (mouseY >= WINHEIGHT / 2 - CURSOR_HEIGHT - 15 && mouseY <= WINHEIGHT / 2 - 15) {
+                cursorRect.x = mouseX - cursorRect.w / 2;
+                if (cursorRect.x < WINWIDTH / 4) cursorRect.x = WINWIDTH / 4;
+                if (cursorRect.x > WINWIDTH / 4 + WINWIDTH / 2 - cursorRect.w) cursorRect.x = WINWIDTH / 4 + WINWIDTH / 2 - cursorRect.w;
+                volumeLevel = ((cursorRect.x - WINWIDTH / 4) * MAX_VOLUME) / (WINWIDTH / 2 - cursorRect.w);
+                Mix_VolumeMusic(volumeLevel);
+            }
+
+            // Gérer le curseur de volume pour les bruitages
+            if (mouseY >= WINHEIGHT / 2 + CURSOR_HEIGHT + 15 && mouseY <= WINHEIGHT / 2 + CURSOR_HEIGHT + 35) {
+                cursorRectSFX.x = mouseX - cursorRectSFX.w / 2;
+                if (cursorRectSFX.x < WINWIDTH / 4) cursorRectSFX.x = WINWIDTH / 4;
+                if (cursorRectSFX.x > WINWIDTH / 4 + WINWIDTH / 2 - cursorRectSFX.w) cursorRectSFX.x = WINWIDTH / 4 + WINWIDTH / 2 - cursorRectSFX.w;
+                sfxVolumeLevel = ((cursorRectSFX.x - WINWIDTH / 4) * MAX_VOLUME) / (WINWIDTH / 2 - cursorRectSFX.w);
+                
+                // Appliquer le volume à tous les bruitages
+                for (int i = 0; i < 4; i++) {
+                    Mix_VolumeChunk(sounds[i], sfxVolumeLevel);
+                }
+            }
         }
     }
 }
@@ -134,21 +188,31 @@ void handleVolumeCursor(SDL_Event *e) {
 void drawMenu(SDL_Renderer *renderer) {
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
+
     if (showMenu) {
         renderSprite(renderer);
         renderImage(renderer, "./asset/UI/play.png", (WINWIDTH / 2 - Image1Width / 2), (WINHEIGHT / 2 - Image1Height / 2), Image1Width, Image1Height);
         renderImage(renderer, "./asset/UI/option.png", WINWIDTH - Image1Width, 0, Image1Width, Image1Height);
         renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", 0, 0, Image1Width, Image1Height);
-        SDL_RenderPresent(renderer);
     } else {
         renderSprite(renderer);
-        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 5, WINWIDTH / 2, 10};
+
+        // Dessiner la barre de volume pour la musique
+        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 40, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRect);
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &cursorRect);
-        SDL_RenderPresent(renderer);
+
+        // Dessiner la barre de volume pour les bruitages
+        SDL_Rect barRectSFX = {WINWIDTH / 4, WINHEIGHT / 2 + 70, WINWIDTH / 2, 10};
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &barRectSFX);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        SDL_RenderFillRect(renderer, &cursorRectSFX);
     }
+
+    SDL_RenderPresent(renderer);
 }
 
 void drawMapMenu(SDL_Renderer *renderer) {
@@ -160,11 +224,19 @@ void drawMapMenu(SDL_Renderer *renderer) {
         renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", (WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
     }
     if (parametre) {
-        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 5, WINWIDTH / 2, 10};
+        // Dessiner la barre de volume pour la musique
+        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 40, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRect);
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &cursorRect);
+
+        // Dessiner la barre de volume pour les bruitages
+        SDL_Rect barRectSFX = {WINWIDTH / 4, WINHEIGHT / 2 + 70, WINWIDTH / 2, 10};
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &barRectSFX);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        SDL_RenderFillRect(renderer, &cursorRectSFX);
     }
 }
 

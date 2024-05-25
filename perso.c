@@ -97,7 +97,9 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         SDL_Rect src_rect;
         if (currentGravity > 0) {
             if (hitbox_bottom(perso, map)) {
-                perso->spriteOffset = (perso->spriteOffset + 1) % 24; // 6 frames par sprite, 4 sprites
+                if (!afficherImage && !parametre) {
+                    perso->spriteOffset = (perso->spriteOffset + 1) % 24; // 6 frames par sprite, 4 sprites
+                }
                 src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 3*64, .w = 64, .h = 64};
             } else {
                 if (hitbox_top(perso, map)) {
@@ -191,7 +193,9 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
 
         SDL_SetTextureAlphaMod(persoTexture, 255);
     } else if (perso->vy != 0) { // perso en train de sauter
+        if (!afficherImage && !parametre) {
         perso->spriteOffset = (perso->spriteOffset + 1) % 42; // 6 frames par sprite, 7 sprites
+        }
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 2*64, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
@@ -212,7 +216,9 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
                 exit(-1);
             }
         }
-        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
+        if (!afficherImage && !parametre) {
+            perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
+        }
         SDL_Rect src_rect;
         // if (currentGravity > 0) {
             src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
@@ -224,7 +230,9 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
             exit(-1);
         }
     } else { // perso immobile
-        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
+        if (!afficherImage && !parametre) {
+            perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
+        }
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 0, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
@@ -498,56 +506,60 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData,Boss* bo
         perso->y += perso->vy*DT;
         perso->x += perso->vx*DT;
         updateHitbox(perso, map);
-        if (hitbox_bottom(perso, map)) {
+        if ((hitbox_bottom(perso, map) && currentGravity > 0) || (hitbox_top(perso, map) && currentGravity < 0)) {
             perso->jumps = 2;
             perso->dashes = 2;
         }
     }
-    if (!isBossMap) {
+    if (isBossMap) {
         if (hitbox_boss(perso, map, boss)) {
             if (perso->invincibility_timer == 0) {
                 perso->invincibility_timer = 150;
                 perso->health--;
             }
-
             float dx = perso->vx * DT;
             float dy = perso->vy * DT;
             float recoilAmount = 1.0f;
-            perso->recoil_timer = 10;
-
-            if (currentGravity > 0) {
-                if (dx > 0) {
+            perso -> recoil_timer = 5;
+            if (currentGravity > 0 ) {
+                if (dx > 0) { // Le personnage se déplace vers la droite
                     perso->vx = max(perso->vx, 0.0f);
-                    perso->x = boss->hitbox.x / map->pix_rect - PERSO_WIDTH / 2.0f;
+                    // Position juste avant le début de la hitbox du boss (côté gauche)
+                    perso->x = boss->hitbox.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
                     perso->x -= recoilAmount;
-                } else if (dx < 0) { 
+                } else if (dx < 0) { // Le personnage se déplace vers la gauche
                     perso->vx = min(perso->vx, 0.0f);
-                    perso->x = (boss->hitbox.x + boss->hitbox.w) / map->pix_rect + PERSO_WIDTH / 2.0f;
+                    // Position juste avant le début de la hitbox du boss (côté droit)
+                    perso->x = (boss->hitbox.x + boss->hitbox.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
                     perso->x += recoilAmount;
                 }
-                if (dy > 0) { 
+                if (dy > 0) { // Le personnage se déplace vers le bas
+                    // Faire rebondir le personnage au-dessus du boss
                     perso->vy = -jumpSpeed;
-                    perso->y = boss->hitbox.y / map->pix_rect - PERSO_HEIGHT;
-                } else if (dy < 0) { 
+                }
+                if (dy < 0) { // Le personnage se déplace vers le haut
+                    // Faire rebondir le personnage en dessous du boss
                     perso->vy = jumpSpeed;
-                    perso->y = (boss->hitbox.y + boss->hitbox.h) / map->pix_rect;
                 }
             } else {
-                if (dx > 0) { 
+                if (dx > 0) { // Le personnage se déplace vers la droite
                     perso->vx = max(perso->vx, 0.0f);
-                    perso->x = boss->hitbox.x / map->pix_rect - PERSO_WIDTH / 2.0f;
+                    // Position juste avant le début de la hitbox du boss (côté gauche)
+                    perso->x = boss->hitbox.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
                     perso->x -= recoilAmount;
-                } else if (dx < 0) { 
+                } else if (dx < 0) { // Le personnage se déplace vers la gauche
                     perso->vx = min(perso->vx, 0.0f);
-                    perso->x = (boss->hitbox.x + boss->hitbox.w) / map->pix_rect + PERSO_WIDTH / 2.0f;
+                    // Position juste avant le début de la hitbox du boss (côté droit)
+                    perso->x = (boss->hitbox.x + boss->hitbox.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
                     perso->x += recoilAmount;
                 }
-                if (dy < 0) { 
+                if (dy < 0) { // Le personnage se déplace vers le bas
+                    // Faire rebondir le personnage au-dessus du boss
                     perso->vy = jumpSpeed;
-                    perso->y = boss->hitbox.y / map->pix_rect - PERSO_HEIGHT;
-                } else if (dy > 0) {
+                }
+                if (dy > 0) { // Le personnage se déplace vers le haut
+                    // Faire rebondir le personnage en dessous du boss
                     perso->vy = jumpSpeed;
-                    perso->y = (boss->hitbox.y + boss->hitbox.h) / map->pix_rect;
                 }
             }
         }

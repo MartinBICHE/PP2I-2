@@ -14,7 +14,7 @@ void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const
     if (!afficherImage && !isBossMap) {
         perso->vx = 0;
         updateCam(perso, map);
-        updatePerso(perso, map, &enemyStateData, state,boss,sounds);
+        updatePerso(perso, map, &enemyStateData, boss,state,sounds);
     }
     if ((afficherImage || parametre) && isBossMap) {
         if (pauseStartTime == 0) {
@@ -53,7 +53,7 @@ void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const
         }
         // 
 
-        updatePerso(perso, map, &enemyStateData, state,boss,sounds);
+        updatePerso(perso, map, &enemyStateData,boss,state,sounds);
         if (boss -> health > 0) {
             if (currentTime1 - lastBossMoveTime >= bossMove) {
                 updateBoss(boss, map);

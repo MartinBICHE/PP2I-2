@@ -149,7 +149,7 @@ int main(int argc, char **argv) {
     loadBossTexture(renderer,&bossTexture,"./asset/spritesheet/boss.png");
 
     EnemyStateData enemyStateData;
-    initEnemy1(600, 660, &enemyStateData);
+    // initEnemy1(600, 660, &enemyStateData);
 
 
 
