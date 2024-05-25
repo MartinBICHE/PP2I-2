@@ -1,5 +1,7 @@
 #ifndef FIGHT_H
 #define FIGHT_H
+#include <SDL2/SDL.h>
+#include "const.h"
 
 /* Fonction de gestion du personnage */
 

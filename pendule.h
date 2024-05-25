@@ -1,21 +1,34 @@
+#ifndef PENDULE_H
+#define PENDULE_H
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#define PI 3.14159
+#include "map.h"
+#include "perso.h"
 
 
-struct _PenduleData{
-    float time;
-    float x;
-    float y;
-    int textureWidth;
-    int textureHeight;
-    int scale;
-    float period;
-    float amplitude;
-    int xInit;
-    int yInit;
+
+enum EnemyPenduleState{
+    PENDULE_MOVING_UP,
+    PENDULE_MOVING_DOWN,
+
 };
-typedef struct _PenduleData PenduleData;
 
-void initPendule(PenduleData *penduleData, SDL_Texture *texture, int xInit, int yInit);
-void pendule_mouvement(SDL_Renderer *renderer, PenduleData *penduleData);
+struct _EnemyPenduleData{
+    enum EnemyPenduleState state;
+    SDL_Rect src_rect;
+    SDL_Rect dst_rect;
+    Uint32 pauseStartBits;
+    Uint32 pauseStart;
+    Uint32 pauseAttack;
+    int attackCounter;
+    Uint32 pauseMusic;
+
+};
+
+typedef struct _EnemyPenduleData EnemyPenduleData;
+void enemyPendule_mouvement(SDL_Renderer *renderer, EnemyPenduleData *enemyFlecheData, Map *map);
+void initEnemyPendule(EnemyPenduleData *enemyPenduleData, int x, int y);
+int hitbox_enemyPendule(Perso *perso, Map *map, EnemyPenduleData *enemy);
+void penduleAttack(EnemyPenduleData *enemy, Perso *perso, Map *map);
+
+#endif

@@ -23,7 +23,7 @@
 
 void scroll_movement(SDL_Renderer *renderer,
                        const char *text, SDL_Color color,
-                       ScrollStateData *scrollStateData, float x_cam) {
+                       ScrollStateData *scrollStateData, Map *map) {
   int speed = 1;
   int interval = 6000;
   int textLength = strlen(text);
@@ -37,7 +37,7 @@ void scroll_movement(SDL_Renderer *renderer,
   Uint32 format;
   int access, textWidth, textHeight;
   SDL_QueryTexture(textureText, &format, &access, &textWidth, &textHeight);
-  SDL_Rect dst_rectFixed = {scrollStateData->dst_rect.x - x_cam, scrollStateData->dst_rect.y, scrollStateData->dst_rect.w, scrollStateData->dst_rect.h};
+  SDL_Rect dst_rectFixed = {scrollStateData->dst_rect.x - map->x_cam, scrollStateData->dst_rect.y, scrollStateData->dst_rect.w, scrollStateData->dst_rect.h};
   /* SDL_RenderCopy(renderer, textureScroll, &scrollStateData->src_rect, &scrollStateData->dst_rect); */
   SDL_RenderCopy(renderer, textureScroll, &scrollStateData->src_rect, &dst_rectFixed);
   SDL_Rect dst_rectText = {scrollStateData->dst_rect.x + pad, scrollStateData->dst_rect.y + pad, 5, 5};
@@ -67,7 +67,7 @@ void scroll_movement(SDL_Renderer *renderer,
       SDL_QueryTexture(textureText, &format, &access, &textWidth, &textHeight);
       dst_rectText.h = textHeight;
       dst_rectText.w = textWidth;
-      SDL_Rect dst_rectTextFixed = {dst_rectText.x - x_cam, dst_rectText.y, dst_rectText.w, dst_rectText.h};
+      SDL_Rect dst_rectTextFixed = {dst_rectText.x - map->x_cam, dst_rectText.y, dst_rectText.w, dst_rectText.h};
       /* SDL_RenderCopy(renderer, textureText, NULL, &dst_rectText); */
       SDL_RenderCopy(renderer, textureText, NULL, &dst_rectTextFixed);
       SDL_DestroyTexture(textureText);
@@ -94,7 +94,7 @@ void scroll_movement(SDL_Renderer *renderer,
     SDL_QueryTexture(textureText, &format, &access, &textWidth, &textHeight);
     dst_rectText.h = textHeight;
     dst_rectText.w = textWidth;
-    SDL_Rect dst_rectFixed = {dst_rectText.x - x_cam, dst_rectText.y, dst_rectText.w, dst_rectText.h};
+    SDL_Rect dst_rectFixed = {dst_rectText.x - map->x_cam, dst_rectText.y, dst_rectText.w, dst_rectText.h};
     /* SDL_RenderCopy(renderer, textureText, NULL, &dst_rectText); */
     SDL_RenderCopy(renderer, textureText, NULL, &dst_rectFixed);
     break;
