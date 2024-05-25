@@ -31,6 +31,7 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
+#include <SDL2/SDL_mixer.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -48,6 +49,7 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Event e;
 SDL_Texture *bgTextures[6];
+Mix_Chunk *sounds[4];
 SDL_Texture *persoTexture;
 SDL_Texture *tileTextures;
 SDL_Texture* projectileTexture = NULL;
@@ -133,8 +135,9 @@ int main(int argc, char **argv) {
 
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
+    // loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
-    loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+
     EnemyStateData enemyStateData;
     initEnemy1(600, 660, &enemyStateData);
 
@@ -153,9 +156,10 @@ int main(int argc, char **argv) {
     /*     return 1; */
     /* } */
 
+    loadSounds(sounds);
+
     // Jouer la musique lorsque le menu s'ouvre
-    // playMusic();
-    //
+    playMusic();
 
 again :
 
@@ -200,17 +204,18 @@ again :
                     } else if (e.key.keysym.sym == SDLK_p && !afficherImage) {
                         perso -> health = 0;
                     }
-                    }   
-                    if (retourMenu) {
-                        goto again;
-                    } 
+                    
+                }   
+                if (retourMenu) {
+                    goto again;
+                } 
                     
 
                 
 
                 // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
                 if (perso-> health > 0) {
-                    game(enemyStateData,boss,map,perso,state);
+                    game(enemyStateData, boss, map, perso, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
                         printf("Error drawing the background");
                         exit(-1);
@@ -219,7 +224,7 @@ again :
                         printf("Error drawing the map");
                         exit(-1);
                     }
-                    if (display_perso(renderer, perso, map, persoTexture, 0)) {
+                    if (display_perso(renderer, perso, map, persoTexture, 0, sounds)) {
                         printf("Error drawing the perso");
                         exit(-1);
                     }
@@ -233,6 +238,10 @@ again :
                         renderProjectiles(renderer);
                     }
                     renderStatusHealth(renderer,perso);
+
+                    if (perso->health == 0) {
+                        gameOver1(renderer, bgTextures, 5, map);
+                    }
                 } else {
                     
                     game2(renderer, playerInFight, bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);

@@ -4,14 +4,14 @@ SRCS = main.c map.c time.c enemy1.c enemy2.c  enemy3.c perso.c dialog_box.c scro
 OBJS = $(SRCS:.c=.o)
 
 #Compilation
-CC = gcc
+CC = clang
 CFLAGS = -std=gnu11 -Wall -pedantic -O3
 LDFLAGS = -lm
 
 #Debug 
 CFLAGS += -g
 CFLAGS += -fsanitize=address -fno-omit-frame-pointer
-LDFLAGS +=  -fsanitize=address -lm
+LDFLAGS +=  -fsanitize=address 
 
 #Libs
 CFLAGS += $(shell pkg-config --cflags sdl2)
