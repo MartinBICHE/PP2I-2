@@ -7,6 +7,11 @@
 #include "graph.h"
 #include "music.h"
 
+#define INIT_ENEMY_BAT(enemy, map, x, y, x_max, goal, start) \
+    initEnemyBat(enemy, (x) * (map)->pix_rect, (y) * (map)->pix_rect, \
+                 (x_max) * (map)->pix_rect, goal, start, map)
+
+
 enum EnemyBatState{
     BAT_MOVING_RIGHT,
     BAT_MOVING_LEFT,

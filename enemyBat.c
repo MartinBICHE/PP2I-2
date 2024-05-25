@@ -20,9 +20,16 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
     SDL_Rect dst_rect2 = {enemyBatData->dst_rectAttack.x - map->x_cam, enemyBatData->dst_rectAttack.y, 64*2, enemyBatData->dst_rectAttack.h};
     SDL_Rect dst_rect2Ex = {enemyBatData->dst_rectAttack.x - map->x_cam - 25, enemyBatData->dst_rectAttack.y, 64*2, enemyBatData->dst_rectAttack.h};
     int pauseInterval = 1000;
+    /* printf("state: %d\n", enemyBatData->state); */
+    printf("src rect height %d\n", enemyBatData->src_rect.h);
+    printf("src rect width %d\n", enemyBatData->src_rect.w);
+    printf("dst rect height %d\n", enemyBatData->dst_rect.h);
+    printf("dst rect width %d\n", enemyBatData->dst_rect.w);
 
     int channel = Mix_PlayChannel(-1, musicEnemyBat, 0);
-    double distance = fabs(perso->x * map->pix_rect - enemyBatData->dst_rect.x);
+    double distance = sqrt(pow(perso->x * map->pix_rect - enemyBatData->dst_rect.x, 2) +
+                       pow(perso->y * map->pix_rect - enemyBatData->dst_rect.y, 2));
+
     if (distance > MAX_HEARING_DISTANCE) {
         Mix_Volume(channel, MIN_VOLUME);
     } else {
@@ -89,7 +96,6 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
 
             break;
     }
-    printf("state: %d\n", enemyBatData->state);
 
 }
 
@@ -115,8 +121,10 @@ void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal
     enemyBatData->src_rect.w = 32;
     enemyBatData->src_rect.h = 64;
 
-    enemyBatData->dst_rect.x = start->x * map->pix_rect;
-    enemyBatData->dst_rect.y = start->y * map->pix_rect;
+    /* enemyBatData->dst_rect.x = start->x * map->pix_rect; */
+     /* enemyBatData->dst_rect.x = start->x * map->pix_rect; */
+    enemyBatData->dst_rect.x = x;
+    enemyBatData->dst_rect.y = y;
     enemyBatData->dst_rect.w = 32*2;
     enemyBatData->dst_rect.h = 64*2;
 
@@ -137,23 +145,31 @@ void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal
     enemyBatData->dst_rectAttack.w = 64*2;
     enemyBatData->dst_rectAttack.h = 64*2;
 
-    enemyBatData->start = start;
-    enemyBatData->goal = goal;
+    
+    if (goal != NULL) {
+        enemyBatData->goal = goal;
+    } else {
+        enemyBatData->goal = NULL;
+    }
+
+    if (start != NULL) {
+        enemyBatData->start = start;
+    } else {
+        enemyBatData->start = NULL;
+    }
+
 }
 
 
 void batAttack(EnemyBatData *enemyBatData, Perso *perso, Map *map){
     int intervalAttack = 1000;
     int spriteLength = 64;
-    float borneInf = enemyBatData->dst_rect.x;
-    float borneSup = borneInf + spriteLength;
-    float persoPositionX = perso->x * map->pix_rect;
 
     if (enemyBatData->state != BAT_ATTACK){
         enemyBatData->previousState = enemyBatData->state;
     }
 
-    if (persoPositionX >= borneInf && persoPositionX <= borneSup){
+    if (hitbox_enemyBat(perso, map, enemyBatData)){
         if (SDL_GetTicks() - enemyBatData->pauseAttack >= intervalAttack){
             perso->health -= 1;
             enemyBatData->pauseAttack = SDL_GetTicks();
@@ -351,12 +367,10 @@ void enemyBat_follow(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **
       Node *current_bat_node = &graph[yPos_bat-1][xPos_bat-1];
       if (!current_bat_node->walkable){
           current_bat_node = get_nearest_walkable_neighbor(graph, map, xPos_bat, yPos_bat);
-          puts("gaga");
           print_node(current_bat_node);
       }
       if (!current_node_perso->walkable){
           current_node_perso = get_nearest_walkable_neighbor(graph, map, xPos_perso, yPos_perso);
-          puts("gaga");
           print_node(current_bat_node);
       }
       /* current_bat_node->walkable = true; */
