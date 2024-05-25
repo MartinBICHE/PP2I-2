@@ -46,7 +46,7 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_Surface *surfaceHealth2 = IMG_Load("asset/spritesheet/health2.png");
     SDL_Surface *surfaceHealth3 = IMG_Load("asset/spritesheet/health3.png");
     SDL_Surface *surfaceHealth4 = IMG_Load("asset/spritesheet/health4.png");
-    SDL_Surface *surfaceHealth5 = IMG_Load("asset/spritesheet/health4.png");
+    SDL_Surface *surfaceHealth5 = IMG_Load("asset/spritesheet/health5.png");
     SDL_Surface *surfaceHealth6 = IMG_Load("asset/spritesheet/health6.png");
     SDL_Surface *surfaceHealth7 = IMG_Load("asset/spritesheet/health7.png");
     SDL_Surface *surfaceHealth8 = IMG_Load("asset/spritesheet/health8.png");

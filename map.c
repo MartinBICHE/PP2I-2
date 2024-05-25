@@ -79,7 +79,7 @@ int drawBackground(SDL_Renderer *renderer, SDL_Texture *bgTextures[], int layer,
 		float parallax = (float)i / (layer - 1);
 		int textureWidth;
         SDL_QueryTexture(bgTextures[i], NULL, NULL, &textureWidth, NULL);
-		int repeats = (WINWIDTH / textureWidth) + 3;
+		int repeats = (WINWIDTH / textureWidth) + 6;
 		for (int j = 0; j < repeats; ++j) {
 			int x_position = j * textureWidth - parallax * map->x_cam;
             if (x_position + textureWidth < 0 || x_position > WINWIDTH) continue;

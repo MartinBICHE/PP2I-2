@@ -146,9 +146,9 @@ void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, Map *map) {
             if (enemy->previousState == RIGHT){
                 SDL_RenderCopyEx(renderer, textureEnemy3Attack, &enemy->src_rectAttack, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
             }
-            int volume = MAX_VOLUME;
-            int channel = Mix_PlayChannel(-1, musicEnemyBat, 0);
-            Mix_Volume(channel, volume);
+            /* int volume = MAX_VOLUME; */
+            /* int channel = Mix_PlayChannel(-1, musicEnemyBat, 0); */
+            /* Mix_Volume(channel, volume); */
             break;
     }
 }

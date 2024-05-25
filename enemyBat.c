@@ -26,18 +26,18 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
     printf("dst rect height %d\n", enemyBatData->dst_rect.h);
     printf("dst rect width %d\n", enemyBatData->dst_rect.w);
 
-    int channel = Mix_PlayChannel(-1, musicEnemyBat, 0);
+    /* int channel = Mix_PlayChannel(-1, musicEnemyBat, 0); */
     double distance = sqrt(pow(perso->x * map->pix_rect - enemyBatData->dst_rect.x, 2) +
                        pow(perso->y * map->pix_rect - enemyBatData->dst_rect.y, 2));
 
-    if (distance > MAX_HEARING_DISTANCE) {
-        Mix_Volume(channel, MIN_VOLUME);
-    } else {
-        double attenuation = 5.0 / (distance - 100); 
-        int volume = (int)(MAX_VOLUME * attenuation);
-        Mix_Volume(channel, volume);
-        printf("Adjusting volume to %d on channel %d based on distance %f\n", volume, channel, distance);
-    }
+    /* if (distance > MAX_HEARING_DISTANCE) { */
+    /*     Mix_Volume(channel, MIN_VOLUME); */
+    /* } else { */
+    /*     double attenuation = 5.0 / (distance - 100); */ 
+    /*     int volume = (int)(MAX_VOLUME * attenuation); */
+    /*     Mix_Volume(channel, volume); */
+    /*     printf("Adjusting volume to %d on channel %d based on distance %f\n", volume, channel, distance); */
+    /* } */
     if (enemyBatData->state == BAT_MOVING_RIGHT){
             SDL_RenderCopyEx(renderer, textureBat, &enemyBatData->src_rect, &dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
     }
