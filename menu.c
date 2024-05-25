@@ -1,10 +1,20 @@
 #include "menu.h"
 #include "init.h"
+#include "boss.h"
 
 Mix_Music* gMusic = NULL;
 bool musicPaused = false;
 int spriteIndex = 0;
 int spriteScrollDelay = 300;
+int volumeLevel = MAX_VOLUME / 2; // Volume initial à 50%
+SDL_Rect cursorRect;
+
+void initCursorRect(void) {
+    cursorRect.x = WINWIDTH / 4 + (volumeLevel * (WINWIDTH / 2)) / MAX_VOLUME - CURSOR_WIDTH / 2;
+    cursorRect.y = WINHEIGHT / 2 - CURSOR_HEIGHT / 2;
+    cursorRect.w = CURSOR_WIDTH;
+    cursorRect.h = CURSOR_HEIGHT;
+}
 
 void renderSprite(SDL_Renderer *renderer) {
     static Uint32 lastScrollTime = 0;
@@ -106,6 +116,20 @@ void toggleMusic(void) {
     }
 }
 
+void handleVolumeCursor(SDL_Event *e) {
+    if (e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEMOTION && parametre) {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+
+        // Vérifiez si le curseur est sur la barre de volume
+        if (x >= WINWIDTH / 4 && x <= WINWIDTH * 3 / 4 && y >= WINHEIGHT / 2 - 15 && y <= WINHEIGHT / 2 + 15) {
+            cursorRect.x = x - CURSOR_WIDTH / 2;
+            volumeLevel = ((x - WINWIDTH / 4) * MAX_VOLUME) / (WINWIDTH / 2);
+            Mix_VolumeMusic(volumeLevel);
+        }
+    }
+}
+
 void drawMenu(SDL_Renderer *renderer) {
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(renderer);
@@ -120,7 +144,6 @@ void drawMenu(SDL_Renderer *renderer) {
         SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 5, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRect);
-        SDL_Rect cursorRect = {(WINWIDTH - CURSOR_WIDTH) / 2, (WINHEIGHT - CURSOR_HEIGHT) / 2, CURSOR_WIDTH, CURSOR_HEIGHT};
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &cursorRect);
         SDL_RenderPresent(renderer);
@@ -133,12 +156,12 @@ void drawMapMenu(SDL_Renderer *renderer) {
         renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", (WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
         renderImage(renderer, "./asset/UI/option.png", WINWIDTH - ImageParametrePauseWidth, 0, ImageParametrePauseWidth, ImageParametrePauseHeight);
         renderImage(renderer, "./asset/UI/bouton-retour-en-arrière.png", 0, 0, ImageRetourArrièreWidth, ImageRetourArrièreHeight);
+        renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", (WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
     }
     if (parametre) {
         SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 5, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRect);
-        SDL_Rect cursorRect = {(WINWIDTH - CURSOR_WIDTH) / 2, (WINHEIGHT - CURSOR_HEIGHT) / 2, CURSOR_WIDTH, CURSOR_HEIGHT};
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &cursorRect);
     }
@@ -159,12 +182,7 @@ void interactionMenu(SDL_Renderer *renderer) {
             } else if (mouseX >= WINWIDTH - Image1Width && mouseX <= WINWIDTH &&
                        mouseY >= 0 && mouseY <= Image1Height && showMenu) {
                 showMenu = false;
-            } else if (mouseX >= ((WINWIDTH - ImageRetourMenuWidth) / 2) && mouseX <= ((WINWIDTH - ImageRetourMenuWidth) / 2) + ImageRetourMenuWidth &&
-                       mouseY >= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) && mouseY <= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) + ImageRetourMenuHeight) {
-                showMenu = true;
-            } else if (mouseX >= ((WINWIDTH - ImageQuitterJeuWidth) / 2) && mouseX <= ((WINWIDTH - ImageQuitterJeuWidth) / 2) + ImageQuitterJeuWidth &&
-                       mouseY >= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) && mouseY <= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) + ImageQuitterJeuHeight) {
-                quit = true;
+                parametre = !parametre;
             } else if (mouseX >= WINWIDTH - Image1Width && mouseX <= WINWIDTH &&
                        mouseY >= 0 && mouseY <= Image1Height && !showMenu) {
                 showMenu = true;
@@ -176,22 +194,11 @@ void interactionMenu(SDL_Renderer *renderer) {
                 afficherImage = false;
             }
         } else if (e.type == SDL_MOUSEMOTION) {
-            if (e.motion.x >= (WINWIDTH - Image1Width) / 2 && e.motion.x <= ((WINWIDTH - Image1Width) / 2) + Image1Width &&
-                e.motion.y >= (WINHEIGHT - Image1Height) / 2 && e.motion.y <= ((WINHEIGHT - Image1Height) / 2) + Image1Height) {
-                spriteScrollDelay = 100;
-            } else {
-                spriteScrollDelay = 300;
-            }
-            if (e.motion.x >= (WINWIDTH - ImageQuitterJeuWidth) / 2 && e.motion.x <= ((WINWIDTH - ImageQuitterJeuWidth) / 2) + ImageQuitterJeuWidth &&
-                e.motion.y >= (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50 && e.motion.y <= ((WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50) + ImageQuitterJeuHeight) {
-                showMenu = true;
-            } else if (e.motion.x >= (WINWIDTH - ImageRetourMenuWidth) / 2 && e.motion.x <= ((WINWIDTH - ImageRetourMenuWidth) / 2) + ImageRetourMenuWidth &&
-                       e.motion.y >= (WINHEIGHT - ImageRetourMenuHeight) / 2 - 50 && e.motion.y <= ((WINHEIGHT - ImageRetourMenuHeight) / 2 - 50) + ImageRetourMenuHeight) {
-                showMenu = true;
-            }
+            handleVolumeCursor(&e); // Ajout du gestionnaire de curseur
         } else if (e.type == SDL_KEYUP) {
             if (e.key.keysym.sym == SDLK_ESCAPE && !showMenu) {
                 showMenu = true;
+                parametre = !parametre;
             }
         }
     }
@@ -228,6 +235,8 @@ void interactionPauseJeu(SDL_Renderer *renderer) {
                 toggleMusic();
             }
         }
+    } else if (e.type == SDL_MOUSEMOTION) {
+        handleVolumeCursor(&e); // Ajout du gestionnaire de curseur
     } else if (e.type == SDL_KEYUP) {
         if (e.key.keysym.sym == SDLK_ESCAPE && !afficherImage && !parametre) {
             afficherImage = !afficherImage;

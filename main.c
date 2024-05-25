@@ -50,6 +50,7 @@ SDL_Renderer* renderer = NULL;
 SDL_Event e;
 SDL_Texture *bgTextures[6];
 SDL_Texture *persoTexture;
+SDL_Texture *bossTexture;
 SDL_Texture *tileTextures;
 SDL_Texture* projectileTexture = NULL;
 bool showMenu = true;
@@ -63,6 +64,8 @@ bool quit = false;
 bool running = true;
 float currentGravity = ACC;
 float jumpSpeed = JUMPSPEED;
+float bossMove = BOSS_MOVE_INTERVAL;
+float projectileSpeed = PROJECTILE_SPEED;
 bool showAttentionImage = true;
 bool firstIteration = true;
 
@@ -71,7 +74,9 @@ Uint32 lastProjectileLoad = 0;
 Uint32 lastBossMoveTime = 0;
 Uint32 boutonGTime = 0;
 Uint32 currentTime1 = 0;
-
+Uint32 bossAngry1 = 0;
+Uint32 bossAngry2 = 0;
+Uint32 bossAngry3 = 0;
 Uint32 pauseStartTime = 0;
 Uint32 totalPauseDuration = 0;
 
@@ -81,7 +86,12 @@ bool isBossMap = false;
 Projectile projectiles[MAX_PROJECTILES] = {
     {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 1
     {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 2
-    {0.0f, 0.0f, 0.0f, 0.0f, false}  // Projectile 3
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 3
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 4
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 5
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 6
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 7
+    {0.0f, 0.0f, 0.0f, 0.0f, false} // Projectile 8
 };
 
 int main(int argc, char **argv) {
@@ -129,6 +139,7 @@ int main(int argc, char **argv) {
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
     loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+    loadBossTexture(renderer,&bossTexture,"./asset/spritesheet/boss.png");
 
     EnemyStateData enemyStateData;
     initEnemy1(300, 460, &enemyStateData);
@@ -147,7 +158,7 @@ int main(int argc, char **argv) {
     }
 
     // Jouer la musique lorsque le menu s'ouvre
-    // playMusic();
+    playMusic();
 
 again :
 
@@ -170,12 +181,12 @@ again :
             loadBackgroundTextures(renderer, bgTextures, 5);
             loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
             loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+            loadBossTexture(renderer,&bossTexture,"./asset/spritesheet/boss.png");
 
             while (running) {
                 Uint64 start = SDL_GetTicks();
                 while (SDL_PollEvent(&e) != 0) {
                     interactionPauseJeu(renderer);
-                
                     if (e.key.keysym.sym == SDLK_SPACE && !afficherImage && perso->recoil_timer <= 0) {
                         jump(perso, map);
                     } else if (e.key.keysym.sym == SDLK_g && !afficherImage) {
@@ -194,11 +205,13 @@ again :
                     }
                     }   
                     if (retourMenu) {
+                        perso -> health = 0;
                         goto again;
                     } 
                     
-
-                
+                if (isBossMap && (perso->x > 26.7 || perso->y > 14.94 || perso->x < 1.3 || perso->y < 1)) {
+                    goto again;
+                }
 
                 // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
                 if (perso-> health > 0) {
@@ -211,6 +224,7 @@ again :
                         printf("Error drawing the map");
                         exit(-1);
                     }
+                    
                     if (display_perso(renderer, perso, map, persoTexture, 0)) {
                         printf("Error drawing the perso");
                         exit(-1);
@@ -218,8 +232,8 @@ again :
                     if (!isBossMap) {
                         enemy1_movement(renderer, &enemyStateData, map);
                     }
-                    if (isBossMap) {
-                        displayBoss(renderer, boss, map);
+                    if (isBossMap && boss->health > 0) {
+                        displayBoss(renderer, boss, map,bossTexture,0);
                         if (showAttentionImage) {
                             renderImage(renderer,"./asset/UI/attention.png",(WINWIDTH / 2 - ImageAttentionWidth / 2),(WINHEIGHT / 2 - ImageAttentionHeight / 2), ImageAttentionWidth, ImageAttentionHeight);
                         }
@@ -227,7 +241,7 @@ again :
                     }
                     renderStatusHealth(renderer,perso);
                 } else {
-                    
+                    isBossMap = !isBossMap;
                     game2(renderer, playerInFight, bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
                     renderStatusHealthFight(renderer,playerInFight);
                     invincibility(playerInFight);
@@ -255,9 +269,10 @@ again :
                 // SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
                 // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
                 // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
-
-                
-
+ 
+                if (isBossMap) {
+                    renderStatusBoss(renderer,boss);
+                }
                 SDL_RenderPresent(renderer);
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                 SDL_RenderClear(renderer);

@@ -6,7 +6,7 @@
 
 
 bool isValidPosition(Map* map, float x, float y);
-void updateProjectile(Projectile* projectiles,Perso* perso, float targetX, float targetY, Map* map);
+void updateProjectile(Projectile* projectiles,Perso* perso, float targetX, float targetY, Map* map,Boss* boss);
 void renderProjectiles(SDL_Renderer* renderer);
 SDL_Texture* loadProjectileTexture(SDL_Renderer* renderer);
 void renderProjectile(float x, float y, SDL_Renderer* renderer);
@@ -14,6 +14,7 @@ void spawnProjectile(int indice, int startTileX, int startTileY, float targetX, 
 void cleanupProjectiles(void);
 void printProjectiles(Projectile* projectiles);
 bool checkProjectileCollisionWithPerso(Projectile* projectile, Perso* perso);
+bool checkProjectileCollisionWithBoss(Projectile* projectile, Boss* boss);
 void checkProjectileCollisionWithTiles(Projectile* projectile, Map* map);
 void resetProjectiles(void);
 void freeProjectileTexture(void);

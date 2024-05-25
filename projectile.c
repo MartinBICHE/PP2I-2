@@ -4,6 +4,8 @@
 #include "perso.h"
 #include "const.h"
 
+
+
 bool isValidPosition(Map* map, float x, float y) {
     int tileX = (int)(x / map->pix_rect);
     int tileY = (int)(y / map->pix_rect);
@@ -17,8 +19,8 @@ bool isValidPosition(Map* map, float x, float y) {
     return false;
 }
 
-void updateProjectile(Projectile* projectiles, Perso* perso, float targetX, float targetY, Map* map) {
-    for (int i = 0; i < MAX_PROJECTILES; i++) {
+void updateProjectile(Projectile* projectiles, Perso* perso, float targetX, float targetY, Map* map,Boss* boss) {
+    for (int i = 0; i < MAX_PROJECTILES ; i++) {
         if (projectiles[i].active) {
             float dx = targetX - projectiles[i].x;
             float dy = targetY - projectiles[i].y;
@@ -53,8 +55,8 @@ void updateProjectile(Projectile* projectiles, Perso* perso, float targetX, floa
             float newDirY = currentDirX * sinAngle + currentDirY * cosAngle;
 
             // Mettre à jour la vitesse du projectile
-            projectiles[i].vx = newDirX * PROJECTILE_SPEED;
-            projectiles[i].vy = newDirY * PROJECTILE_SPEED;
+            projectiles[i].vx = newDirX * projectileSpeed;
+            projectiles[i].vy = newDirY * projectileSpeed;
             projectiles[i].x += projectiles[i].vx * DT;
             projectiles[i].y += projectiles[i].vy * DT;
 
@@ -69,7 +71,7 @@ void updateProjectile(Projectile* projectiles, Perso* perso, float targetX, floa
             if (!isValidPosition(map, projectiles[i].x, projectiles[i].y) || checkProjectileCollisionWithPerso(&projectiles[i], perso)) {
                 // Si le projectile touche le personnage, appliquer le recul
                 if (checkProjectileCollisionWithPerso(&projectiles[i], perso)) {
-                    perso -> health -=1;
+                    perso -> health--;
                     // Calculer la direction du recul
                     float recoil_dx = projectiles[i].vx;
                     float recoil_dy = projectiles[i].vy;
@@ -84,10 +86,13 @@ void updateProjectile(Projectile* projectiles, Perso* perso, float targetX, floa
                     // Activer le mode recul
                     perso->recoil_timer = 8; // Définir la durée du recul en frames
                 }
+                // if (checkProjectileCollisionWithBoss(&projectiles[i], boss)){
+                //     boss -> health--;
+                // }
                 projectiles[i].active = false;
             }
             
-            for (int j = 0; j < MAX_PROJECTILES; j++) {
+            for (int j = 0; j < MAX_PROJECTILES ; j++) {
                 if (i != j && projectiles[j].active && SDL_HasIntersection(&projectiles[i].hitbox, &projectiles[j].hitbox)) {
                     projectiles[i].active = false;
                     projectiles[j].active = false;
@@ -155,8 +160,8 @@ void spawnProjectile(int indice, int startTileX, int startTileY, float targetX, 
         float dx = targetX - startTileX * map->pix_rect;
         float dy = targetY - startTileY * map->pix_rect;
         float distance = sqrt(dx * dx + dy * dy); 
-        projectiles[indice].vx = (dx / distance) * PROJECTILE_SPEED;
-        projectiles[indice].vy = (dy / distance) * PROJECTILE_SPEED;
+        projectiles[indice].vx = (dx / distance) * projectileSpeed;
+        projectiles[indice].vy = (dy / distance) * projectileSpeed;
         
         projectiles[indice].active = true;
     }
@@ -198,6 +203,12 @@ bool checkProjectileCollisionWithPerso(Projectile* projectile, Perso* perso) {
     return SDL_HasIntersection(&projectileRect, &persoRect);
 }
 
+bool checkProjectileCollisionWithBoss(Projectile* projectile, Boss* boss) {
+    SDL_Rect projectileRect = projectile->hitbox;
+    SDL_Rect bossRect = boss->hitbox;
+    return SDL_HasIntersection(&projectileRect, &bossRect);
+}
+
 void checkProjectileCollisionWithTiles(Projectile* projectile, Map* map) {
     int tileX = (int)(projectile->x / map->pix_rect);
     int tileY = (int)(projectile->y / map->pix_rect);
@@ -219,4 +230,5 @@ void resetProjectiles(void) {
         projectiles[i].active = false;
     }
 }
+
 

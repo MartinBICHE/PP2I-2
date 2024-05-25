@@ -30,54 +30,56 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData, Map
     int interval = 1000;
     Uint32 ticks = SDL_GetTicks();
     Uint32 sprite = (ticks/500) % 10;
-    switch(enemyStateData->state){
-        case MOVING_UP:
-            if (SDL_GetTicks() - enemyStateData->pauseStartBits >= interval){
-                if (enemyStateData->dst_rect.h <= 128){
-                    enemyStateData->src_rect.h += speed;
-                    enemyStateData->src_rect.y -= speed;
-                    enemyStateData->dst_rect.h += speed;
-                    enemyStateData->dst_rect.y -= speed;
-                    enemyStateData->pauseStartBits = SDL_GetTicks();
-                }else{
-                    enemyStateData->state = ANIMATION_START;
+    if (!afficherImage && !parametre) {
+        switch(enemyStateData->state){
+            case MOVING_UP:
+                if (SDL_GetTicks() - enemyStateData->pauseStartBits >= interval){
+                    if (enemyStateData->dst_rect.h <= 128){
+                        enemyStateData->src_rect.h += speed;
+                        enemyStateData->src_rect.y -= speed;
+                        enemyStateData->dst_rect.h += speed;
+                        enemyStateData->dst_rect.y -= speed;
+                        enemyStateData->pauseStartBits = SDL_GetTicks();
+                    }else{
+                        enemyStateData->state = ANIMATION_START;
+                    }
                 }
-            }
-                break;
-        case ANIMATION_START:
-            enemyStateData->src_rect.x += 64;
-            enemyStateData->src_rect.x = sprite * 64;
+                    break;
+            case ANIMATION_START:
+                enemyStateData->src_rect.x += 64;
+                enemyStateData->src_rect.x = sprite * 64;
 
-            if (sprite == 9){
-                enemyStateData->state = PAUSE_TOP;
-                enemyStateData->pauseStart = SDL_GetTicks();
-            }
-            break;
-        case PAUSE_TOP:
-            if (SDL_GetTicks() - enemyStateData->pauseStart >= interval){
-                enemyStateData->state = MOVING_DOWN;
-            }
-            break;
-        case MOVING_DOWN:
-            if (SDL_GetTicks() - enemyStateData->pauseStartBits >= interval){
-                if (enemyStateData->dst_rect.h >= 2*64){
-                    enemyStateData->src_rect.h -= speed;
-                    enemyStateData->src_rect.y += speed;
-                    enemyStateData->dst_rect.h -= speed;
-                    enemyStateData->dst_rect.y += speed;
-                    enemyStateData->pauseStartBits = SDL_GetTicks();
-                }else{
-                    enemyStateData->state = PAUSE_BOTTOM;
+                if (sprite == 9){
+                    enemyStateData->state = PAUSE_TOP;
                     enemyStateData->pauseStart = SDL_GetTicks();
                 }
-            }
                 break;
-            case PAUSE_BOTTOM:
+            case PAUSE_TOP:
                 if (SDL_GetTicks() - enemyStateData->pauseStart >= interval){
-                    enemyStateData->state = MOVING_UP;
+                    enemyStateData->state = MOVING_DOWN;
                 }
                 break;
-    } 
+            case MOVING_DOWN:
+                if (SDL_GetTicks() - enemyStateData->pauseStartBits >= interval){
+                    if (enemyStateData->dst_rect.h >= 2*64){
+                        enemyStateData->src_rect.h -= speed;
+                        enemyStateData->src_rect.y += speed;
+                        enemyStateData->dst_rect.h -= speed;
+                        enemyStateData->dst_rect.y += speed;
+                        enemyStateData->pauseStartBits = SDL_GetTicks();
+                    }else{
+                        enemyStateData->state = PAUSE_BOTTOM;
+                        enemyStateData->pauseStart = SDL_GetTicks();
+                    }
+                }
+                    break;
+                case PAUSE_BOTTOM:
+                    if (SDL_GetTicks() - enemyStateData->pauseStart >= interval){
+                        enemyStateData->state = MOVING_UP;
+                    }
+                    break;
+        } 
+    }
     SDL_Rect dst_rectFixed = {
         enemyStateData->dst_rect.x - map->x_cam, enemyStateData->dst_rect.y, enemyStateData->dst_rect.w, enemyStateData->dst_rect.h};
     SDL_RenderCopy(renderer, textureEnemy1, &enemyStateData->src_rect, &dst_rectFixed);
