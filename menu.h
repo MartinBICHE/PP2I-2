@@ -1,5 +1,6 @@
 #ifndef MENU_H
 #define MENU_H
+#include <stdbool.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

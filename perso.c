@@ -1,16 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_events.h>
-#include "const.h"
 #include "perso.h"
 
 
 Perso *create_perso(Map *map) {
     Perso *res = malloc(sizeof(Perso));
     res->x = map->start_x;
+    /* res->x = 3 * map->pix_rect; */
     res->y = map->start_y;
     res->vx = 0;
     res->vy = 0;
@@ -249,21 +243,6 @@ int hitbox_right(Perso *perso, Map *map) {
     return 0;
 }
 
-int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
-    SDL_Rect enemyHitbox = enemyStateData->dst_rect;
-    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
-    enemyHitbox.x -= margin;
-    enemyHitbox.y -= margin;
-    enemyHitbox.w += 2 * margin;
-    enemyHitbox.h += 2 * margin;
-    SDL_Rect intersection;
-    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
-        return 1;
-    }
-    return 0;
-}
-
-
 float max(float a, float b) {
     if (a<b)return b;
     else return a;
@@ -407,27 +386,5 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
             perso->jumps = 2;
         }
     }
-    if (!isBossMap){
-        if (enemyStateData->state != PAUSE_BOTTOM) { // Le personnage peut passer si l'ennemi est abaissé
-            if (hitbox_enemy(perso, map, enemyStateData)) {
-                float dx = perso->vx * DT;
-                float dy = perso->vy * DT;
-                if (dx > 0) { // Le personnage se déplace vers la droite
-                    perso->vx = max(perso->vx, 0.0f);
-                    // Position juste avant le début de la hitbox de l'ennemi (côté gauche)
-                    perso->x = enemyStateData->dst_rect.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
-                } else if (dx < 0) { // Le personnage se déplace vers la gauche
-                    perso->vx = min(perso->vx, 0.0f);
-                    // Position juste avant le début de la hitbox de l'ennemi (côté droit)
-                    perso->x = (enemyStateData->dst_rect.x + enemyStateData->dst_rect.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
-                }
-                if (dy > 0) { // Le personnage se déplace vers le bas
-                    // Faire rebondir le personnage au dessus de l'ennemi
-                    perso->vy = -JUMPSPEED;
-                }
-            }
-        }
-    }
 }
-
 

@@ -1,239 +1,154 @@
-#include <SDL2/SDL_events.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_surface.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_video.h>
-#include <SDL2/SDL_image.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <SDL2/SDL.h>
-#include "const.h"
-#include "main.h"
 #include "enemy2.h"
-#include "map.h"
-
-/* Pour l'instant celui-là on ne va pas l'utiliser donc c'est pour cela il n'y a pas d'init et les fonctions associées */
-
-    /* enemy2_movement_1(renderer, textureEnemy, &dest_rect2, &src_rect2, enemy4, 1, map, &list_mov_right); */
-    /* SDL_Rect dest_rect2 = {map->pix_rect, 130, 64, 64}; */
-    /* SDL_Rect src_rect2 = {0, 0, 64, 64}; */
-    /* MoveList *list_mov_right = rightMovementList(1, 4, *map, WIDTH-1); */
-    /* MoveList *list_mov_left = leftMovementList(1, 4, *map, WIDTH-4); */
-    /* MoveList *list_left = leftMovementList(1, 4, *map, WIDTH-4); */
-    /* concatenate(&list_mov_right, &list_mov_left); */
-    /* Enemy2 *enemy4 = malloc(sizeof(Enemy2)); */
-    /* enemy4->image_path = "bubble.png"; */
-    /* enemy4->speed = 45; */
-    /* enemy4->xPosition = 1*map->pix_rect; */
-    /* enemy4->yPosition = 4*map->pix_rect ; */
-    /* enemy4->health = 0; */
-    /* enemy4->collision_max_x = WIDTH*map->pix_rect; */
-    /* enemy4->collision_min_x = 1*map->pix_rect; */
-    /* enemy4->yInitialPosition = 4; */
+#include "perso.h"
 
 
 
-MoveList *newMoveList(MoveData data){
-    MoveList *temp = malloc(sizeof(MoveList));
-    temp->mouvement = data;
-    temp->next = NULL;
-    return temp;
+/* Pour l'utiliser: */
+/* Avant le while(running); */
+/* Enemy2 enemy; */
+/* Node *goal = &graph[13 (goal_y)][24 (goal_x)];  le premier paramère va jusqu'à map->height - 1 et l'autre jusqu'à map->width -1, et il faut que ça soit pas un obstacle */ 
+/* Node *startA = &graph[10 (start_y)][15 (start_x)]; */ 
+/* initEnemy2(&enemy, startEnemy, goalEnemy, map); */
+/* puis juste avant le render_present: */
+/* enemy2_follow(renderer, &enemy, graph, map); */
+/* pour l'attaque: */
+/* enemy2Attack(&enemy, perso, map); */
+
+void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map){
+    int interval = 130;   
+    int speed = 10;      
+      Node *path;
+    if (enemy->state == EYE_MOVING_RIGHT) {
+        path = a_star(graph, map, enemy->goal, enemy->start);
+    } else {
+        path = a_star(graph, map, enemy->start, enemy->goal);
+    }
+    SDL_Rect dst_rectFixed = {enemy->dst_rect.x - map->x_cam, enemy->dst_rect.y, enemy->dst_rect.w, enemy->dst_rect.h};
+    int path_length = len_nodes(path);
+
+    int i;
+    for (i = 0; i < path_length; i++) {
+        if ((enemy->dst_rect.x < path[i].x * map->pix_rect && enemy->state == EYE_MOVING_RIGHT) ||
+            (enemy->dst_rect.x > path[i].x * map->pix_rect && enemy->state == EYE_MOVING_LEFT)) {
+            break;
+        }
+    }
+    if (enemy->state == EYE_MOVING_RIGHT) {
+        SDL_RenderCopyEx(renderer, textureEnemy2, &enemy->src_rect, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
+    } else if (enemy->state == EYE_MOVING_LEFT) {
+        SDL_RenderCopy(renderer, textureEnemy2, &enemy->src_rect, &dst_rectFixed);
+    }
+
+    int dx = path[i].x * map->pix_rect - enemy->dst_rect.x;
+    int dy = path[i].y * map->pix_rect - enemy->dst_rect.y;
+
+    if (SDL_GetTicks() - enemy->pauseStartBits >= interval) {
+        if (enemy->state == EYE_MOVING_RIGHT) {
+            if (enemy->dst_rect.x / map->pix_rect >= enemy->goal->x ) {
+                enemy->state = EYE_MOVING_LEFT;
+            }
+            if (abs(dx) >= speed) {
+                enemy->dst_rect.x += speed;
+            } else {
+                enemy->dst_rect.x = path[i].x * map->pix_rect;
+            }
+            if (abs(dy) >= speed) {
+                enemy->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+            } else {
+                enemy->dst_rect.y = path[i].y * map->pix_rect;
+            }
+        } else if (enemy->state == EYE_MOVING_LEFT) {
+            if (enemy->dst_rect.x / map->pix_rect <= enemy->start->x){
+                enemy->state = EYE_MOVING_RIGHT;
+            }
+            if (abs(dx) >= speed) {
+                enemy->dst_rect.x -= speed;
+            } else {
+                enemy->dst_rect.x = path[i].x * map->pix_rect;
+            }
+            if (abs(dy) >= speed) {
+                enemy->dst_rect.y += speed * (dy > 0 ? 1 : -1);
+            } else {
+                enemy->dst_rect.y = path[i].y * map->pix_rect;
+            }
+        }
+
+        enemy->src_rect.x += 64;
+        if (enemy->src_rect.x >= 512) {
+            enemy->src_rect.x = 0;
+        }
+        enemy->pauseStartBits = SDL_GetTicks();
+    }
+    free(path);
 }
 
-void insertAtEnd( MoveList** head, MoveData data) {
-  MoveList * new_node = newMoveList(data);
 
-  if (*head == NULL) {
-    *head = new_node;
-    new_node->next = new_node;
-  } else {
-    // Find the last node
-    MoveList* last = *head;
-    while (last->next != *head) {
-      last = last->next;
+void initEnemy2(Enemy2 *enemy, Node *start, Node *goal, Map *map){
+    if (!goal->walkable || !start->walkable){
+        puts("Error: the goal or the start is not walkable");
+        exit(-1);
     }
-    last->next = new_node;
-    new_node->next = *head;
+    enemy->src_rect.x = 0;
+    enemy->src_rect.y = 0;
+    enemy->src_rect.w = 64;
+    enemy->src_rect.h = 64;
+
+    enemy->dst_rect.x = start->x * map->pix_rect;
+    enemy->dst_rect.y = start->y * map->pix_rect;
+    enemy->dst_rect.w = 64;
+    enemy->dst_rect.h = 64;
+
+    enemy->start = start;
+    enemy->goal = goal;
+    enemy->pauseAttack = 0;
+}
+
+void enemy2Attack(Enemy2 *enemy, Perso *perso, Map *map) {
+  int intervalAttack = 1000;
+  if (hitbox_enemy2(perso, map, enemy)){
+      if (SDL_GetTicks() - enemy->pauseAttack >= intervalAttack){
+          if (perso->health > 0){
+              perso->health -= 1;
+              enemy->pauseAttack = SDL_GetTicks();
+              /* à mettre effet sonore et animation */
+          }
+      }
   }
 }
 
-
-
-
-
-
-MoveList *rightMovementList(const int xInitialPosition, const int yInitialPosition, Map map, int xEndPosition){
-
-    MoveList *res = NULL;
-    static int yPosition = 0;
-    if (yPosition == 0){
-        yPosition = yInitialPosition;
+int hitbox_enemy2(Perso *perso, Map *map, Enemy2 *enemy) {
+    SDL_Rect enemyHitbox = enemy->dst_rect;
+    int margin = 30; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
+    enemyHitbox.x -= margin;
+    enemyHitbox.y -= margin;
+    enemyHitbox.w += round(1.0 * margin);
+    enemyHitbox.h += round(1.0 * margin);
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
+        return 1;
     }
-    for (int i = xInitialPosition; i <= xEndPosition; i ++){
-        if (strncmp(&map.matrix[yPosition+1][i], "-", 1) == 0 ) {
-            yPosition += 1;
-            MoveData *temp = malloc(sizeof(MoveData));
-            temp->jumpDirection = 1;
-            temp->position = i;
-            insertAtEnd(&res, *temp) ;
-            free(temp);
-        }
-        if (!(strncmp(&map.matrix[yPosition][i+1], "-", 1) == 0)){
-            yPosition -= 1;
-            MoveData *temp = malloc(sizeof(MoveData));
-            temp->jumpDirection = -1;
-            temp->position = i+1;
-            insertAtEnd(&res, *temp) ;
-            free(temp);
-        }
-    }
-    return res;
+    return 0;
 }
 
-void traverse(MoveList *last) {
-    printf("-------");
-
-    MoveList *p;
-    if (last == NULL) {
-        printf("The list is empty");
-        return;
+void updatePersoEnemy2(Perso *perso, Map *map, Enemy2 *enemy){
+    if (!isBossMap){
+        if (hitbox_enemy2(perso, map, enemy)){
+            float dx = perso->vx * DT;
+            float dy = perso->vy * DT;
+            if (dx > 0) { // Le personnage se déplace vers la droite
+                perso->vx = max(perso->vx, 0.0f);
+                // Position juste avant le début de la hitbox de l'ennemi (côté gauche)
+                perso->x = enemy->dst_rect.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
+            } else if (dx < 0) { // Le personnage se déplace vers la gauche
+                perso->vx = min(perso->vx, 0.0f);
+                // Position juste avant le début de la hitbox de l'ennemi (côté droit)
+                perso->x = (enemy->dst_rect.x + enemy->dst_rect.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
+            }
+            if (dy > 0) { // Le personnage se déplace vers le bas
+                // Faire rebondir le personnage au dessus de l'ennemi
+                perso->vy = -JUMPSPEED;
+        }
+        }
     }
-
-  p = last->next;
-
-  do {
-      printf("(");
-      printf("%d ", p->mouvement.position);
-      printf("%d ", p->mouvement.jumpDirection);
-      printf(")");
-      p = p->next;
-  } while (p != last->next);
 }
 
-
-
-MoveList *leftMovementList(const int xInitialPosition, const int yInitialPosition, Map map, int xEndPosition){
-    MoveList *res = NULL;
-    static int yPosition = 0;
-    if (yPosition == 0){
-        yPosition = yInitialPosition;
-    }
-    for (int i = xEndPosition; i >= xInitialPosition; i--){
-        if (!(strncmp(&map.matrix[yPosition][i+1], "-", 1) == 0)){
-            yPosition -= 1;
-            MoveData *temp = malloc(sizeof(MoveData));
-            temp->jumpDirection = -1;
-            temp->position = i+1;
-            insertAtEnd(&res, *temp);
-            free(temp);
-        }
-        if (strncmp(&map.matrix[yPosition+1][i], "-", 1) == 0 ) {
-            yPosition += 1;
-            MoveData *temp = malloc(sizeof(MoveData));
-            temp->jumpDirection = +1;
-            temp->position = i;
-            insertAtEnd(&res, *temp);
-            free(temp);
-        }
-    }
-    return res;
-}
-
-void concatenate(MoveList** head1, MoveList** head2) {
-  if (*head1 == NULL) {
-    *head1 = *head2;
-    return;
-  }
-
-  if (*head2 == NULL) {
-    return;
-  }
-
-  MoveList *last1 = (*head1)->next;
-  while (last1->next != *head1) {
-    last1 = last1->next;
-  }
-
-  MoveList *last2 = (*head2)->next;
-  while (last2->next != *head2) {
-    last2 = last2->next;
-  }
-  last1->next = *head2;
-  last2->next = *head1;
-}
-
-
-void enemy2_movement(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *dst_rect, SDL_Rect *src_rect, Enemy2 *enemy, float scale, Map *map, MoveList **list_ptr){
-    static int dx = 1;
-    Uint32 ticks = SDL_GetTicks();
-    Uint32 sprite = (ticks / 200) % 9;
-
-    enemy->xPosition += dx *enemy->speed * 0.1;
-    MoveList *list = *list_ptr;
-    dst_rect->x += dx *enemy->speed * 0.1;
-    /* render_sprite(renderer, texture, enemy->xPosition, enemy->yPosition, scale, enemy->image_path); */
-
-    int position_tolerance = 3;
-    src_rect->x = sprite * 64;
-
-
-    if (fabs(enemy->xPosition - list->mouvement.position *map->pix_rect) <= position_tolerance){
-        enemy->yPosition += map->pix_rect*list->mouvement.jumpDirection;
-        dst_rect->y += map->pix_rect*list->mouvement.jumpDirection;
-        list = list->next;
-        *list_ptr = list;
-    }
-    if (enemy->xPosition <= enemy->collision_min_x-30 || enemy->xPosition >= enemy->collision_max_x ){
-        dx *= -1;
-        list = list->next;
-        *list_ptr = list;
-        if (dx == -1){
-            enemy->yPosition = enemy->yInitialPosition*map->pix_rect;
-            dst_rect->y = enemy->yInitialPosition*map->pix_rect;
-        }
-        if (dx == 1){
-            enemy->yPosition = (enemy->yInitialPosition + 1)*map->pix_rect;
-            dst_rect->y = (enemy->yInitialPosition + 1)*map->pix_rect;
-        }
-    }
-    SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
-}
-
-void enemy2_movement_1(SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *dst_rect, SDL_Rect *src_rect, Enemy2 *enemy, float scale, Map *map, MoveList **list_ptr){
-    static int dx = 1;
-    Uint32 ticks = SDL_GetTicks();
-    Uint32 sprite = (ticks / 200) % 9;
-
-    MoveList *list = *list_ptr;
-    dst_rect->x += dx *enemy->speed * 0.1;
-
-    int position_tolerance = 3;
-    src_rect->x = sprite * 64;
-
-
-    if (fabs((double)dst_rect->x - list->mouvement.position *map->pix_rect) <= position_tolerance){
-        enemy->yPosition += map->pix_rect*list->mouvement.jumpDirection;
-        dst_rect->y += map->pix_rect*list->mouvement.jumpDirection;
-        list = list->next;
-        *list_ptr = list;
-    }
-    if (dst_rect->x <= enemy->collision_min_x-30 || dst_rect->x >= enemy->collision_max_x ){
-        dx *= -1;
-        list = list->next;
-        *list_ptr = list;
-        if (dx == -1){
-            enemy->yPosition = enemy->yInitialPosition*map->pix_rect;
-            dst_rect->y = enemy->yInitialPosition*map->pix_rect;
-        }
-        if (dx == 1){
-            enemy->yPosition = (enemy->yInitialPosition + 1)*map->pix_rect;
-            dst_rect->y = (enemy->yInitialPosition + 1)*map->pix_rect;
-        }
-    }
-    if (dx == -1){
-        SDL_RenderCopy(renderer, texture, src_rect, dst_rect);
-    }
-    if (dx == 1){
-        SDL_RenderCopyEx(renderer, texture, src_rect, dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
-    }
-}
