@@ -24,8 +24,6 @@ struct _EnemyStateData{
     int health;
 }; 
 
-/* à mettre health dans EnemyState au pire */
-
 typedef struct _EnemyStateData EnemyStateData;
 
 void initEnemy1(int x, int y, EnemyStateData *enemyStateData);

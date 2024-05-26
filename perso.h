@@ -2,6 +2,8 @@
 #define PERSO_H
 #include "map.h"
 #include "enemy1.h"
+#include "enemyFleche.h"
+
 
 
 Perso *create_perso(Map*);
@@ -12,12 +14,13 @@ int hitbox_top(Perso*, Map*);
 int hitbox_left(Perso*, Map*);
 int hitbox_right(Perso*, Map*);
 int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData);
+int hitbox_fleche(Perso *perso, Map *map, EnemyFlecheData *enemyFlecheData);
 float max(float, float);
 float min(float, float);
-void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*);
+void updatePerso(Perso*, Map*, EnemyStateData*, EnemyFlecheData*, const Uint8*);
 void jump(Perso*, Map*);
 void persoAttack(Perso *perso, EnemyStateData *enemyStateData);
 void distanceAttack(Perso *perso, EnemyStateData *enemyStateData, Map *map);
-
+void changeGravity(void);
 
 #endif
