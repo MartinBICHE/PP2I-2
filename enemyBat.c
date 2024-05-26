@@ -20,15 +20,10 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
     SDL_Rect dst_rect2 = {enemyBatData->dst_rectAttack.x - map->x_cam, enemyBatData->dst_rectAttack.y, 64*2, enemyBatData->dst_rectAttack.h};
     SDL_Rect dst_rect2Ex = {enemyBatData->dst_rectAttack.x - map->x_cam - 25, enemyBatData->dst_rectAttack.y, 64*2, enemyBatData->dst_rectAttack.h};
     int pauseInterval = 1000;
-    /* printf("state: %d\n", enemyBatData->state); */
-    printf("src rect height %d\n", enemyBatData->src_rect.h);
-    printf("src rect width %d\n", enemyBatData->src_rect.w);
-    printf("dst rect height %d\n", enemyBatData->dst_rect.h);
-    printf("dst rect width %d\n", enemyBatData->dst_rect.w);
 
-    /* int channel = Mix_PlayChannel(-1, musicEnemyBat, 0); */
-    double distance = sqrt(pow(perso->x * map->pix_rect - enemyBatData->dst_rect.x, 2) +
-                       pow(perso->y * map->pix_rect - enemyBatData->dst_rect.y, 2));
+    /* int channel = Mix_PlayChannel(-1, musicEnemyBat, 2); */
+    /* double distance = sqrt(pow(perso->x * map->pix_rect - enemyBatData->dst_rect.x, 2) + */
+    /*                    pow(perso->y * map->pix_rect - enemyBatData->dst_rect.y, 2)); */
 
     /* if (distance > MAX_HEARING_DISTANCE) { */
     /*     Mix_Volume(channel, MIN_VOLUME); */
@@ -56,10 +51,10 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
         case BAT_MOVING_RIGHT:
             if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
                 enemyBatData->dst_rect.x += speed;
-                enemyBatData->src_rect.x += 32;
+                enemyBatData->src_rect.x += 64;
                 enemyBatData->pauseStartBits = SDL_GetTicks();
             }
-            if (enemyBatData->src_rect.x == 160){
+            if (enemyBatData->src_rect.x == 320){
                 enemyBatData->src_rect.x = 0;
             }
             if (fabs((double)enemyBatData->dst_rect.x - enemyBatData->xMax) <= position_tolerance){
@@ -72,10 +67,10 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
         }
         if (SDL_GetTicks() - enemyBatData->pauseStartBits >= interval){
             enemyBatData->dst_rect.x -= speed;
-            enemyBatData->src_rect.x += 32;
+            enemyBatData->src_rect.x += 64;
             enemyBatData->pauseStartBits = SDL_GetTicks();
         }
-        if (enemyBatData->src_rect.x == 160){
+        if (enemyBatData->src_rect.x == 320){
             enemyBatData->src_rect.x = 0;
         }
         break;
@@ -86,7 +81,7 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
                 enemyBatData->src_rectAttack.x += 1*64;
                 enemyBatData->pauseStartBitsAttack = SDL_GetTicks();
             }
-            if (fabs((double)enemyBatData->src_rectAttack.x - 448) <= position_tolerance){
+            if (fabs((double)enemyBatData->src_rectAttack.x - 320) <= position_tolerance){
                 enemyBatData->state = enemyBatData->previousState;
                 enemyBatData->src_rectAttack.x = 0;
             }
@@ -104,8 +99,8 @@ int hitbox_enemyBat(Perso *perso, Map *map, EnemyBatData *enemy) {
     int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
     enemyHitbox.x -= margin;
     enemyHitbox.y -= margin;
-    enemyHitbox.w += 2 * margin;
-    enemyHitbox.h += 2 * margin;
+    enemyHitbox.w += 1 * margin;
+    enemyHitbox.h += 1 * margin;
     SDL_Rect intersection;
     if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
         return 1;
@@ -113,19 +108,43 @@ int hitbox_enemyBat(Perso *perso, Map *map, EnemyBatData *enemy) {
     return 0;
 }
 
+void updatePersoEnemyBat(Perso *perso, Map *map, EnemyBatData *enemy){
+    if (!isBossMap){
+        if (enemy->state != PAUSE_BOTTOM){
+            if (hitbox_enemyBat(perso, map, enemy)){
+                float dx = perso->vx * DT;
+                float dy = perso->vy * DT;
+                if (dx > 0) { // Le personnage se déplace vers la droite
+                    perso->vx = max(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox de l'ennemi (côté gauche)
+                    perso->x = enemy->dst_rect.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
+                } else if (dx < 0) { // Le personnage se déplace vers la gauche
+                    perso->vx = min(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox de l'ennemi (côté droit)
+                    perso->x = (enemy->dst_rect.x + enemy->dst_rect.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
+                }
+                if (dy > 0) { // Le personnage se déplace vers le bas
+                    // Faire rebondir le personnage au dessus de l'ennemi
+                    perso->vy = -JUMPSPEED;
+                }
+            }
+        }
+    }
+}
+
 
 void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal, Node *start, Map *map){
 
     enemyBatData->src_rect.x = 0; 
     enemyBatData->src_rect.y = 0; 
-    enemyBatData->src_rect.w = 32;
+    enemyBatData->src_rect.w = 64;
     enemyBatData->src_rect.h = 64;
 
     /* enemyBatData->dst_rect.x = start->x * map->pix_rect; */
      /* enemyBatData->dst_rect.x = start->x * map->pix_rect; */
     enemyBatData->dst_rect.x = x;
     enemyBatData->dst_rect.y = y;
-    enemyBatData->dst_rect.w = 32*2;
+    enemyBatData->dst_rect.w = 64*2;
     enemyBatData->dst_rect.h = 64*2;
 
     enemyBatData->pauseStartBits = 0;
@@ -138,7 +157,7 @@ void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal
     enemyBatData->src_rectAttack.x = 0; 
     enemyBatData->src_rectAttack.y = 0;
     enemyBatData->src_rectAttack.w = 64;
-    enemyBatData->src_rectAttack.h = 64*2;
+    enemyBatData->src_rectAttack.h = 64;
 
     enemyBatData->dst_rectAttack.x = x;
     enemyBatData->dst_rectAttack.y = y;
@@ -444,7 +463,6 @@ void enemyBat_follow(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **
             enemyBatData->pauseStartBits = SDL_GetTicks();
         }
     }
-
         /* free(path); */
 }
 

@@ -47,4 +47,5 @@ void follow_path2(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **gra
 void enemyBat_follow(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **graph, Map *map, Perso *perso);
 void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal, Node *start, Map *map);
 int hitbox_enemyBat(Perso *perso, Map *map, EnemyBatData *enemy);
+void updatePersoEnemyBat(Perso *perso, Map *map, EnemyBatData *enemy);
 #endif

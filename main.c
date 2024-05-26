@@ -269,6 +269,7 @@ again :
                         updatePersoEnemy3(perso, map, &enemy3);
                         enemy3Attack(&enemy3, perso, map);
                         enemyBat_mouvement(renderer, &enemyBatData, map, perso);
+                        /* updatePersoEnemyBat(perso, map, &enemyBatData); fontionne pas très bien, à voir*/
                         batAttack(&enemyBatData, perso, map);
                         enemyFleche_mouvement(renderer, &enemyFlecheData, map);
                         updatePersoEnemyFleche(perso, map, &enemyFlecheData);
