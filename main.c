@@ -168,6 +168,9 @@ int main(int argc, char **argv) {
     /* initEnemyFleche(&enemyFlecheData, 100, 300); */
     initEnemyFleche(&enemyFlecheData, 48*map->pix_rect, 14*map->pix_rect);
 
+    ProjectileData projectile;
+    initProjectile(100, 100, &projectile);
+
 
     ///////////////////////////////////////////////////* fin init des ennemis *////////////////////////////////////////////////////////////////////////:
 
@@ -276,6 +279,10 @@ again :
                         flecheAttack(&enemyFlecheData, perso, map);
                         enemyPendule_mouvement(renderer, &enemyPenduleData, map);
                         penduleAttack(&enemyPenduleData, perso, map);
+                        /* SDL_Rect dst_rect = {10, 10, 32, 32}; */
+                        /* SDL_Rect src_rect = {0, 0, 32, 32}; */
+                        /* SDL_RenderCopy(renderer, textureProjectile, &src_rect, &dst_rect); */
+                        projectile_mouvement(renderer, &projectile, map);
                         //////////////////////////////* fin mouvements de chaque ennemi *////////////////////////////////////////////////
 
                     }
