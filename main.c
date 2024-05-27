@@ -43,6 +43,7 @@
 #include "enemyFleche.h"
 #include "enemyBat.h"
 #include "fight.h"
+#include "attack.h"
 
 
 SDL_Window* window = NULL;
@@ -142,7 +143,7 @@ int main(int argc, char **argv) {
      /////////////////////////////////////////////////////* Les init des ennemis *////////////////////////////////////////////////////////////////////////
      
     /////////* Le graph pour A* *///////////:
-    Node **graph = create_graph(map);
+    /* Node **graph = create_graph(map); */
 
     EnemyStateData enemyStateData;
     initEnemy1(119*map->pix_rect, 15*map->pix_rect, &enemyStateData);
@@ -151,10 +152,9 @@ int main(int argc, char **argv) {
     INIT_ENEMY3(&enemy3, map, 14, 14, 23);
 
     Enemy2 enemy2;
-    Node *goalEnemy2 = &graph[7][6];
-    Node *startEnemy2 = &graph[7][30];
-    /* Node *list = a_star(graph, map, startEnemy2, goalEnemy2); */
-    initEnemy2(&enemy2, startEnemy2, goalEnemy2, map);
+    /* Node *goalEnemy2 = &graph[7][6]; */
+    /* Node *startEnemy2 = &graph[7][30]; */
+    /* initEnemy2(&enemy2, startEnemy2, goalEnemy2, map); */
 
 
     EnemyPenduleData enemyPenduleData;
@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
 
 
     EnemyBatData enemyBatData;
-    initEnemyBat(&enemyBatData, 56*map->pix_rect, 4*map->pix_rect, 61*map->pix_rect, startEnemy2, goalEnemy2, map);  /*ici le startEnemy2 et goalEnemy2 ne sert à rien pour le mouvemnt simple donc j'ai mis celui de enemy2 alléatoirement */ 
+    /* initEnemyBat(&enemyBatData, 56*map->pix_rect, 4*map->pix_rect, 61*map->pix_rect, startEnemy2, goalEnemy2, map); */  
 
     EnemyFlecheData enemyFlecheData;
     /* initEnemyFleche(&enemyFlecheData, 100, 300); */
@@ -170,6 +170,10 @@ int main(int argc, char **argv) {
 
     ProjectileData projectile;
     initProjectile(100, 100, &projectile);
+
+
+    AttackData attack;
+    initAttackAnimation(200, 100, &attack);
 
 
     ///////////////////////////////////////////////////* fin init des ennemis *////////////////////////////////////////////////////////////////////////:
@@ -265,7 +269,7 @@ again :
                         enemy1_movement(renderer, &enemyStateData, map);
                         enemy1Attack(&enemyStateData, perso, map);
                         updatePersoEnemy1(perso, map, &enemyStateData);
-                        enemy2_follow(renderer, &enemy2, graph, map);
+                        /* enemy2_follow(renderer, &enemy2, graph, map); */
                         updatePersoEnemy2(perso, map, &enemy2);
                         enemy2Attack(&enemy2, perso, map);
                         enemy3_movement(renderer, &enemy3, map);
@@ -279,10 +283,11 @@ again :
                         flecheAttack(&enemyFlecheData, perso, map);
                         enemyPendule_mouvement(renderer, &enemyPenduleData, map);
                         penduleAttack(&enemyPenduleData, perso, map);
-                        /* SDL_Rect dst_rect = {10, 10, 32, 32}; */
-                        /* SDL_Rect src_rect = {0, 0, 32, 32}; */
-                        /* SDL_RenderCopy(renderer, textureProjectile, &src_rect, &dst_rect); */
+                        SDL_Rect dst_rect = {10, 10, 16, 32};
+                        SDL_Rect src_rect = {0, 0, 16, 32};
+                        SDL_RenderCopy(renderer, textureAttack, &src_rect, &dst_rect);
                         projectile_mouvement(renderer, &projectile, map);
+                        attack_mouvement(renderer, &attack, map);
                         //////////////////////////////* fin mouvements de chaque ennemi *////////////////////////////////////////////////
 
                     }

@@ -24,6 +24,7 @@ extern SDL_Texture* textureBat;
 extern SDL_Texture* textureBatAttack;
 extern SDL_Texture* textureEnemy3Attack;
 extern SDL_Texture* textureProjectile;
+extern SDL_Texture* textureAttack;
 
 extern SDL_Texture *healthTextures[10];
 

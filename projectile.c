@@ -222,7 +222,7 @@ void resetProjectiles(void) {
 }
 
 void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, Map *map){
-    int interval = 300;
+    int interval = 100;
 
     SDL_Rect dst_rect = {projectile->dst_rect.x - map->x_cam, projectile->dst_rect.y, projectile->dst_rect.w, projectile->dst_rect.h};
     if (SDL_GetTicks() - projectile->pause >= interval){
@@ -243,7 +243,7 @@ void initProjectile(int x, int y, ProjectileData *projectile){
 
     projectile->dst_rect.x = x;
     projectile->dst_rect.y = y;
-    projectile->dst_rect.w = 32;
+    projectile->dst_rect.w = 64;
     projectile->dst_rect.h = 32;
     projectile->pause = 0;
 }
