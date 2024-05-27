@@ -6,4 +6,4 @@
 
 void initSDL(SDL_Window **window, SDL_Renderer **renderer);
 void loadSounds(Mix_Chunk **sounds);
-void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map, Boss *boss);
+void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map2, Map *mapBoss, Boss *boss);

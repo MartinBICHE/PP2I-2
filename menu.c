@@ -203,7 +203,7 @@ void interactionMenu(SDL_Renderer *renderer) {
     drawMenu(renderer);
 }
 
-void interactionPauseJeu(SDL_Renderer *renderer) {
+void interactionPauseJeu(SDL_Renderer *renderer, Map **map2, Map **mapBoss, Perso **perso, Boss **boss) {
     if (e.type == SDL_QUIT) {
         quit = true;
     } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
@@ -219,6 +219,7 @@ void interactionPauseJeu(SDL_Renderer *renderer) {
                 toggleMusic();
                 afficherImage = !afficherImage;
                 isBossMap = false;
+                resetGame(&window, &renderer, &map2, &mapBoss, &perso, &boss);
             } else if (mouseX >= (WINWIDTH - ImageParametrePauseWidth) && mouseX <= WINWIDTH &&
                        mouseY >= 0 && mouseY <= ImageParametrePauseHeight) {
                 parametre = !parametre;
@@ -244,13 +245,14 @@ void interactionPauseJeu(SDL_Renderer *renderer) {
     }
 }
 
-void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **perso, Boss **boss) {
+void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map2, Map **mapBoss, Perso **perso, Boss **boss) {
     // Nettoyez les ressources existantes
     cleanupProjectiles();
     freeProjectileTexture();
     closeSDL_mixer();
     free(*perso);
-    destroyMap(*map); 
+    destroyMap(*map2);
+    destroyMap(*mapBoss); 
     free(*boss);
 
     // Réinitialisez les variables globales
@@ -262,9 +264,20 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
     startGame = false;
     prevShowMenu = true;
     musicToggled = false;
-    currentGravity = ACC;
     jumpSpeed = JUMPSPEED;
     showAttentionImage = true;
+
+    lastGravityChange = 0;
+    lastProjectileLoad = 0;
+    lastBossMoveTime = 0;
+    boutonGTime = 0;
+    currentTime1 = 0;
+    currentTime1 = SDL_GetTicks();
+    currentGravity = ACC;
+    
+
+    pauseStartTime = 0;
+    totalPauseDuration = 0;
 
     // Réinitialisez les projectiles
     resetProjectiles();
@@ -288,15 +301,12 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
 
     // Jouer la musique du menu
     playMusic();
+    isBossMap = false;
+    *map2 = initMap("map2");
+    *mapBoss = initMap("mapBoss1");
+    *boss = create_boss(*mapBoss);
 
-    // Initialiser la carte, le personnage et le boss en fonction de la valeur de isBossMap
-    if (isBossMap) {
-        *map = initMap("mapBoss1");
-    } else {
-        *map = initMap("map2");
-    }
-
-    *perso = create_perso(*map);
+    *perso = create_perso(*map2);
 }
 
 

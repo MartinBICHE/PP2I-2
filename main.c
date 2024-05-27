@@ -121,9 +121,11 @@ int main(int argc, char **argv) {
 	AttackFight *attack5 = initAttack(TIERWIDTH, 0, bossDeath);
 	AttackFight *attack6 = initAttack(2*TIERWIDTH, 0, bossDeath);
     
-    Map *map = initMap("map2");
+    Map *map2 = initMap("map2");
+    Map *mapBoss = initMap("mapBoss1");
+    Map *map = map2;
 	Perso *perso = create_perso(map);
-    Boss *boss = NULL;
+    Boss *boss = create_boss(mapBoss);
 
     CheckpointList *checkpointList = malloc(sizeof(CheckpointList));
     initCheckpointList(checkpointList);
@@ -167,7 +169,8 @@ again :
     startGame = false;
     prevShowMenu = true;
     if (perso -> health == 0) {
-        revive(perso); // revive ne marche pas créer une fonction resetGame qui renvoie au point de départ
+        resetGame(&window, &renderer, &map2, &mapBoss, &perso, &boss);
+        map = map2;
     }
     // Boucle principale du menu
     quit = false;
@@ -186,18 +189,16 @@ again :
             while (running) {
                 Uint64 start = SDL_GetTicks();
                 while (SDL_PollEvent(&e) != 0) {
-                    interactionPauseJeu(renderer);
+                    interactionPauseJeu(renderer, &map2, &mapBoss, &perso, &boss);
                 
                     if (e.key.keysym.sym == SDLK_SPACE && !afficherImage && perso->recoil_timer <= 0) {
                         jump(perso, map);
-                    } else if (e.key.keysym.sym == SDLK_g && !afficherImage) {
+                    } else if (perso->x > 296) {
                         boutonGTime = SDL_GetTicks();
                         isBossMap = true;
-                        destroyMap(map);
                         free(perso);
-                        map = initMap("mapBoss1");
+                        map = mapBoss;
                         perso = create_perso(map);
-                        boss = create_boss(map);
                         lastGravityChange = currentTime1;
                         lastProjectileLoad = currentTime1;
                         lastBossMoveTime = currentTime1;
@@ -211,9 +212,7 @@ again :
                 } 
                     
 
-                
-
-                // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
+            
                 if (perso-> health > 0) {
                     game(enemyStateData, boss, map, perso, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
@@ -285,7 +284,7 @@ again :
             }
         }
     }
-    quitSDL(&renderer, &window, perso, map, boss);
+    quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
 	free(nullAttack1);
     free(nullAttack2);
 	free(attack1);
