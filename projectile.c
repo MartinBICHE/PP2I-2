@@ -221,21 +221,35 @@ void resetProjectiles(void) {
     }
 }
 
-void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, Map *map){
-    int interval = 300;
+void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, EnemyStateData *enemyStateData, Map *map){
+    if (!projectile->distance_attack_active) return;
+
+    int interval = 100;
+    int speed = 20;
 
     SDL_Rect dst_rect = {projectile->dst_rect.x - map->x_cam, projectile->dst_rect.y, projectile->dst_rect.w, projectile->dst_rect.h};
     if (SDL_GetTicks() - projectile->pause >= interval){
         projectile->src_rect.x += 32;
+        if (projectile->src_rect.x >= 96){
+            projectile->src_rect.x = 0;
+        }
         projectile->pause = SDL_GetTicks();
     }
-    if (projectile->src_rect.x == 96){
-        projectile->src_rect.x = 0;
+    /* if (projectile->src_rect.x == 96){
+        //projectile->src_rect.x = 0;
+        projectile->dst_rect.w = 0;
+        projectile->dst_rect.h = 0;
+        //projectile->distance_attack_active = 0;
+    } */
+    projectile->dst_rect.x += projectile->dirX * speed;
+    if (hitbox_projectile_enemy(projectile, enemyStateData)) {
+        projectile->distance_attack_active = 0;
+        enemyStateData->health -= 1;
     }
     SDL_RenderCopy(renderer, textureProjectile, &projectile->src_rect, &dst_rect);
 }
 
-void initProjectile(int x, int y, ProjectileData *projectile){
+void initProjectile(int x, int y, int dirX, ProjectileData *projectile){
     projectile->src_rect.x = 0;
     projectile->src_rect.y = 0;
     projectile->src_rect.w = 32;
@@ -243,7 +257,19 @@ void initProjectile(int x, int y, ProjectileData *projectile){
 
     projectile->dst_rect.x = x;
     projectile->dst_rect.y = y;
-    projectile->dst_rect.w = 32*2;
-    projectile->dst_rect.h = 32*2;
+    projectile->dst_rect.w = 64;
+    projectile->dst_rect.h = 32;
     projectile->pause = 0;
+    projectile->distance_attack_active = 0;
+    projectile->dirX = dirX;
+}
+
+int hitbox_projectile_enemy(ProjectileData *projectile, EnemyStateData *enemyStateData) {
+    SDL_Rect projectileHitbox = projectile->dst_rect;
+    SDL_Rect enemyHitbox = enemyStateData->dst_rect;
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&projectileHitbox, &enemyHitbox, &intersection)) {
+        return 1;
+    }
+    return 0;
 }

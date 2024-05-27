@@ -122,7 +122,7 @@ void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, Map *map) {
                 enemy->src_rectAttack.x += 64;
                 enemy->pauseAttack = SDL_GetTicks();
             }
-            if (fabs((double)enemy->src_rectAttack.x - 192 ) <= position_tolerance){
+            if (fabs((double)enemy->src_rectAttack.x - 448 ) <= position_tolerance){
                 enemy->state = enemy->previousState;
                 enemy->src_rectAttack.x = 0;
             }
@@ -146,7 +146,9 @@ void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, Map *map) {
             if (enemy->previousState == RIGHT){
                 SDL_RenderCopyEx(renderer, textureEnemy3Attack, &enemy->src_rectAttack, &dst_rectFixed, 0, NULL, SDL_FLIP_HORIZONTAL);
             }
-            /* SDL_RenderCopy(renderer, textureEnemy3Attack, &enemy->src_rect, &dst_rectFixed); */
+            /* int volume = MAX_VOLUME; */
+            /* int channel = Mix_PlayChannel(-1, musicEnemyBat, 0); */
+            /* Mix_Volume(channel, volume); */
             break;
     }
 }

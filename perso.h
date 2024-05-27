@@ -9,18 +9,11 @@
 #include "const.h"
 #include "map.h"
 #include "enemy1.h"
+#include "attack.h"
+#include "projectile.h"
 #include <SDL2/SDL_mixer.h>
 
-typedef struct Projectile_Perso {
-    float x; // Position x du projectile
-    float y; // Position y du projectile
-    float speed; // Vitesse du projectile
-    float direction_x; // Direction x du projectile
-    float direction_y; // Direction y du projectile
-    int active;
-} Projectile_Perso;
-
-
+typedef struct _ProjectileData ProjectileData; // Forward declaration
 
 Perso *create_perso(Map*);
 void loadPersoTexture(SDL_Renderer*, SDL_Texture**, char*);
@@ -33,12 +26,10 @@ int hitbox_right(Perso*, Map*);
 int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData);
 float max(float, float);
 float min(float, float);
-void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*, Mix_Chunk**);
+void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*, Mix_Chunk**, AttackData*, ProjectileData*);
 void jump(Perso*, Map*);
 void persoAttack(Perso *perso, EnemyStateData *enemyStateData);
-void distanceAttack(Perso *perso, EnemyStateData *enemyStateData, Map *map, Projectile_Perso *projectile_perso);
+void distanceAttack(Perso *perso, EnemyStateData *enemyStateData, Map *map, ProjectileData *projectile);
 void changeGravity(void);
-
-void display_projectile(SDL_Renderer *renderer, Projectile_Perso *projectile_perso);
 
 #endif

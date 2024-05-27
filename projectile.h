@@ -3,6 +3,7 @@
 
 #include "const.h"
 #include "perso.h"
+#include "enemy1.h"
 
 
 bool isValidPosition(Map* map, float x, float y);
@@ -18,13 +19,18 @@ void checkProjectileCollisionWithTiles(Projectile* projectile, Map* map);
 void resetProjectiles(void);
 void freeProjectileTexture(void);
 
+
 struct _ProjectileData{
     SDL_Rect src_rect;
     SDL_Rect dst_rect;
     Uint32 pause;
+    int distance_attack_active;
+    Uint32 last_distance_attack;
+    int dirX; // Direction du projectile (1 pour droite, -1 pour gauche)
 };
 typedef struct _ProjectileData ProjectileData;
-void initProjectile(int x, int y, ProjectileData *projectile);
-void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, Map *map);
+void initProjectile(int x, int y, int dirX, ProjectileData *projectile);
+void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, EnemyStateData *enemyStateData, Map *map);
+int hitbox_projectile_enemy(ProjectileData *projectile, EnemyStateData *enemyStateData);
 
 #endif /* PROJECTILE_H */
