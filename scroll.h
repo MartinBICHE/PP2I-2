@@ -36,5 +36,5 @@ void initScroll(ScrollStateData *scrollStateData, int x, int y);
 
 void scroll_movement(SDL_Renderer *renderer,
                        const char *text, SDL_Color color,
-                       ScrollStateData *scrollStateData, float x_cam);
+                       ScrollStateData *scrollStateData, Map *map);
 #endif

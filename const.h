@@ -120,6 +120,7 @@ typedef struct _Perso {
     int jumps; // nombre de sauts restants
     int recoil_timer;
     int jump_delay; // délai entre les sauts (22 frames)
+    int dashes; // nombre de dashs restants
     int dash_duration;
     float dash_speed;
     int dash_delay;

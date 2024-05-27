@@ -31,12 +31,12 @@
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
+#include <SDL2/SDL_mixer.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include "pendule.h"
 #include "textures.h"
 #include "fonts.h"
 #include "health.h"
@@ -49,6 +49,7 @@ SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Event e;
 SDL_Texture *bgTextures[6];
+Mix_Chunk *sounds[4];
 SDL_Texture *persoTexture;
 SDL_Texture *tileTextures;
 SDL_Texture* projectileTexture = NULL;
@@ -83,6 +84,8 @@ Projectile projectiles[MAX_PROJECTILES] = {
     {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 2
     {0.0f, 0.0f, 0.0f, 0.0f, false}  // Projectile 3
 };
+
+
 
 int main(int argc, char **argv) {
     SDL_Window *window;
@@ -122,35 +125,43 @@ int main(int argc, char **argv) {
 	Perso *perso = create_perso(map);
     Boss *boss = NULL;
 
+    CheckpointList *checkpointList = malloc(sizeof(CheckpointList));
+    initCheckpointList(checkpointList);
+
+    ProjectileData *projectile;
+    initProjectile(100, 100, projectile);
+    
+
     const Uint8 *state = SDL_GetKeyboardState(NULL);
 
     int running = 1;
 
+
     loadBackgroundTextures(renderer, bgTextures, 5);
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
-    loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+    // loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+
 
     EnemyStateData enemyStateData;
-    initEnemy1(300, 460, &enemyStateData);
-
-    EnemyFlecheData enemyFlecheData;
-    initEnemyFleche(&enemyFlecheData, 800, 540);
+    initEnemy1(500, 460, &enemyStateData);
 
     // Initialiser SDL_mixer
-    if (!initSDL_mixer()) {
-        SDL_Log("Erreur lors de l'initialisation de SDL_mixer.");
-        return 1;
-    }
+    /* if (!initSDL_mixer()) { */
+    /*     SDL_Log("Erreur lors de l'initialisation de SDL_mixer."); */
+    /*     return 1; */
+    /* } */
 
-    // Charger la musique
-    if (!loadMusic()) {
-        SDL_Log("Erreur lors du chargement de la musique.");
-        closeSDL_mixer();
-        return 1;
-    }
+    /* // Charger la musique */
+    /* if (!loadMusic()) { */
+    /*     SDL_Log("Erreur lors du chargement de la musique."); */
+    /*     closeSDL_mixer(); */
+    /*     return 1; */
+    /* } */
+
+    loadSounds(sounds);
 
     // Jouer la musique lorsque le menu s'ouvre
-    // playMusic();
+    playMusic();
 
 again :
 
@@ -195,19 +206,19 @@ again :
                     } else if (e.key.keysym.sym == SDLK_p && !afficherImage) {
                         perso -> health = 0;
                     }
-                    }   
-                    if (retourMenu) {
-                        goto again;
-                    } 
+                    
+                }   
+                if (retourMenu) {
+                    goto again;
+                } 
                     
 
                 
-
                 //x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
                 if (perso-> health > 0) {
-                    //game(enemyStateData,boss,map,perso,state);
-                    updatePerso(perso, map, &enemyStateData, &enemyFlecheData, state);
-                    updateCam(perso, map); 
+                    //game(enemyStateData, boss, map, perso, state, sounds);
+                    updateCam(perso, map);
+                    updatePerso(perso, map, &enemyStateData, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
                         printf("Error drawing the background");
                         exit(-1);
@@ -216,15 +227,13 @@ again :
                         printf("Error drawing the map");
                         exit(-1);
                     }
-                    if (display_perso(renderer, perso, map, persoTexture, 0)) {
+                    if (display_perso(renderer, perso, map, persoTexture, 0, sounds)) {
                         printf("Error drawing the perso");
                         exit(-1);
                     }
                     if (!isBossMap) {
                         enemy1_movement(renderer, &enemyStateData, map);
-                        enemyFleche_mouvement(renderer, &enemyFlecheData, map->x_cam);
-                        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-                        SDL_RenderDrawRect(renderer, &enemyFlecheData.dst_rect);
+                        projectile_mouvement(renderer, projectile, map);
                     }
                     if (isBossMap) {
                         displayBoss(renderer, boss, map);
@@ -234,6 +243,10 @@ again :
                         renderProjectiles(renderer);
                     }
                     renderStatusHealth(renderer,perso);
+
+                    if (perso->health == 0) {
+                        gameOver1(renderer, bgTextures, 5, map);
+                    }
                 } else {
                     
                     game2(renderer, playerInFight, bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
@@ -253,7 +266,6 @@ again :
                         resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
                         goto again;
                     }
-                    printf("health : %d\n", playerInFight->health);
                 }
                 drawMapMenu(renderer);
                     
@@ -289,8 +301,10 @@ again :
 	free(attack6);
     free(playerInFight);
 	free(bossDeath);
+    free(checkpointList->xPositions);
+    free(checkpointList);
     cleanupProjectiles();
-    closeSDL_mixer();
+    /* closeSDL_mixer(); */
     atexit(SDL_Quit);
     return 0;
     

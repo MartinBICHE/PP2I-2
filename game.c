@@ -7,11 +7,12 @@
 #include "perso.h"
 #include "fight.h"
 
-void game(EnemyStateData enemyStateData, EnemyFlecheData enemyFlecheData, Boss *boss,Map *map, Perso *perso,const Uint8 *state) {
+
+void game(EnemyStateData enemyStateData, Boss *boss, Map *map, Perso *perso, const Uint8 *state, Mix_Chunk **sounds) {
     if (!afficherImage && !isBossMap) {
         perso->vx = 0;
         updateCam(perso, map);
-        updatePerso(perso, map, &enemyStateData, &enemyFlecheData, state);
+        updatePerso(perso, map, &enemyStateData, state, sounds);
     }
 
     if (afficherImage && isBossMap) {
@@ -36,7 +37,7 @@ void game(EnemyStateData enemyStateData, EnemyFlecheData enemyFlecheData, Boss *
             totalPauseDuration = 0;
         }
 
-        updatePerso(perso, map, &enemyStateData, &enemyFlecheData, state);
+        updatePerso(perso, map, &enemyStateData, state, sounds);
         if (currentTime1 - lastBossMoveTime >= BOSS_MOVE_INTERVAL) {
             updateBoss(boss, map);
             lastBossMoveTime = currentTime1;

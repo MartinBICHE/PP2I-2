@@ -18,4 +18,13 @@ void checkProjectileCollisionWithTiles(Projectile* projectile, Map* map);
 void resetProjectiles(void);
 void freeProjectileTexture(void);
 
+struct _ProjectileData{
+    SDL_Rect src_rect;
+    SDL_Rect dst_rect;
+    Uint32 pause;
+};
+typedef struct _ProjectileData ProjectileData;
+void initProjectile(int x, int y, ProjectileData *projectile);
+void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, Map *map);
+
 #endif /* PROJECTILE_H */

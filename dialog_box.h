@@ -19,6 +19,6 @@ char *remove_first_word(const char *str);
 
 void initPapirus(DialogBoxData *dialogBoxData, int x, int y);
 void render_text(SDL_Renderer *renderer, const char *text,
-                 SDL_Color color, DialogBoxData *dialogBoxData, float x_cam);
+                 SDL_Color color, DialogBoxData *dialogBoxData, Map *map);
 
 #endif
