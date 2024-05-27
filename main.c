@@ -126,15 +126,18 @@ int main(int argc, char **argv) {
 	AttackFight *attack4 = initAttack(0, 0, bossDeath);
 	AttackFight *attack5 = initAttack(TIERWIDTH, 0, bossDeath);
 	AttackFight *attack6 = initAttack(2*TIERWIDTH, 0, bossDeath);
+    
+    Map *map2 = initMap("map2");
+    Map *mapBoss = initMap("mapBoss1");
+    Map *map = map2;
 
     Animation *scratchAnim = malloc(sizeof(Animation));
     Animation *hitpointAnim = malloc(sizeof(Animation));
     Animation *bgDeathAnim = malloc(sizeof(Animation));
 
 
-    Map *map = initMap("map2");
 	Perso *perso = create_perso(map);
-    Boss *boss = NULL;
+    Boss *boss = create_boss(mapBoss);
 
     CheckpointList *checkpointList = malloc(sizeof(CheckpointList));
     initCheckpointList(checkpointList);
@@ -172,7 +175,8 @@ again :
     startGame = false;
     prevShowMenu = true;
     if (perso -> health == 0) {
-        revive(perso); // revive ne marche pas créer une fonction resetGame qui renvoie au point de départ
+        resetGame(&window, &renderer, &map2, &mapBoss, &perso, &boss);
+        map = map2;
     }
     // Boucle principale du menu
     quit = false;
@@ -196,18 +200,16 @@ again :
             while (running) {
                 Uint64 start = SDL_GetTicks();
                 while (SDL_PollEvent(&e) != 0) {
-                    interactionPauseJeu(renderer);
+                    interactionPauseJeu(renderer, &map2, &mapBoss, &perso, &boss);
                 
                     if (e.key.keysym.sym == SDLK_SPACE && !afficherImage && perso->recoil_timer <= 0) {
                         jump(perso, map);
-                    } else if (e.key.keysym.sym == SDLK_g && !afficherImage) {
+                    } else if (perso->x > 296) {
                         boutonGTime = SDL_GetTicks();
                         isBossMap = true;
-                        destroyMap(map);
                         free(perso);
-                        map = initMap("mapBoss1");
+                        map = mapBoss;
                         perso = create_perso(map);
-                        boss = create_boss(map);
                         lastGravityChange = currentTime1;
                         lastProjectileLoad = currentTime1;
                         lastBossMoveTime = currentTime1;
@@ -221,9 +223,6 @@ again :
                 } 
                     
 
-                
-
-                // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
                 if (perso-> health > 0) {
                     game(enemyStateData, boss, map, perso, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
@@ -234,7 +233,7 @@ again :
                         printf("Error drawing the map");
                         exit(-1);
                     }
-                    if (display_perso(renderer, perso, map, persoTexture, 0, sounds)) {
+                    if (display_perso(renderer, perso, map, persoTexture, texturePortail, 0, sounds)) {
                         printf("Error drawing the perso");
                         exit(-1);
                     }
@@ -250,7 +249,7 @@ again :
                     renderStatusHealth(renderer,perso);
 
                     if (perso->health == 0) {
-                        gameOver1(renderer, bgTextures, 5, map);
+                        gameOver(renderer, bgTextures, 5, map, '?');
                     }
                 } else {
                     animateBackground(renderer, bgDeathAnim);
@@ -268,18 +267,12 @@ again :
                         bossDeath->health = 9;
                         playerInFight->health = 9;
                         bossDeath->phase = 1;
+                        gameOver(renderer, bgTextures, 5, map, '!');
                         resetGameplay2(bossDeath, attack1, attack2, attack3, attack4, attack5, attack6);
                         goto again;
                     }
                 }
                 drawMapMenu(renderer);
-                    
-                // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)
-                // SDL_RenderDrawRect(renderer, &rect1); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
-                // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
                 
 
@@ -294,7 +287,7 @@ again :
             }
         }
     }
-    quitSDL(&renderer, &window, perso, map, boss);
+    quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
 	free(attack1);
 	free(attack2);
 	free(attack3);
