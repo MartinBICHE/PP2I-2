@@ -43,6 +43,7 @@
 #include "enemyFleche.h"
 #include "enemyBat.h"
 #include "fight.h"
+#include "attack.h"
 
 
 SDL_Window* window = NULL;
@@ -140,9 +141,44 @@ int main(int argc, char **argv) {
     // loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
 
-    EnemyStateData enemyStateData;
-    initEnemy1(600, 660, &enemyStateData);
 
+     /////////////////////////////////////////////////////* Les init des ennemis *////////////////////////////////////////////////////////////////////////
+     
+    /////////* Le graph pour A* *///////////:
+    /* Node **graph = create_graph(map); */
+
+    EnemyStateData enemyStateData;
+    initEnemy1(119*map->pix_rect, 15*map->pix_rect, &enemyStateData);
+
+    Enemy3 enemy3;
+    INIT_ENEMY3(&enemy3, map, 14, 14, 23);
+
+    Enemy2 enemy2;
+    /* Node *goalEnemy2 = &graph[7][6]; */
+    /* Node *startEnemy2 = &graph[7][30]; */
+    /* initEnemy2(&enemy2, startEnemy2, goalEnemy2, map); */
+
+
+    EnemyPenduleData enemyPenduleData;
+    initEnemyPendule(&enemyPenduleData, 123*map->pix_rect, 1*map->pix_rect);
+
+
+    EnemyBatData enemyBatData;
+    /* initEnemyBat(&enemyBatData, 56*map->pix_rect, 4*map->pix_rect, 61*map->pix_rect, startEnemy2, goalEnemy2, map); */  
+
+    EnemyFlecheData enemyFlecheData;
+    /* initEnemyFleche(&enemyFlecheData, 100, 300); */
+    initEnemyFleche(&enemyFlecheData, 48*map->pix_rect, 14*map->pix_rect);
+
+    ProjectileData projectile;
+    initProjectile(100, 100, &projectile);
+
+
+    AttackData attack;
+    initAttackAnimation(200, 100, &attack);
+
+
+    ///////////////////////////////////////////////////* fin init des ennemis *////////////////////////////////////////////////////////////////////////:
 
 
     // Initialiser SDL_mixer
@@ -228,6 +264,31 @@ again :
                         exit(-1);
                     }
                     if (!isBossMap) {
+                        /////////////////////////////////* les mouvements de chaque ennemi *////////////////////////////////////////////////
+                        enemy1_movement(renderer, &enemyStateData, map);
+                        enemy1Attack(&enemyStateData, perso, map);
+                        updatePersoEnemy1(perso, map, &enemyStateData);
+                        /* enemy2_follow(renderer, &enemy2, graph, map); */
+                        updatePersoEnemy2(perso, map, &enemy2);
+                        enemy2Attack(&enemy2, perso, map);
+                        enemy3_movement(renderer, &enemy3, map);
+                        updatePersoEnemy3(perso, map, &enemy3);
+                        enemy3Attack(&enemy3, perso, map);
+                        enemyBat_mouvement(renderer, &enemyBatData, map, perso);
+                        /* updatePersoEnemyBat(perso, map, &enemyBatData); fontionne pas très bien, à voir*/
+                        batAttack(&enemyBatData, perso, map);
+                        enemyFleche_mouvement(renderer, &enemyFlecheData, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData);
+                        flecheAttack(&enemyFlecheData, perso, map);
+                        enemyPendule_mouvement(renderer, &enemyPenduleData, map);
+                        penduleAttack(&enemyPenduleData, perso, map);
+                        SDL_Rect dst_rect = {10, 10, 16, 32};
+                        SDL_Rect src_rect = {0, 0, 16, 32};
+                        SDL_RenderCopy(renderer, textureAttack, &src_rect, &dst_rect);
+                        projectile_mouvement(renderer, &projectile, map);
+                        attack_mouvement(renderer, &attack, map);
+                        //////////////////////////////* fin mouvements de chaque ennemi *////////////////////////////////////////////////
+
                     }
                     if (isBossMap) {
                         displayBoss(renderer, boss, map);
@@ -285,6 +346,9 @@ again :
         }
     }
     quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
+    free(checkpointList->xPositions);
+    free(checkpointList);
+    free(boss);
 	free(nullAttack1);
     free(nullAttack2);
 	free(attack1);
@@ -295,8 +359,6 @@ again :
 	free(attack6);
     free(playerInFight);
 	free(bossDeath);
-    free(checkpointList->xPositions);
-    free(checkpointList);
     cleanupProjectiles();
     /* closeSDL_mixer(); */
     atexit(SDL_Quit);
