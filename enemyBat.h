@@ -7,11 +7,6 @@
 #include "graph.h"
 #include "music.h"
 
-#define INIT_ENEMY_BAT(enemy, map, x, y, x_max, goal, start) \
-    initEnemyBat(enemy, (x) * (map)->pix_rect, (y) * (map)->pix_rect, \
-                 (x_max) * (map)->pix_rect, goal, start, map)
-
-
 enum EnemyBatState{
     BAT_MOVING_RIGHT,
     BAT_MOVING_LEFT,
@@ -47,5 +42,4 @@ void follow_path2(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **gra
 void enemyBat_follow(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **graph, Map *map, Perso *perso);
 void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal, Node *start, Map *map);
 int hitbox_enemyBat(Perso *perso, Map *map, EnemyBatData *enemy);
-void updatePersoEnemyBat(Perso *perso, Map *map, EnemyBatData *enemy);
 #endif

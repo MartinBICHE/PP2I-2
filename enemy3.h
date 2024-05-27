@@ -6,8 +6,6 @@
 #include <SDL2/SDL_ttf.h>
 #include "map.h"
 #include "const.h"
-#define INIT_ENEMY3(enemy, map, x, y, xMax) initEnemy3(enemy, (x) * (map)->pix_rect, (y) * (map)->pix_rect, (xMax) * (map)->pix_rect)
-
 
 enum Enemy3State{
     RIGHT,
