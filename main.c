@@ -322,15 +322,7 @@ again :
                         goto again;
                     }
                 }
-                // } // else interactionMenu(renderer);
                 drawMapMenu(renderer);
-                    
-                // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)
-                // SDL_RenderDrawRect(renderer, &rect1); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
-                // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
                 
 
@@ -348,7 +340,6 @@ again :
     quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
     free(checkpointList->xPositions);
     free(checkpointList);
-    // free(boss);
 	free(nullAttack1);
     free(nullAttack2);
 	free(attack1);

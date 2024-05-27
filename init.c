@@ -77,9 +77,7 @@ void loadSounds(Mix_Chunk **sounds){
 
 void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map2, Map *mapBoss, Boss *boss){
     SDL_DestroyRenderer(*renderer);
-    // if (boss != NULL) {
         free(boss);
-    // }
     destroyMap(map2);
     destroyMap(mapBoss);
     freeTextures();
@@ -87,7 +85,6 @@ void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *m
     TTF_Quit();
     free(perso);
     SDL_DestroyWindow(*window);
-    // destroyMap(map);
     free_music();
     Mix_HaltMusic();
     Mix_CloseAudio();
