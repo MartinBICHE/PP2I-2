@@ -219,7 +219,7 @@ void interactionPauseJeu(SDL_Renderer *renderer, Map **map2, Map **mapBoss, Pers
                 toggleMusic();
                 afficherImage = !afficherImage;
                 isBossMap = false;
-                resetGame(&window, &renderer, &map2, &mapBoss, &perso, &boss);
+                // resetGame(&window, &renderer, map2, mapBoss, perso, boss);
             } else if (mouseX >= (WINWIDTH - ImageParametrePauseWidth) && mouseX <= WINWIDTH &&
                        mouseY >= 0 && mouseY <= ImageParametrePauseHeight) {
                 parametre = !parametre;
@@ -250,7 +250,7 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map2, Map **m
     cleanupProjectiles();
     freeProjectileTexture();
     closeSDL_mixer();
-    free(*perso);
+        free(*perso);
     destroyMap(*map2);
     destroyMap(*mapBoss); 
     free(*boss);
@@ -274,7 +274,7 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map2, Map **m
     currentTime1 = 0;
     currentTime1 = SDL_GetTicks();
     currentGravity = ACC;
-    
+
 
     pauseStartTime = 0;
     totalPauseDuration = 0;
@@ -311,7 +311,7 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map2, Map **m
 
 
 void gameOver(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Map *map, char c) { // cette fonction joue une "cinématique" de game over et est joué entre les gameplay 1 et 2 quand le perso meurt
-    SDL_Surface *gameOverSurface = IMG_Load("asset/aseprite/gameOver.png");
+    SDL_Surface *gameOverSurface = IMG_Load("asset/spritesheet/gameOver.png");
     if (!gameOverSurface){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init game over surface : %s", SDL_GetError());
 		exit(-1);
@@ -324,9 +324,9 @@ void gameOver(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Map
 
     SDL_Surface *markSurface;
     if (c == '?') {
-        markSurface = IMG_Load("asset/aseprite/interogation.png");
+        markSurface = IMG_Load("asset/spritesheet/interogation.png");
     } else {
-        markSurface = IMG_Load("asset/aseprite/exclamation.png");
+        markSurface = IMG_Load("asset/spritesheet/exclamation.png");
     }
     
     if (!markSurface){

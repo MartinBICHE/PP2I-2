@@ -70,7 +70,7 @@ int hitbox_bottom(Perso *perso, Map *map) {
 }
 
 
-int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox, Mix_Chunk **sounds) {
+int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, SDL_Texture *texturePortail, int showHitbox, Mix_Chunk **sounds) {
     int c = 96; // côté du carré de destination du sprite du perso
     int centrage = 6;
     if (currentGravity < 0) {
@@ -165,11 +165,7 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         }
         perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
         SDL_Rect src_rect;
-        // if (currentGravity > 0) {
             src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
-        // } else {
-        //     src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
-        // }
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
             exit(-1);
@@ -188,6 +184,15 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in display perso hitbox: %s", SDL_GetError());
             exit(-1);
         }
+    }
+
+    // Portail :
+
+    SDL_Rect src_rectP = {.x = ((perso->spriteOffset)%16/4)*64, .y = 0, .w = 64, .h = 64};
+    SDL_Rect dst_rectP = {.x = 296*map->pix_rect - map->x_cam, .y = 7.5*map->pix_rect, .w = c, .h = c};
+    if (SDL_RenderCopy(renderer, texturePortail, &src_rectP, &dst_rectP)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render portail copy: %s", SDL_GetError());
+        exit(-1);
     }
 
     return 0;

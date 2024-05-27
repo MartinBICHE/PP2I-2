@@ -248,7 +248,6 @@ again :
                 } 
                     
 
-            
                 if (perso-> health > 0) {
                     game(enemyStateData, boss, map, perso, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
@@ -259,7 +258,7 @@ again :
                         printf("Error drawing the map");
                         exit(-1);
                     }
-                    if (display_perso(renderer, perso, map, persoTexture, 0, sounds)) {
+                    if (display_perso(renderer, perso, map, persoTexture, texturePortail, 0, sounds)) {
                         printf("Error drawing the perso");
                         exit(-1);
                     }
@@ -323,6 +322,7 @@ again :
                         goto again;
                     }
                 }
+                // } // else interactionMenu(renderer);
                 drawMapMenu(renderer);
                     
                 // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
@@ -348,7 +348,7 @@ again :
     quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
     free(checkpointList->xPositions);
     free(checkpointList);
-    free(boss);
+    // free(boss);
 	free(nullAttack1);
     free(nullAttack2);
 	free(attack1);
