@@ -2,7 +2,8 @@
 #include "init.h"
 #include "boss.h"
 
-Mix_Music* gMusic = NULL;
+Mix_Music* gMusic1 = NULL;
+Mix_Music* gMusic2 = NULL;
 bool musicPaused = false;
 int spriteIndex = 0;
 int spriteScrollDelay = 300;
@@ -14,12 +15,12 @@ Mix_Chunk* sounds[4];
 
 void initCursorRects(void) {
     cursorRect.x = WINWIDTH / 4 + (volumeLevel * (WINWIDTH / 2)) / MAX_VOLUME - CURSOR_WIDTH / 2;
-    cursorRect.y = WINHEIGHT / 2 - CURSOR_HEIGHT - 15; // Volume de la musique
+    cursorRect.y = WINHEIGHT / 4 - CURSOR_HEIGHT / 2 ; // Volume de la musique
     cursorRect.w = CURSOR_WIDTH;
     cursorRect.h = CURSOR_HEIGHT;
 
     cursorRectSFX.x = WINWIDTH / 4 + (sfxVolumeLevel * (WINWIDTH / 2)) / MAX_VOLUME - CURSOR_WIDTH / 2;
-    cursorRectSFX.y = WINHEIGHT / 2 + CURSOR_HEIGHT + 15; // Volume des bruitages
+    cursorRectSFX.y = WINHEIGHT / 4 * 3 - CURSOR_HEIGHT / 2; // Volume des bruitages
     cursorRectSFX.w = CURSOR_WIDTH;
     cursorRectSFX.h = CURSOR_HEIGHT;
 }
@@ -86,17 +87,9 @@ void renderImage(SDL_Renderer *renderer, const char* imagePath, int x, int y, in
     SDL_FreeSurface(imageSurface);
 }
 
-bool initSDL_mixer(void) {
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 8, 2048) < 0) {
-        SDL_Log("Erreur lors de l'ouverture de l'audio : %s", Mix_GetError());
-        return false;
-    }
-    return true;
-}
-
-bool loadMusic(void) {
-    gMusic = Mix_LoadMUS("./asset/musique/musique-menu.mp3");
-    if (!gMusic) {
+bool loadMusicGameplay1(void) {
+    gMusic1 = Mix_LoadMUS("./asset/musique/gameplay 1.mp3");
+    if (!gMusic1) {
         SDL_Log("Erreur lors du chargement de la musique : %s", Mix_GetError());
         return false;
     }
@@ -104,13 +97,31 @@ bool loadMusic(void) {
     return true;
 }
 
-void playMusic(void) {
-    Mix_PlayMusic(gMusic, -1);
+bool loadMusicGameplay2(void) {
+    gMusic2 = Mix_LoadMUS("./asset/musique/gameplay 2.mp3");
+    if (!gMusic2) {
+        SDL_Log("Erreur lors du chargement de la musique : %s", Mix_GetError());
+        return false;
+    }
+    Mix_VolumeMusic(MIX_MAX_VOLUME/2);
+    return true;
+}
+
+void playMusic(Mix_Music* music) {
+    if (Mix_PlayMusic(music, -1) == -1) {
+        SDL_Log("Erreur lors de la lecture de la musique : %s", Mix_GetError());
+    }
 }
 
 void closeSDL_mixer(void) {
-    Mix_FreeMusic(gMusic);
-    gMusic = NULL;
+    if (gMusic1) {
+        Mix_FreeMusic(gMusic1);
+        gMusic1 = NULL;
+    }
+    if (gMusic2) {
+        Mix_FreeMusic(gMusic2);
+        gMusic2 = NULL;
+    }
     Mix_CloseAudio();
     Mix_Quit();
 }
@@ -161,7 +172,7 @@ void handleVolumeCursor(SDL_Event *e) {
             int mouseY = e->button.y;
 
             // Gérer le curseur de volume pour la musique
-            if (mouseY >= WINHEIGHT / 2 - CURSOR_HEIGHT - 15 && mouseY <= WINHEIGHT / 2 - 15) {
+            if (mouseY >= WINHEIGHT / 4 - CURSOR_HEIGHT / 2 && mouseY <= WINHEIGHT / 4 + CURSOR_HEIGHT / 2) {
                 cursorRect.x = mouseX - cursorRect.w / 2;
                 if (cursorRect.x < WINWIDTH / 4) cursorRect.x = WINWIDTH / 4;
                 if (cursorRect.x > WINWIDTH / 4 + WINWIDTH / 2 - cursorRect.w) cursorRect.x = WINWIDTH / 4 + WINWIDTH / 2 - cursorRect.w;
@@ -170,7 +181,7 @@ void handleVolumeCursor(SDL_Event *e) {
             }
 
             // Gérer le curseur de volume pour les bruitages
-            if (mouseY >= WINHEIGHT / 2 + CURSOR_HEIGHT + 15 && mouseY <= WINHEIGHT / 2 + CURSOR_HEIGHT + 35) {
+            if (mouseY >= WINHEIGHT / 4 * 3 - CURSOR_HEIGHT / 2 && mouseY <= WINHEIGHT / 4 * 3 + CURSOR_HEIGHT / 2) {
                 cursorRectSFX.x = mouseX - cursorRectSFX.w / 2;
                 if (cursorRectSFX.x < WINWIDTH / 4) cursorRectSFX.x = WINWIDTH / 4;
                 if (cursorRectSFX.x > WINWIDTH / 4 + WINWIDTH / 2 - cursorRectSFX.w) cursorRectSFX.x = WINWIDTH / 4 + WINWIDTH / 2 - cursorRectSFX.w;
@@ -192,20 +203,21 @@ void drawMenu(SDL_Renderer *renderer) {
     if (showMenu) {
         renderSprite(renderer);
         renderImage(renderer, "./asset/UI/play.png", (WINWIDTH / 2 - Image1Width / 2), (WINHEIGHT / 2 - Image1Height / 2), Image1Width, Image1Height);
-        renderImage(renderer, "./asset/UI/option.png", WINWIDTH - Image1Width, 0, Image1Width, Image1Height);
-        renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", 0, 0, Image1Width, Image1Height);
+        renderImage(renderer, "./asset/UI/option.png", WINWIDTH - ImageParametreMenuWidth, 0, ImageParametreMenuWidth, ImageParametreMenuHeight);
+        renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", 0, 0, Image1Width, Image1Height-40);
     } else {
         renderSprite(renderer);
-
+        renderImage(renderer,"./asset/UI/music.png",WINWIDTH / 4 - 200, WINHEIGHT / 4 - 75,150,150);
+        renderImage(renderer,"./asset/UI/fx.png",WINWIDTH / 4 - 200, WINHEIGHT / 4 * 3 - 75,150,150);
         // Dessiner la barre de volume pour la musique
-        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 40, WINWIDTH / 2, 10};
+        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 4 - 5, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRect);
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &cursorRect);
 
         // Dessiner la barre de volume pour les bruitages
-        SDL_Rect barRectSFX = {WINWIDTH / 4, WINHEIGHT / 2 + 70, WINWIDTH / 2, 10};
+        SDL_Rect barRectSFX = {WINWIDTH / 4, WINHEIGHT / 4 * 3 - 5, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRectSFX);
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
@@ -224,15 +236,17 @@ void drawMapMenu(SDL_Renderer *renderer) {
         renderImage(renderer, "./asset/UI/bouton-quitter-le-jeu.png", (WINWIDTH - ImageQuitterJeuWidth) / 2, (WINHEIGHT - ImageQuitterJeuHeight) / 2 + 50, ImageQuitterJeuWidth, ImageQuitterJeuHeight);
     }
     if (parametre) {
+        renderImage(renderer,"./asset/UI/music.png",WINWIDTH / 4 - 200, WINHEIGHT / 4 - 75,150,150);
+        renderImage(renderer,"./asset/UI/fx.png",WINWIDTH / 4 - 200, WINHEIGHT / 4 * 3 - 75,150,150);
         // Dessiner la barre de volume pour la musique
-        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 2 - 40, WINWIDTH / 2, 10};
+        SDL_Rect barRect = {WINWIDTH / 4, WINHEIGHT / 4 - 5, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRect);
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderFillRect(renderer, &cursorRect);
 
         // Dessiner la barre de volume pour les bruitages
-        SDL_Rect barRectSFX = {WINWIDTH / 4, WINHEIGHT / 2 + 70, WINWIDTH / 2, 10};
+        SDL_Rect barRectSFX = {WINWIDTH / 4, WINHEIGHT / 4 * 3 - 5, WINWIDTH / 2, 10};
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderFillRect(renderer, &barRectSFX);
         SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
@@ -247,13 +261,14 @@ void interactionMenu(SDL_Renderer *renderer) {
         } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
             int mouseX = e.button.x;
             int mouseY = e.button.y;
-            if (mouseX >= 0 && mouseX <= Image1Width && mouseY >= 0 && mouseY <= Image1Height && showMenu) {
+            if (mouseX >= 0 && mouseX <= Image1Width && mouseY >= 0 && mouseY <= Image1Height - 40 && showMenu) {
                 quit = true;
             } else if (mouseX >= ((WINWIDTH - Image1Width) / 2) && mouseX <= ((WINWIDTH - Image1Width) / 2) + Image1Width &&
                        mouseY >= ((WINHEIGHT - Image1Height) / 2) && mouseY <= ((WINHEIGHT - Image1Height) / 2) + Image1Height && showMenu) {
                 startGame = true;
-            } else if (mouseX >= WINWIDTH - Image1Width && mouseX <= WINWIDTH &&
-                       mouseY >= 0 && mouseY <= Image1Height && showMenu) {
+                playMusic(gMusic1);
+            } else if (mouseX >= WINWIDTH - ImageParametreMenuWidth && mouseX <= WINWIDTH &&
+                       mouseY >= 0 && mouseY <= ImageParametreMenuHeight && showMenu) {
                 showMenu = false;
                 parametre = !parametre;
             } else if (mouseX >= WINWIDTH - Image1Width && mouseX <= WINWIDTH &&
@@ -261,10 +276,6 @@ void interactionMenu(SDL_Renderer *renderer) {
                 showMenu = true;
             } else if (mouseX >= 0 && mouseX <= Image1Width && mouseY >= 0 && mouseY <= Image1Height && !showMenu) {
                 showMenu = true;
-            } else if (mouseX >= (WINWIDTH - ImageParametrePauseWidth) && mouseX <= WINWIDTH &&
-                       mouseY >= 0 && mouseY <= ImageParametrePauseHeight) {
-                parametre = !parametre;
-                afficherImage = false;
             }
         } else if (e.type == SDL_MOUSEMOTION) {
             handleVolumeCursor(&e); // Ajout du gestionnaire de curseur
@@ -349,26 +360,6 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
 
     // Réinitialisez les projectiles
     resetProjectiles();
-
-    if (!loadProjectileTexture(*renderer)) {
-        SDL_Log("Erreur lors du chargement de la texture du projectile.");
-        exit(1);
-    }
-
-    // Initialiser SDL_mixer et charger la musique
-    if (!initSDL_mixer()) {
-        SDL_Log("Erreur lors de l'initialisation de SDL_mixer.");
-        exit(1);
-    }
-
-    if (!loadMusic()) {
-        SDL_Log("Erreur lors du chargement de la musique.");
-        closeSDL_mixer();
-        exit(1);
-    }
-
-    // Jouer la musique du menu
-    playMusic();
 
     // Initialiser la carte, le personnage et le boss en fonction de la valeur de isBossMap
     if (isBossMap) {

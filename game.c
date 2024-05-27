@@ -5,6 +5,7 @@
 #include "boss.h"
 #include "perso.h"
 #include "fight.h"
+#include "menu.h"
 
 bool firstTime1 = true;
 bool firstTime2 = true;

@@ -517,11 +517,11 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData,Boss* bo
                 perso->invincibility_timer = 150;
                 perso->health--;
             }
+
             float dx = perso->vx * DT;
             float dy = perso->vy * DT;
-            float recoilAmount = 1.0f;
-            perso -> recoil_timer = 5;
-            if (currentGravity > 0 ) {
+            float recoilAmount = 1.5f;
+            if (currentGravity > 0) {
                 if (dx > 0) { // Le personnage se déplace vers la droite
                     perso->vx = max(perso->vx, 0.0f);
                     // Position juste avant le début de la hitbox du boss (côté gauche)
@@ -535,11 +535,11 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData,Boss* bo
                 }
                 if (dy > 0) { // Le personnage se déplace vers le bas
                     // Faire rebondir le personnage au-dessus du boss
-                    perso->vy = -jumpSpeed;
+                    perso->vy = -JUMPSPEED;
                 }
                 if (dy < 0) { // Le personnage se déplace vers le haut
                     // Faire rebondir le personnage en dessous du boss
-                    perso->vy = jumpSpeed;
+                    perso->vy = JUMPSPEED;
                 }
             } else {
                 if (dx > 0) { // Le personnage se déplace vers la droite
@@ -555,11 +555,11 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData,Boss* bo
                 }
                 if (dy < 0) { // Le personnage se déplace vers le bas
                     // Faire rebondir le personnage au-dessus du boss
-                    perso->vy = jumpSpeed;
+                    perso->vy = -JUMPSPEED;
                 }
                 if (dy > 0) { // Le personnage se déplace vers le haut
                     // Faire rebondir le personnage en dessous du boss
-                    perso->vy = jumpSpeed;
+                    perso->vy = -JUMPSPEED;
                 }
             }
         }

@@ -53,7 +53,7 @@ Mix_Chunk *sounds[4];
 SDL_Texture *persoTexture;
 SDL_Texture *bossTexture;
 SDL_Texture *tileTextures;
-SDL_Texture* projectileTexture = NULL;
+SDL_Texture *projectileTexture;
 bool showMenu = true;
 bool parametre = false;
 bool afficherImage = false;
@@ -69,6 +69,7 @@ float bossMove = BOSS_MOVE_INTERVAL;
 float projectileSpeed = PROJECTILE_SPEED;
 bool showAttentionImage = true;
 bool firstIteration = true;
+bool firstSwicthMusic = true;
 
 Uint32 lastGravityChange = 0;
 Uint32 lastProjectileLoad = 0;
@@ -147,32 +148,17 @@ int main(int argc, char **argv) {
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
     loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
     loadBossTexture(renderer,&bossTexture,"./asset/spritesheet/boss.png");
+    loadProjectileTexture(renderer,&projectileTexture,"./asset/spritesheet/tornade.png");
 
     EnemyStateData enemyStateData;
     // initEnemy1(600, 660, &enemyStateData);
 
-
-
-    // Initialiser SDL_mixer
-    /* if (!initSDL_mixer()) { */
-    /*     SDL_Log("Erreur lors de l'initialisation de SDL_mixer."); */
-    /*     return 1; */
-    /* } */
-
-    /* // Charger la musique */
-    /* if (!loadMusic()) { */
-    /*     SDL_Log("Erreur lors du chargement de la musique."); */
-    /*     closeSDL_mixer(); */
-    /*     return 1; */
-    /* } */
-
+    loadMusicGameplay1();
+    loadMusicGameplay2();
     loadSounds(sounds);
 
-    // Jouer la musique lorsque le menu s'ouvre
-    playMusic();
-
 again :
-
+    Mix_HaltMusic();
     retourMenu = false;
     startGame = false;
     prevShowMenu = true;
@@ -193,6 +179,7 @@ again :
             loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
             loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
             loadBossTexture(renderer,&bossTexture,"./asset/spritesheet/boss.png");
+            loadProjectileTexture(renderer,&projectileTexture,"./asset/spritesheet/tornade.png");
 
             while (running) {
                 Uint64 start = SDL_GetTicks();
@@ -247,15 +234,21 @@ again :
                         if (showAttentionImage) {
                             renderImage(renderer,"./asset/UI/attention.png",(WINWIDTH / 2 - ImageAttentionWidth / 2),(WINHEIGHT / 2 - ImageAttentionHeight / 2), ImageAttentionWidth, ImageAttentionHeight);
                         }
-                        renderProjectiles(renderer);
+                        renderProjectiles(renderer,map);
                     }
+
                     renderStatusHealth(renderer,perso);
 
                     if (perso->health == 0) {
                         gameOver1(renderer, bgTextures, 5, map);
                     }
                 } else {
-                    isBossMap = !isBossMap;
+                    if (firstSwicthMusic) {
+                        Mix_HaltMusic();
+                        firstSwicthMusic = !firstSwicthMusic;
+                        playMusic(gMusic2);
+                    }
+                    isBossMap = false;
                     game2(renderer, playerInFight, bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
                     renderStatusHealthFight(renderer,playerInFight);
                     invincibility(playerInFight);

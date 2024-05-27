@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #ifndef CONST_H
 #define CONST_H
 #include <stdbool.h>
@@ -34,6 +35,8 @@ extern Uint32 bossAngry2;
 extern Uint32 bossAngry3;
 extern float bossMove;
 extern float projectileSpeed;
+extern Mix_Music* gMusic1;
+extern Mix_Music* gMusic2;
 
 #define Image1Width 200
 #define Image1Height 150
@@ -45,6 +48,8 @@ extern float projectileSpeed;
 #define ImageQuitterJeuWidth 200
 #define ImageQuitterJeuHeight 50
 #define ImageParametrePauseWidth 50
+#define ImageParametreMenuWidth 150
+#define ImageParametreMenuHeight 150
 #define ImageParametrePauseHeight 50
 #define ImageRetourArrièreWidth 50
 #define ImageRetourArrièreHeight 50
@@ -160,6 +165,7 @@ typedef struct {
     float vy;
     bool active;
     SDL_Rect hitbox;
+    int spriteOffset;
 } Projectile;
 
 extern Projectile projectiles[MAX_PROJECTILES]; // Tableau pour stocker les projectiles actifs
