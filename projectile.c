@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include "perso.h"
 #include "const.h"
+#include "textures.h"
 
 bool isValidPosition(Map* map, float x, float y) {
     int tileX = (int)(x / map->pix_rect);
@@ -218,5 +219,32 @@ void resetProjectiles(void) {
         projectiles[i].vy = 0.0f;
         projectiles[i].active = false;
     }
+}
+
+void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, Map *map){
+    int interval = 100;
+
+    SDL_Rect dst_rect = {projectile->dst_rect.x - map->x_cam, projectile->dst_rect.y, projectile->dst_rect.w, projectile->dst_rect.h};
+    if (SDL_GetTicks() - projectile->pause >= interval){
+        projectile->src_rect.x += 32;
+        projectile->pause = SDL_GetTicks();
+    }
+    if (projectile->src_rect.x == 96){
+        projectile->src_rect.x = 0;
+    }
+    SDL_RenderCopy(renderer, textureProjectile, &projectile->src_rect, &dst_rect);
+}
+
+void initProjectile(int x, int y, ProjectileData *projectile){
+    projectile->src_rect.x = 0;
+    projectile->src_rect.y = 0;
+    projectile->src_rect.w = 32;
+    projectile->src_rect.h = 32;
+
+    projectile->dst_rect.x = x;
+    projectile->dst_rect.y = y;
+    projectile->dst_rect.w = 64;
+    projectile->dst_rect.h = 32;
+    projectile->pause = 0;
 }
 

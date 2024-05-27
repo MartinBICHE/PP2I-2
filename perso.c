@@ -14,6 +14,7 @@ Perso *create_perso(Map *map) {
     res->health = 9;
     res->jumps = 2;
     res->jump_delay = 0;
+    res->dashes = 2;
     res->dash_duration = 0;
     res->dash_speed = 21.0f;
     res->dash_delay = 0;
@@ -69,7 +70,7 @@ int hitbox_bottom(Perso *perso, Map *map) {
 }
 
 
-int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox) {
+int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox, Mix_Chunk **sounds) {
     int c = 96; // côté du carré de destination du sprite du perso
     int centrage = 6;
     if (currentGravity < 0) {
@@ -79,7 +80,15 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
     double angle = (currentGravity < 0) ? 180.0 : 0.0;
     SDL_RendererFlip flip = (perso->facing == 1) ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
 
-    if (perso->dash_duration > 0) {
+    if (perso->dash_duration == 10) {
+        int channel = Mix_PlayChannel(-1, sounds[2], 0);
+        if(channel == -1) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing dashing sound: %s", Mix_GetError());
+            exit(-1);
+        }
+    }
+    if (perso->dash_duration > 0) { // perso en train de dasher
+    
         int offset = 45; // décalage en x pour les "rémanences"
         if (currentGravity < 0) {
             offset = -offset;
@@ -132,27 +141,40 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         }
 
         SDL_SetTextureAlphaMod(persoTexture, 255);
-    
-    } else if (perso->vy != 0) {
+    } else if (perso->vy != 0) { // perso en train de sauter
         perso->spriteOffset = (perso->spriteOffset + 1) % 42; // 6 frames par sprite, 7 sprites
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 2*64, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
             exit(-1);
         }
-    } else if (perso->vx != 0) {
+
+    } else if (perso->vx != 0) { // perso en train de marcher
+        if (perso->spriteOffset == 24) {
+            int channel = Mix_PlayChannel(-1, sounds[0], 0);
+            if(channel == -1) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing walking sound: %s", Mix_GetError());
+                exit(-1);
+            }
+        } else if (perso->spriteOffset == 60) {
+            int channel = Mix_PlayChannel(-1, sounds[1], 0);
+            if(channel == -1) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing walking sound: %s", Mix_GetError());
+                exit(-1);
+            }
+        }
         perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
         SDL_Rect src_rect;
-        if (currentGravity > 0) {
+        // if (currentGravity > 0) {
             src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
-        } else {
-            src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
-        }
+        // } else {
+        //     src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
+        // }
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
             exit(-1);
         }
-    } else {
+    } else { // perso immobile
         perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 0, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
@@ -313,7 +335,7 @@ void updatePersoDashing(Perso *perso, Map *map) {
 }
 
 
-void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const Uint8 *state) {
+void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const Uint8 *state, Mix_Chunk **sounds) {
     perso->jump_delay = max(perso->jump_delay - 1, 0);
     perso->dash_duration = max(perso->dash_duration - 1, 0);
     perso->dash_delay = max(perso->dash_delay - 1, 0);
@@ -342,7 +364,8 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         
             if (state[SDL_SCANCODE_SPACE]) jump(perso, map);
         }
-        if (state[SDL_SCANCODE_J] && perso->dash_delay == 0) {
+        if (state[SDL_SCANCODE_J] && perso->dash_delay == 0 && perso->dashes > 0) {
+            perso->dashes--;
             perso->dash_duration = 11;
             perso->dash_delay = 30;
         }
@@ -350,11 +373,18 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         int i = floor(perso->y);
         int j = floor(perso->x);
         perso->vy += currentGravity*DT;
+        int v = 17; // vitesse à partir de laquelle le son "crack" est joué quand le perso s'écrase au sol
         if (currentGravity > 0) {
             if (hitbox_bottom(perso, map)) {
+                if (perso->vy > v) {
+                    int channel = Mix_PlayChannel(-1, sounds[3], 0);
+                    if(channel == -1) {
+                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing crack sound: %s", Mix_GetError());
+                        exit(-1);
+                    }
+                }
                 perso->vy = min(perso->vy, 0.0f);
                 perso->y = i + 1 - PERSO_HEIGHT/2.0f;
-                perso->jumps = 1;
             }
             if (hitbox_top(perso, map)) {
                 perso->vy = max(perso->vy, 0.0f);
@@ -366,6 +396,13 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
                 perso->y = i + 1 - PERSO_HEIGHT/2.0f;
             }
             if (hitbox_top(perso, map)) {
+                if (perso->vy > v) {
+                    int channel = Mix_PlayChannel(-1, sounds[3], 0);
+                    if(channel == -1) {
+                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error playing crack sound: %s", Mix_GetError());
+                        exit(-1);
+                    }
+                }
                 perso->vy = max(perso->vy, 0.0f);
                 perso->y = i + PERSO_HEIGHT/2.0f;
                 perso->jumps = 1;
@@ -384,6 +421,7 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         updateHitbox(perso, map);
         if (hitbox_bottom(perso, map)) {
             perso->jumps = 2;
+            perso->dashes = 2;
         }
     }
 }
