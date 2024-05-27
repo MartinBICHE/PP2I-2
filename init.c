@@ -38,7 +38,7 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
        exit(-1);
     }
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 8, 2048) < 0) {
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
         printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
         exit(-1);
     }
