@@ -25,6 +25,8 @@ SDL_Texture* textureFleche = NULL;
 SDL_Texture* textureBat = NULL;
 SDL_Texture* textureBatAttack = NULL;
 SDL_Texture* textureEnemy3Attack = NULL;
+SDL_Texture* textureProjectile = NULL;
+SDL_Texture* textureAttack = NULL;
 
 SDL_Texture *healthTextures[10];
 
@@ -52,13 +54,23 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_Surface *surfaceHealth8 = IMG_Load("asset/spritesheet/health8.png");
     SDL_Surface *surfaceHealth9 = IMG_Load("asset/spritesheet/health9.png");
     SDL_Surface *surfaceFleche = IMG_Load("asset/spritesheet/fleche.png");
-    SDL_Surface *surfaceBat = IMG_Load("asset/spritesheet/bat.png");
-    SDL_Surface *surfaceBatAttack = IMG_Load("asset/spritesheet/batAttack.png");
-    SDL_Surface *surfaceEnemy3Attack = IMG_Load("asset/spritesheet/ennemy3Attack.png");
+    SDL_Surface *surfaceBat = IMG_Load("asset/spritesheet/Bat.png");
+    SDL_Surface *surfaceBatAttack = IMG_Load("asset/spritesheet/batattack.png");
+    SDL_Surface *surfaceEnemy3Attack = IMG_Load("asset/spritesheet/ennemy3att.png");
+    SDL_Surface *surfaceProjectile = IMG_Load("asset/spritesheet/projectiles.png");
+    SDL_Surface *surfaceAttack = IMG_Load("asset/spritesheet/attack.png");
     if (!surfaceEnemy1 || !surfacePapirus || !surfaceScroll || !surfaceEnemy3 || !surfacePendule ){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init surfaceEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
 		exit(-1);
 	}
+    if (!surfaceBat){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init surfaceEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
+		exit(-1);
+    }
+    if (!surfaceProjectile){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init surfaceEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
+		exit(-1);
+    }
 
     textureEnemy1 = SDL_CreateTextureFromSurface(renderer, surfaceEnemy1);
     textureEnemy2 = SDL_CreateTextureFromSurface(renderer, surfaceEnemy2);
@@ -81,11 +93,17 @@ int loadTextures(SDL_Renderer *renderer){
     textureBat = SDL_CreateTextureFromSurface(renderer, surfaceBat);
     textureBatAttack = SDL_CreateTextureFromSurface(renderer, surfaceBatAttack);
     textureEnemy3Attack = SDL_CreateTextureFromSurface(renderer, surfaceEnemy3Attack);
+    textureProjectile = SDL_CreateTextureFromSurface(renderer, surfaceProjectile);
+    textureAttack = SDL_CreateTextureFromSurface(renderer, surfaceAttack);
 
     if (!textureEnemy1 || !texturePapirus || !textureScroll || !textureEnemy3 || !texturePendule){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init textureEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
 		exit(-1);
 	}
+    if (!textureBat){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init textureEnemy1 or surfacePendule or.... etc : %s", SDL_GetError());
+		exit(-1);
+    }
 
     healthTextures[0] = textureHealth0;
     healthTextures[1] = textureHealth1;
@@ -120,6 +138,8 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_FreeSurface(surfaceBat);
     SDL_FreeSurface(surfaceBatAttack);
     SDL_FreeSurface(surfaceEnemy3Attack);
+    SDL_FreeSurface(surfaceProjectile);
+    SDL_FreeSurface(surfaceAttack);
 
     return 0;
 }
@@ -148,6 +168,7 @@ int freeTextures(void){
     SDL_DestroyTexture(textureFleche);
     SDL_DestroyTexture(textureBatAttack);
     SDL_DestroyTexture(textureEnemy3Attack);
+    SDL_DestroyTexture(textureProjectile);
 
     textureEnemy1 = NULL;
     textureEnemy2 = NULL;
@@ -170,6 +191,7 @@ int freeTextures(void){
     textureBat = NULL;
     textureBatAttack = NULL;
     textureEnemy3Attack = NULL;
+    textureProjectile = NULL;
 
     return 0;
 }
