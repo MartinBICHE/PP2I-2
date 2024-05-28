@@ -11,8 +11,8 @@ extern Mix_Chunk *musicEnemySnake;
 extern Mix_Chunk *musicEnemyBat;
 extern Mix_Chunk *musicEnemyBatAttack;
 
-int load_music(void);
-int free_music(void);
+int load_music();
+int free_music();
 /* void adjustVolumeBasedOnDistance(Perso *perso, int channel, double soundSourceX); */
 
 
