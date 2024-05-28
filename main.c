@@ -43,7 +43,6 @@
 #include "enemyFleche.h"
 #include "enemyBat.h"
 #include "fight.h"
-#include "attack.h"
 
 
 SDL_Window* window = NULL;
@@ -52,6 +51,9 @@ SDL_Event e;
 SDL_Texture *bgTextures[6];
 Mix_Chunk *sounds[4];
 SDL_Texture *persoTexture;
+SDL_Texture *scratchTexture;
+SDL_Texture *hitpointTexture;
+SDL_Texture *bgDeathTexture;
 SDL_Texture *tileTextures;
 SDL_Texture* projectileTexture = NULL;
 bool showMenu = true;
@@ -113,8 +115,11 @@ int main(int argc, char **argv) {
 
 	/* Déclaration des attaques pour le gameplay 2 */
 
-	AttackFight *nullAttack1 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
-	AttackFight *nullAttack2 = initAttack(3*TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
+    loadDeathTexture(renderer, &scratchTexture, "./asset/spritesheet/scratch.png");
+    loadDeathTexture(renderer, &hitpointTexture, "./asset/spritesheet/hitpoint.png");
+    loadDeathTexture(renderer, &bgDeathTexture, "./asset/background/satan.png");
+
+
 	AttackFight *attack1 = initAttack(0, 2*QUARTERHEIGHT, bossDeath);
 	AttackFight *attack2 = initAttack(TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
 	AttackFight *attack3 = initAttack(2*TIERWIDTH, 2*QUARTERHEIGHT, bossDeath);
@@ -122,9 +127,17 @@ int main(int argc, char **argv) {
 	AttackFight *attack5 = initAttack(TIERWIDTH, 0, bossDeath);
 	AttackFight *attack6 = initAttack(2*TIERWIDTH, 0, bossDeath);
     
-    Map *map = initMap("map2");
+    Map *map2 = initMap("map2");
+    Map *mapBoss = initMap("mapBoss1");
+    Map *map = map2;
+
+    Animation *scratchAnim = malloc(sizeof(Animation));
+    Animation *hitpointAnim = malloc(sizeof(Animation));
+    Animation *bgDeathAnim = malloc(sizeof(Animation));
+
+
 	Perso *perso = create_perso(map);
-    Boss *boss = NULL;
+    Boss *boss = create_boss(mapBoss);
 
     CheckpointList *checkpointList = malloc(sizeof(CheckpointList));
     initCheckpointList(checkpointList);
@@ -134,16 +147,24 @@ int main(int argc, char **argv) {
     int running = 1;
 
 
-    loadBackgroundTextures(renderer, bgTextures, 5);
-    loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
-    // loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+    // Initialiser SDL_mixer
+    /* if (!initSDL_mixer()) { */
+    /*     SDL_Log("Erreur lors de l'initialisation de SDL_mixer."); */
+    /*     return 1; */
+    /* } */
+
+    /* // Charger la musique */
+    /* if (!loadMusic()) { */
+    /*     SDL_Log("Erreur lors du chargement de la musique."); */
+    /*     closeSDL_mixer(); */
+    /*     return 1; */
+    /* } */
 
     const char *instructionText = "Instructions:   Appuyez sur Q pour se deplacer a gauche et D pour se deplacer a droite. J pour un dash et Espace pour un saut";
 
     DialogBoxData instructionBox;
     initPapirus(&instructionBox, 200, 100);
     SDL_Color BLACK = {0, 0, 0, 255};
-
 
      /////////////////////////////////////////////////////* Les init des ennemis *////////////////////////////////////////////////////////////////////////
      
@@ -246,7 +267,8 @@ again :
     startGame = false;
     prevShowMenu = true;
     if (perso -> health == 0) {
-        revive(perso); // revive ne marche pas créer une fonction resetGame qui renvoie au point de départ
+        resetGame(&window, &renderer, &map2, &mapBoss, &perso, &boss);
+        map = map2;
     }
     // Boucle principale du menu
     quit = false;
@@ -261,22 +283,25 @@ again :
             loadBackgroundTextures(renderer, bgTextures, 5);
             loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
             loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+            initAnimation(scratchAnim, scratchTexture, 2400, 160, 10, 150);
+            initAnimation(hitpointAnim, hitpointTexture, 960 ,160, 4, 200);
+            initAnimation(bgDeathAnim, bgDeathTexture, 12960,480, 18, 100);
+
+
 
             while (running) {
                 Uint64 start = SDL_GetTicks();
                 while (SDL_PollEvent(&e) != 0) {
-                    interactionPauseJeu(renderer);
+                    interactionPauseJeu(renderer, &map2, &mapBoss, &perso, &boss);
                 
                     if (e.key.keysym.sym == SDLK_SPACE && !afficherImage && perso->recoil_timer <= 0) {
                         jump(perso, map);
-                    } else if (e.key.keysym.sym == SDLK_g && !afficherImage) {
+                    } else if (perso->x > 296) {
                         boutonGTime = SDL_GetTicks();
                         isBossMap = true;
-                        destroyMap(map);
                         free(perso);
-                        map = initMap("mapBoss1");
+                        map = mapBoss;
                         perso = create_perso(map);
-                        boss = create_boss(map);
                         lastGravityChange = currentTime1;
                         lastProjectileLoad = currentTime1;
                         lastBossMoveTime = currentTime1;
@@ -290,9 +315,6 @@ again :
                 } 
                     
 
-                
-
-                // x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
                 if (perso-> health > 0) {
                     game(enemyStateData, boss, map, perso, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
@@ -303,12 +325,12 @@ again :
                         printf("Error drawing the map");
                         exit(-1);
                     }
-                    if (display_perso(renderer, perso, map, persoTexture, 0, sounds)) {
+                    if (display_perso(renderer, perso, map, persoTexture, texturePortail, 0, sounds)) {
                         printf("Error drawing the perso");
                         exit(-1);
                     }
                     if (!isBossMap) {
-                        /////////////////////////////////* les mouvements de chaque ennemi *////////////////////////////////////////////////
+                         /////////////////////////////////* les mouvements de chaque ennemi *////////////////////////////////////////////////
                         enemy1_movement(renderer, &enemyStateData, map);
                         enemy1Attack(&enemyStateData, perso, map);
                         updatePersoEnemy1(perso, map, &enemyStateData);
@@ -445,7 +467,6 @@ again :
 
                         render_text(renderer, instructionText, BLACK, &instructionBox, map);
                         //////////////////////////////* fin mouvements de chaque ennemi *////////////////////////////////////////////////
-
                     }
                     if (isBossMap) {
                         displayBoss(renderer, boss, map);
@@ -457,11 +478,11 @@ again :
                     renderStatusHealth(renderer,perso);
 
                     if (perso->health == 0) {
-                        gameOver1(renderer, bgTextures, 5, map);
+                        gameOver(renderer, bgTextures, 5, map, '?');
                     }
                 } else {
-                    
-                    game2(renderer, playerInFight, bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+                    animateBackground(renderer, bgDeathAnim);
+                    game2(renderer, playerInFight, bossDeath, attack1, attack2, attack3, attack4, attack5, attack6,scratchAnim,hitpointAnim);
                     renderStatusHealthFight(renderer,playerInFight);
                     invincibility(playerInFight);
                     if (bossDeath->health <= 0) {
@@ -469,24 +490,18 @@ again :
                         bossDeath->health = 9;
                         playerInFight->health = 9;
                         bossDeath->phase = 1;
-                        resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+                        resetGameplay2(bossDeath, attack1, attack2, attack3, attack4, attack5, attack6);
                     }
                     if (playerInFight -> health == 0) {
                         bossDeath->health = 9;
                         playerInFight->health = 9;
                         bossDeath->phase = 1;
-                        resetGameplay2(bossDeath, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+                        gameOver(renderer, bgTextures, 5, map, '!');
+                        resetGameplay2(bossDeath, attack1, attack2, attack3, attack4, attack5, attack6);
                         goto again;
                     }
                 }
                 drawMapMenu(renderer);
-                    
-                // SDL_SetRenderDrawColor(renderer, WHITE.r, WHITE.g, WHITE.b, WHITE.a); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_Rect rect1 = {.x = x_perso*PIX_RECT - 10 - x_cam, .y = 3*PIX_RECT - 10, .w = 20, .h = 20}; // !!! seulement pour les tests de caméra (à changer)
-                // SDL_RenderDrawRect(renderer, &rect1); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a); // !!! seulement pour les tests de caméra (à changer)
-                // SDL_Rect rect2 = {.x = x_perso*PIX_RECT - 9 - x_cam, .y = 3*PIX_RECT - 9, .w = 18, .h = 18}; // !!! seulement pour les tests de caméra (à changer)
-                // SDL_RenderDrawRect(renderer, &rect2); // !!! seulement pour les tests de caméra (à changer)
 
                 
 
@@ -501,14 +516,7 @@ again :
             }
         }
     }
-    quitSDL(&renderer, &window, perso, map, boss);
-    free(checkpointList->xPositions);
-    free(checkpointList);
-    free(boss);
-	free(nullAttack1);
-    free(nullAttack2);
-    destroy_graph(graph, map);
-    destroyMap(map);
+    quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
 	free(attack1);
 	free(attack2);
 	free(attack3);
@@ -517,7 +525,13 @@ again :
 	free(attack6);
     free(playerInFight);
 	free(bossDeath);
+    free(scratchAnim);
+    free(hitpointAnim);
+    free(bgDeathAnim);
+    free(checkpointList->xPositions);
+    free(checkpointList);
     cleanupProjectiles();
+    /* closeSDL_mixer(); */
     atexit(SDL_Quit);
     return 0;
     
