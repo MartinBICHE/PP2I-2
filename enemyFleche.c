@@ -14,8 +14,9 @@
         /* renderStatusHealth(renderer, perso); pour voir l'impact sur la santé */
 
 void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheData, Map *map) {
-  int interval = 200;
+  int interval = 100;
   int pauseInterval = 3000;
+  int pauseIntervalTop = 1000;
 
   switch (enemyFlecheData->state) {
   case FLECHE_MOVING_UP:
@@ -29,7 +30,7 @@ void enemyFleche_mouvement(SDL_Renderer *renderer, EnemyFlecheData *enemyFlecheD
     }
     break;
   case FLECHE_PAUSE_TOP:
-    if (SDL_GetTicks() - enemyFlecheData->pauseStart >= pauseInterval) {
+    if (SDL_GetTicks() - enemyFlecheData->pauseStart >= pauseIntervalTop) {
       enemyFlecheData->state = FLECHE_MOVING_DOWN;
     }
     break;
@@ -65,8 +66,8 @@ void initEnemyFleche(EnemyFlecheData *enemyFlecheData, int x, int y) {
 
   enemyFlecheData->dst_rect.x = x;
   enemyFlecheData->dst_rect.y = y;
-  enemyFlecheData->dst_rect.w = 64 * 3;
-  enemyFlecheData->dst_rect.h = 64 * 1;
+  enemyFlecheData->dst_rect.w = 64 * 2;
+  enemyFlecheData->dst_rect.h = 64 * 2;
 
   enemyFlecheData->state = FLECHE_MOVING_UP;
   enemyFlecheData->pauseStartBits = 0;
@@ -87,10 +88,9 @@ void flecheAttack(EnemyFlecheData *enemyFlecheData, Perso *perso, Map *map) {
 
 int hitbox_enemyFleche(Perso *perso, Map *map, EnemyFlecheData *enemy) {
     SDL_Rect enemyHitbox = enemy->dst_rect;
-    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
-    enemyHitbox.x -= margin;
-    enemyHitbox.y -= margin;
-    enemyHitbox.w += margin;
+    int margin = 30;
+    enemyHitbox.y += 2*margin;
+    enemyHitbox.h -= 2*margin;
     enemyHitbox.h -= 1*margin;
     SDL_Rect intersection;
     if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi

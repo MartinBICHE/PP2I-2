@@ -28,8 +28,9 @@
 void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData,
                      Map *map) {
   int speed = 64;
-  int interval = 1000;
-  /* int pauseInterval = 3000; */
+  int interval = 500;
+  int pauseInterval = 3000;
+  int pauseIntervalTop = 1000;
   Uint32 ticks = SDL_GetTicks();
   Uint32 sprite = (ticks / 500) % 10;
   switch (enemyStateData->state) {
@@ -56,7 +57,7 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData,
     }
     break;
   case PAUSE_TOP:
-    if (SDL_GetTicks() - enemyStateData->pauseStart >= interval) {
+    if (SDL_GetTicks() - enemyStateData->pauseStart >= pauseIntervalTop) {
       enemyStateData->state = MOVING_DOWN;
     }
     break;
@@ -75,7 +76,7 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData,
     }
     break;
   case PAUSE_BOTTOM:
-    if (SDL_GetTicks() - enemyStateData->pauseStart >= interval) {
+    if (SDL_GetTicks() - enemyStateData->pauseStart >= pauseInterval) {
       enemyStateData->state = MOVING_UP;
       enemyStateData->pauseStart = SDL_GetTicks();
     }
@@ -107,10 +108,12 @@ void enemy1Attack(EnemyStateData *enemyStateData, Perso *perso, Map *map) {
   int intervalAttack = 1000;
   if (hitbox_enemy1(perso, map, enemyStateData)){
       if (SDL_GetTicks() - enemyStateData->pauseAttack >= intervalAttack){
-          if (perso->health > 0){
-              perso->health -= 1;
-              enemyStateData->pauseAttack = SDL_GetTicks();
-              /* à mettre effet sonore et animation */
+          if (enemyStateData->state != PAUSE_BOTTOM){
+              if (perso->health > 0){
+                  perso->health -= 1;
+                  enemyStateData->pauseAttack = SDL_GetTicks();
+                  /* à mettre effet sonore et animation */
+              }
           }
       }
   }

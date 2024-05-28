@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_render.h>
 #include "perso.h"
+#define INIT_ENEMYFLECHE(enemy, map, x, y) initEnemyFleche(enemy, (x) * (map)->pix_rect, (y) * (map)->pix_rect)
 
 
 enum EnemyFlecheState{

@@ -146,10 +146,6 @@ int main(int argc, char **argv) {
 
     int running = 1;
 
-    EnemyStateData enemyStateData;
-    initEnemy1(600, 660, &enemyStateData);
-
-
 
     // Initialiser SDL_mixer
     /* if (!initSDL_mixer()) { */
@@ -163,6 +159,102 @@ int main(int argc, char **argv) {
     /*     closeSDL_mixer(); */
     /*     return 1; */
     /* } */
+
+    const char *instructionText = "Instructions:   Appuyez sur Q pour se deplacer a gauche et D pour se deplacer a droite. J pour un dash et Espace pour un saut";
+
+    DialogBoxData instructionBox;
+    initPapirus(&instructionBox, 200, 100);
+    SDL_Color BLACK = {0, 0, 0, 255};
+
+     /////////////////////////////////////////////////////* Les init des ennemis *////////////////////////////////////////////////////////////////////////
+     
+    /////////* Le graph pour A* *///////////:
+    Node **graph = create_graph(map);
+    
+    /////////////////////////////////////////////////////////* Déclaration enemis *///////////////////////////////////////////////////////////////////
+
+    EnemyStateData enemyStateData;
+    EnemyStateData enemyStateData1;
+    EnemyStateData enemyStateData2;
+    EnemyStateData enemyStateData3;
+    EnemyPenduleData enemyPenduleData;
+    EnemyPenduleData enemyPenduleData1;
+    EnemyPenduleData enemyPenduleData2;
+    EnemyBatData enemyBatData;
+    EnemyBatData enemyBatData1;
+    EnemyBatData enemyBatData2;
+    EnemyBatData enemyBatData3;
+    EnemyBatData enemyBatData4;
+    EnemyBatData enemyBatData5;
+    EnemyBatData enemyBatData6;
+    EnemyFlecheData enemyFlecheData;
+    EnemyFlecheData enemyFlecheData1;
+    EnemyFlecheData enemyFlecheData2;
+    EnemyFlecheData enemyFlecheData3;
+    EnemyFlecheData enemyFlecheData4;
+    EnemyFlecheData enemyFlecheData5;
+    EnemyFlecheData enemyFlecheData6;
+    EnemyFlecheData enemyFlecheData7;
+    EnemyFlecheData enemyFlecheData8;
+    EnemyFlecheData enemyFlecheData9;
+    EnemyFlecheData enemyFlecheData10;
+    Enemy3 enemy3;
+    Enemy3 enemy31;
+    Enemy3 enemy32;
+    Enemy3 enemy33;
+    Enemy3 enemy34;
+    Enemy2 enemy2;
+    Enemy2 enemy21;
+
+    //////////////////////////////////////////////////:/* Les fonctions d'init pour chaque *////////////////////////////////////////////////////////:
+
+    INIT_ENEMY1(&enemyStateData, map, 26, 14);
+    INIT_ENEMY1(&enemyStateData1, map, 103, 15);
+    INIT_ENEMY1(&enemyStateData2, map, 118, 15);
+    INIT_ENEMY1(&enemyStateData3, map, 183, 15);
+    INIT_ENEMYPENDULE(&enemyPenduleData, map, 46, 3);
+    INIT_ENEMYPENDULE(&enemyPenduleData1, map, 129, 1);
+    INIT_ENEMYPENDULE(&enemyPenduleData2, map, 169, 1);
+    INIT_ENEMYBAT(&enemyBatData, map, 15, 7, 21);
+    INIT_ENEMYBAT(&enemyBatData1, map, 57, 4, 63);
+    INIT_ENEMYBAT(&enemyBatData2, map, 35, 7, 39);
+    INIT_ENEMYBAT(&enemyBatData2, map, 108, 5, 113);
+    INIT_ENEMYBAT(&enemyBatData3, map, 122, 9, 126);
+    INIT_ENEMYBAT(&enemyBatData4, map, 132, 7, 137);
+    INIT_ENEMYBAT(&enemyBatData5, map, 195, 12, 234);
+    INIT_ENEMYBAT(&enemyBatData6, map, 246, 9, 253);
+    INIT_ENEMYFLECHE(&enemyFlecheData, map, 15, 11);
+    INIT_ENEMYFLECHE(&enemyFlecheData1, map, 40, 12);
+    INIT_ENEMYFLECHE(&enemyFlecheData2, map, 47, 12);
+    INIT_ENEMYFLECHE(&enemyFlecheData3, map, 75, 6);
+    INIT_ENEMYFLECHE(&enemyFlecheData4, map, 97, 6);
+    INIT_ENEMYFLECHE(&enemyFlecheData5, map, 110, 13);
+    INIT_ENEMYFLECHE(&enemyFlecheData6, map, 113, 13);
+    INIT_ENEMYFLECHE(&enemyFlecheData7, map, 166, 13);
+    INIT_ENEMYFLECHE(&enemyFlecheData8, map, 169, 13);
+    INIT_ENEMYFLECHE(&enemyFlecheData9, map, 163, 13);
+    INIT_ENEMYFLECHE(&enemyFlecheData10, map, 255, 5);
+    INIT_ENEMY3(&enemy3, map, 27, 12, 39);
+    INIT_ENEMY3(&enemy31, map, 67, 12, 78);
+    INIT_ENEMY3(&enemy32, map, 141, 14, 146);
+    INIT_ENEMY3(&enemy33, map, 172, 13, 180);
+    INIT_ENEMY3(&enemy34, map, 185, 13, 195);
+    Node *startEnemy2 = &graph[12][77];
+    Node *goalEnemy2 = &graph[14][95];
+    Node *startEnemy21 = &graph[8][231];
+    Node *goalEnemy21 = &graph[14][246];
+    initEnemy2(&enemy2, startEnemy2, goalEnemy2, map);
+    initEnemy2(&enemy21, startEnemy21, goalEnemy21, map);
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////* fin init des ennemis *////////////////////////////////////////////////////////////////////////:
+
 
     loadSounds(sounds);
 
@@ -238,6 +330,143 @@ again :
                         exit(-1);
                     }
                     if (!isBossMap) {
+                         /////////////////////////////////* les mouvements de chaque ennemi *////////////////////////////////////////////////
+                        enemy1_movement(renderer, &enemyStateData, map);
+                        enemy1Attack(&enemyStateData, perso, map);
+                        updatePersoEnemy1(perso, map, &enemyStateData);
+
+                        enemy1_movement(renderer, &enemyStateData1, map);
+                        enemy1Attack(&enemyStateData1, perso, map);
+                        updatePersoEnemy1(perso, map, &enemyStateData1);
+
+                        enemy1_movement(renderer, &enemyStateData2, map);
+                        enemy1Attack(&enemyStateData2, perso, map);
+                        updatePersoEnemy1(perso, map, &enemyStateData2);
+
+                        enemy1_movement(renderer, &enemyStateData3, map);
+                        enemy1Attack(&enemyStateData3, perso, map);
+                        updatePersoEnemy1(perso, map, &enemyStateData3);
+
+
+                        enemy2_follow(renderer, &enemy2, graph, map);
+                        updatePersoEnemy2(perso, map, &enemy2);
+                        enemy2Attack(&enemy2, perso, map);
+
+                        enemy2_follow(renderer, &enemy21, graph, map);
+                        updatePersoEnemy2(perso, map, &enemy21);
+                        enemy2Attack(&enemy21, perso, map);
+
+
+                        enemy3_movement(renderer, &enemy3, map);
+                        updatePersoEnemy3(perso, map, &enemy3);
+                        enemy3Attack(&enemy3, perso, map);
+
+                        enemy3_movement(renderer, &enemy31, map);
+                        updatePersoEnemy3(perso, map, &enemy31);
+                        enemy3Attack(&enemy31, perso, map);
+
+                        enemy3_movement(renderer, &enemy32, map);
+                        updatePersoEnemy3(perso, map, &enemy32);
+                        enemy3Attack(&enemy32, perso, map);
+
+                        enemy3_movement(renderer, &enemy33, map);
+                        updatePersoEnemy3(perso, map, &enemy33);
+                        enemy3Attack(&enemy33, perso, map);
+
+                        enemy3_movement(renderer, &enemy34, map);
+                        updatePersoEnemy3(perso, map, &enemy34);
+                        enemy3Attack(&enemy34, perso, map);
+
+
+
+                        enemyBat_mouvement(renderer, &enemyBatData, map, perso);
+                        batAttack(&enemyBatData, perso, map);
+                        updatePersoEnemyBat(perso, map, &enemyBatData);
+
+                        enemyBat_mouvement(renderer, &enemyBatData1, map, perso);
+                        batAttack(&enemyBatData1, perso, map);
+                        updatePersoEnemyBat(perso, map, &enemyBatData1);
+
+                        enemyBat_mouvement(renderer, &enemyBatData2, map, perso);
+                        batAttack(&enemyBatData2, perso, map);
+                        updatePersoEnemyBat(perso, map, &enemyBatData2);
+
+                        enemyBat_mouvement(renderer, &enemyBatData3, map, perso);
+                        batAttack(&enemyBatData3, perso, map);
+                        updatePersoEnemyBat(perso, map, &enemyBatData3);
+
+                        enemyBat_mouvement(renderer, &enemyBatData4, map, perso);
+                        batAttack(&enemyBatData4, perso, map);
+                        updatePersoEnemyBat(perso, map, &enemyBatData4);
+
+                        enemyBat_mouvement(renderer, &enemyBatData5, map, perso);
+                        batAttack(&enemyBatData5, perso, map);
+                        updatePersoEnemyBat(perso, map, &enemyBatData5);
+
+                        enemyBat_mouvement(renderer, &enemyBatData6, map, perso);
+                        batAttack(&enemyBatData6, perso, map);
+                        updatePersoEnemyBat(perso, map, &enemyBatData6);
+
+
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData);
+                        flecheAttack(&enemyFlecheData, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData1, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData1);
+                        flecheAttack(&enemyFlecheData1, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData2, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData2);
+                        flecheAttack(&enemyFlecheData2, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData3, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData3);
+                        flecheAttack(&enemyFlecheData3, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData4, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData4);
+                        flecheAttack(&enemyFlecheData4, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData5, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData5);
+                        flecheAttack(&enemyFlecheData5, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData6, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData6);
+                        flecheAttack(&enemyFlecheData6, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData7, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData7);
+                        flecheAttack(&enemyFlecheData7, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData8, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData8);
+                        flecheAttack(&enemyFlecheData8, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData9, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData9);
+                        flecheAttack(&enemyFlecheData9, perso, map);
+
+                        enemyFleche_mouvement(renderer, &enemyFlecheData10, map);
+                        updatePersoEnemyFleche(perso, map, &enemyFlecheData10);
+                        flecheAttack(&enemyFlecheData10, perso, map);
+
+
+
+                        enemyPendule_mouvement(renderer, &enemyPenduleData, map);
+                        penduleAttack(&enemyPenduleData, perso, map);
+
+                        enemyPendule_mouvement(renderer, &enemyPenduleData1, map);
+                        penduleAttack(&enemyPenduleData1, perso, map);
+
+                        enemyPendule_mouvement(renderer, &enemyPenduleData2, map);
+                        penduleAttack(&enemyPenduleData2, perso, map);
+
+
+                        render_text(renderer, instructionText, BLACK, &instructionBox, map);
+                        //////////////////////////////* fin mouvements de chaque ennemi *////////////////////////////////////////////////
                     }
                     if (isBossMap) {
                         displayBoss(renderer, boss, map);
