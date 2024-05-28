@@ -21,14 +21,14 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
     SDL_Rect dst_rect2Ex = {enemyBatData->dst_rectAttack.x - map->x_cam - 25, enemyBatData->dst_rectAttack.y, 64*2, enemyBatData->dst_rectAttack.h};
     int pauseInterval = 1000;
 
-    /* int channel = Mix_PlayChannel(-1, musicEnemyBat, 2); */
+    /* int channel = Mix_PlayChannel(-2, musicEnemyBat, 2); */
     /* double distance = sqrt(pow(perso->x * map->pix_rect - enemyBatData->dst_rect.x, 2) + */
     /*                    pow(perso->y * map->pix_rect - enemyBatData->dst_rect.y, 2)); */
 
     /* if (distance > MAX_HEARING_DISTANCE) { */
     /*     Mix_Volume(channel, MIN_VOLUME); */
     /* } else { */
-    /*     double attenuation = 5.0 / (distance - 100); */ 
+    /*     double attenuation = 10.0 / (distance - 100); */ 
     /*     int volume = (int)(MAX_VOLUME * attenuation); */
     /*     Mix_Volume(channel, volume); */
     /*     printf("Adjusting volume to %d on channel %d based on distance %f\n", volume, channel, distance); */
@@ -96,11 +96,11 @@ void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map 
 
 int hitbox_enemyBat(Perso *perso, Map *map, EnemyBatData *enemy) {
     SDL_Rect enemyHitbox = enemy->dst_rect;
-    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
-    enemyHitbox.x -= margin;
-    enemyHitbox.y -= margin;
-    enemyHitbox.w += 1 * margin;
-    enemyHitbox.h += 1 * margin;
+    int margin = 40;
+    enemyHitbox.x += margin;
+    enemyHitbox.y += margin;
+    enemyHitbox.w -= 2*margin;
+    enemyHitbox.h -= 2*margin;
     SDL_Rect intersection;
     if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
         return 1;
@@ -133,7 +133,7 @@ void updatePersoEnemyBat(Perso *perso, Map *map, EnemyBatData *enemy){
 }
 
 
-void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal, Node *start, Map *map){
+void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax){
 
     enemyBatData->src_rect.x = 0; 
     enemyBatData->src_rect.y = 0; 
@@ -163,19 +163,6 @@ void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal
     enemyBatData->dst_rectAttack.y = y;
     enemyBatData->dst_rectAttack.w = 64*2;
     enemyBatData->dst_rectAttack.h = 64*2;
-
-    
-    if (goal != NULL) {
-        enemyBatData->goal = goal;
-    } else {
-        enemyBatData->goal = NULL;
-    }
-
-    if (start != NULL) {
-        enemyBatData->start = start;
-    } else {
-        enemyBatData->start = NULL;
-    }
 
 }
 

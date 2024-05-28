@@ -6,10 +6,7 @@
 #include <SDL2/SDL_render.h>
 #include "graph.h"
 #include "music.h"
-
-#define INIT_ENEMY_BAT(enemy, map, x, y, x_max, goal, start) \
-    initEnemyBat(enemy, (x) * (map)->pix_rect, (y) * (map)->pix_rect, \
-                 (x_max) * (map)->pix_rect, goal, start, map)
+#define INIT_ENEMYBAT(enemy, map, x, y, xMax) initEnemyBat(enemy, (x) * (map)->pix_rect, (y) * (map)->pix_rect, (xMax) * (map)->pix_rect)
 
 
 enum EnemyBatState{
@@ -45,7 +42,7 @@ void move_enemy_to_node(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node
 void follow_path(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node path[MAX_NODES], Map *map, Perso *perso);
 void follow_path2(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **graph, Map *map, Perso *perso);
 void enemyBat_follow(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Node **graph, Map *map, Perso *perso);
-void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal, Node *start, Map *map);
 int hitbox_enemyBat(Perso *perso, Map *map, EnemyBatData *enemy);
 void updatePersoEnemyBat(Perso *perso, Map *map, EnemyBatData *enemy);
+void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax);
 #endif
