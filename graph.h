@@ -37,4 +37,5 @@ void invert_array(Node arr[], int n);
 Node* invert_node_array(const Node *array, int length);
 void free_graph(Node **graph, Map *map);
 Node* get_nearest_walkable_neighbor(Node** graph, Map *map, int xPos, int yPos);
+void destroy_graph(Node **graph, Map *map);
 #endif

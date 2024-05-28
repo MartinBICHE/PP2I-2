@@ -13,13 +13,11 @@
 
 void enemyBat_mouvement(SDL_Renderer *renderer, EnemyBatData *enemyBatData, Map *map, Perso *perso) {
     int interval = 130;
-    int intervalAttack = 1000;
     int speed = 20;
     double position_tolerance = 20;
     SDL_Rect dst_rect = {enemyBatData->dst_rect.x - map->x_cam, enemyBatData->dst_rect.y, enemyBatData->dst_rect.w, enemyBatData->dst_rect.h};
     SDL_Rect dst_rect2 = {enemyBatData->dst_rectAttack.x - map->x_cam, enemyBatData->dst_rectAttack.y, 64*2, enemyBatData->dst_rectAttack.h};
     SDL_Rect dst_rect2Ex = {enemyBatData->dst_rectAttack.x - map->x_cam - 25, enemyBatData->dst_rectAttack.y, 64*2, enemyBatData->dst_rectAttack.h};
-    int pauseInterval = 1000;
 
     /* int channel = Mix_PlayChannel(-2, musicEnemyBat, 2); */
     /* double distance = sqrt(pow(perso->x * map->pix_rect - enemyBatData->dst_rect.x, 2) + */
@@ -169,7 +167,6 @@ void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax){
 
 void batAttack(EnemyBatData *enemyBatData, Perso *perso, Map *map){
     int intervalAttack = 1000;
-    int spriteLength = 64;
 
     if (enemyBatData->state != BAT_ATTACK){
         enemyBatData->previousState = enemyBatData->state;

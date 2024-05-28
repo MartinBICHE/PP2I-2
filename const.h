@@ -166,5 +166,4 @@ typedef struct {
 } Projectile;
 
 extern Projectile projectiles[MAX_PROJECTILES]; // Tableau pour stocker les projectiles actifs
-
 #endif

@@ -79,7 +79,7 @@ void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map
         }
         enemy->pauseStartBits = SDL_GetTicks();
     }
-    /* free(path); */
+    free(path);
 }
 
 

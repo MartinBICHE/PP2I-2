@@ -82,7 +82,7 @@ void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *m
     TTF_Quit();
     free(perso);
     SDL_DestroyWindow(*window);
-    destroyMap(map);
+    /* destroyMap(map); */
     free_music();
     Mix_HaltMusic();
     Mix_CloseAudio();

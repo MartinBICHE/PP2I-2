@@ -138,6 +138,11 @@ int main(int argc, char **argv) {
     loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
     // loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
 
+    const char *instructionText = "Instructions:   Appuyez sur Q pour se deplacer a gauche et D pour se deplacer a droite. J pour un dash et Espace pour un saut";
+
+    DialogBoxData instructionBox;
+    initPapirus(&instructionBox, 200, 100);
+    SDL_Color BLACK = {0, 0, 0, 255};
 
 
      /////////////////////////////////////////////////////* Les init des ennemis *////////////////////////////////////////////////////////////////////////
@@ -229,19 +234,6 @@ int main(int argc, char **argv) {
 
     ///////////////////////////////////////////////////* fin init des ennemis *////////////////////////////////////////////////////////////////////////:
 
-
-    // Initialiser SDL_mixer
-    /* if (!initSDL_mixer()) { */
-    /*     SDL_Log("Erreur lors de l'initialisation de SDL_mixer."); */
-    /*     return 1; */
-    /* } */
-
-    /* // Charger la musique */
-    /* if (!loadMusic()) { */
-    /*     SDL_Log("Erreur lors du chargement de la musique."); */
-    /*     closeSDL_mixer(); */
-    /*     return 1; */
-    /* } */
 
     loadSounds(sounds);
 
@@ -342,12 +334,6 @@ again :
                         updatePersoEnemy2(perso, map, &enemy21);
                         enemy2Attack(&enemy21, perso, map);
 
-                        SDL_Rect enemyHitbox = enemyPenduleData.dst_rect;
-                        int margin = 40;
-                        enemyHitbox.w -= 3*margin;
-                        enemyHitbox.h -= 2*margin;
-                        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); 
-                        SDL_RenderDrawRect(renderer, &enemyHitbox);
 
                         enemy3_movement(renderer, &enemy3, map);
                         updatePersoEnemy3(perso, map, &enemy3);
@@ -455,11 +441,9 @@ again :
 
                         enemyPendule_mouvement(renderer, &enemyPenduleData2, map);
                         penduleAttack(&enemyPenduleData2, perso, map);
-                        /* SDL_Rect dst_rect = {300, 300, 64, 64}; */
-                        /* SDL_Rect src_rect = {0, 0, 64, 64}; */
-                        /* SDL_RenderCopy(renderer, textureBat, &src_rect, &dst_rect); */
-                        /* projectile_mouvement(renderer, &projectile, map); */
-                        /* attack_mouvement(renderer, &attack, map); */
+
+
+                        render_text(renderer, instructionText, BLACK, &instructionBox, map);
                         //////////////////////////////* fin mouvements de chaque ennemi *////////////////////////////////////////////////
 
                     }
@@ -523,6 +507,8 @@ again :
     free(boss);
 	free(nullAttack1);
     free(nullAttack2);
+    destroy_graph(graph, map);
+    destroyMap(map);
 	free(attack1);
 	free(attack2);
 	free(attack3);
@@ -532,7 +518,6 @@ again :
     free(playerInFight);
 	free(bossDeath);
     cleanupProjectiles();
-    /* closeSDL_mixer(); */
     atexit(SDL_Quit);
     return 0;
     
