@@ -16,7 +16,7 @@
 
 void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map){
     int interval = 130;   
-    int speed = 10;      
+    int speed = 30;      
       Node *path;
     if (enemy->state == EYE_MOVING_RIGHT) {
         path = a_star(graph, map, enemy->goal, enemy->start);
@@ -44,7 +44,7 @@ void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map
 
     if (SDL_GetTicks() - enemy->pauseStartBits >= interval) {
         if (enemy->state == EYE_MOVING_RIGHT) {
-            if (enemy->dst_rect.x / map->pix_rect >= enemy->goal->x ) {
+            if (enemy->dst_rect.x >= enemy->goal->x * map->pix_rect) {
                 enemy->state = EYE_MOVING_LEFT;
             }
             if (abs(dx) >= speed) {
@@ -58,7 +58,7 @@ void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map
                 enemy->dst_rect.y = path[i].y * map->pix_rect;
             }
         } else if (enemy->state == EYE_MOVING_LEFT) {
-            if (enemy->dst_rect.x / map->pix_rect <= enemy->start->x){
+            if (enemy->dst_rect.x <= enemy->start->x * map->pix_rect){
                 enemy->state = EYE_MOVING_RIGHT;
             }
             if (abs(dx) >= speed) {
@@ -118,11 +118,6 @@ void enemy2Attack(Enemy2 *enemy, Perso *perso, Map *map) {
 
 int hitbox_enemy2(Perso *perso, Map *map, Enemy2 *enemy) {
     SDL_Rect enemyHitbox = enemy->dst_rect;
-    int margin = 30; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
-    enemyHitbox.x -= margin;
-    enemyHitbox.y -= margin;
-    enemyHitbox.w += round(1.0 * margin);
-    enemyHitbox.h += round(1.0 * margin);
     SDL_Rect intersection;
     if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
         return 1;
