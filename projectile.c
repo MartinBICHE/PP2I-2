@@ -221,7 +221,7 @@ void resetProjectiles(void) {
     }
 }
 
-void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, EnemyStateData *enemyStateData, Map *map){
+void projectile_mouvement_enemy2(SDL_Renderer *renderer, ProjectileData *projectile, Enemy2 *enemy2, Map *map){
     if (!projectile->distance_attack_active) return;
 
     int interval = 100;
@@ -242,9 +242,9 @@ void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, En
         //projectile->distance_attack_active = 0;
     } */
     projectile->dst_rect.x += projectile->dirX * speed;
-    if (hitbox_projectile_enemy(projectile, enemyStateData)) {
+    if (hitbox_projectile_enemy2(projectile, enemy2)) {
         projectile->distance_attack_active = 0;
-        enemyStateData->health -= 1;
+        enemy2->health -= 1;
     }
     SDL_RenderCopy(renderer, textureProjectile, &projectile->src_rect, &dst_rect);
 }
@@ -264,9 +264,9 @@ void initProjectile(int x, int y, int dirX, ProjectileData *projectile){
     projectile->dirX = dirX;
 }
 
-int hitbox_projectile_enemy(ProjectileData *projectile, EnemyStateData *enemyStateData) {
+int hitbox_projectile_enemy2(ProjectileData *projectile, Enemy2 *enemy2) {
     SDL_Rect projectileHitbox = projectile->dst_rect;
-    SDL_Rect enemyHitbox = enemyStateData->dst_rect;
+    SDL_Rect enemyHitbox = enemy2->dst_rect;
     SDL_Rect intersection;
     if (SDL_IntersectRect(&projectileHitbox, &enemyHitbox, &intersection)) {
         return 1;

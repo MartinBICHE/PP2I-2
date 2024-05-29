@@ -164,6 +164,8 @@ void initEnemyBat(EnemyBatData *enemyBatData, int x, int y, int xMax, Node *goal
     enemyBatData->dst_rectAttack.w = 64*2;
     enemyBatData->dst_rectAttack.h = 64*2;
 
+    enemyBatData->health = 3;
+
     
     if (goal != NULL) {
         enemyBatData->goal = goal;

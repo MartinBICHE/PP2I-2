@@ -38,6 +38,7 @@ void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax){
     enemy->dx = 1;
     enemy->pauseAttack = 0;
     enemy->pauseBits = 0;
+    enemy->health = 3;
 }
 
 int hitbox_enemy3(Perso *perso, Map *map, Enemy3 *enemy) {

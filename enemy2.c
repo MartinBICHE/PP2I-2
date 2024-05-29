@@ -101,6 +101,7 @@ void initEnemy2(Enemy2 *enemy, Node *start, Node *goal, Map *map){
     enemy->start = start;
     enemy->goal = goal;
     enemy->pauseAttack = 0;
+    enemy->health = 3;
 }
 
 void enemy2Attack(Enemy2 *enemy, Perso *perso, Map *map) {

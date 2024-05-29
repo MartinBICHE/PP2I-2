@@ -30,7 +30,7 @@ struct _ProjectileData{
 };
 typedef struct _ProjectileData ProjectileData;
 void initProjectile(int x, int y, int dirX, ProjectileData *projectile);
-void projectile_mouvement(SDL_Renderer *renderer, ProjectileData *projectile, EnemyStateData *enemyStateData, Map *map);
-int hitbox_projectile_enemy(ProjectileData *projectile, EnemyStateData *enemyStateData);
+void projectile_mouvement_enemy2(SDL_Renderer *renderer, ProjectileData *projectile, Enemy2 *enemy2, Map *map);
+int hitbox_projectile_enemy2(ProjectileData *projectile, Enemy2 *enemy2);
 
 #endif /* PROJECTILE_H */

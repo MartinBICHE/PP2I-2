@@ -30,6 +30,7 @@ struct _Enemy3{
     Uint32 pauseMusic;
     Uint32 pauseBits;
     enum Enemy3State previousState;
+    int health;
 };
 typedef struct _Enemy3 Enemy3;
 void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax);

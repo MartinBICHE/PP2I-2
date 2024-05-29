@@ -33,6 +33,7 @@ struct _EnemyBatData{
     Node *goal;
     Node *start;
     Node *path;
+    int health;
 
     enum EnemyBatState previousState;
 };

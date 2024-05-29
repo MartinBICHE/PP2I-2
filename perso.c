@@ -278,7 +278,7 @@ int hitbox_right(Perso *perso, Map *map) {
     return 0;
 }
 
-int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
+/* int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
     SDL_Rect enemyHitbox = enemyStateData->dst_rect;
     int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
     enemyHitbox.x -= margin;
@@ -290,7 +290,7 @@ int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
         return 1;
     }
     return 0;
-}
+} */
 
 
 float max(float a, float b) {
@@ -317,29 +317,29 @@ void jump(Perso *perso, Map *map) {
 }
 
 
-void persoAttack(Perso *perso, EnemyStateData *enemyStateData) {
+void persoAttackEnemy2(Perso *perso, Enemy2 *enemy2) {
     SDL_Rect attackHitbox = perso->hitbox;
     int attackRange = 20; // Portée de l'attaque
     attackHitbox.x += perso->facing * attackRange;
     SDL_Rect intersection;
-    if (SDL_IntersectRect(&attackHitbox, &enemyStateData->dst_rect, &intersection)) {
+    if (SDL_IntersectRect(&attackHitbox, &enemy2->dst_rect, &intersection)) {
         static int i = 0;
         printf("Attaque %d\n", i++);
-        printf("Santé ennemi : %d\n", enemyStateData->health);
-        enemyStateData->health -= 1; // Infliger 1 point de dégât
-        printf("Santé ennemi : %d\n", enemyStateData->health);
-        if (enemyStateData->health <= 0) {
+        printf("Santé ennemi : %d\n", enemy2->health);
+        enemy2->health -= 1; // Infliger 1 point de dégât
+        printf("Santé ennemi : %d\n", enemy2->health);
+        if (enemy2->health <= 0) {
             // Faire disparaître l'ennemi, par exemple en le déplaçant hors de l'écran
-            enemyStateData->dst_rect.x = -1000;
-            enemyStateData->dst_rect.y = -1000;
+            enemy2->dst_rect.x = -1000;
+            enemy2->dst_rect.y = -1000;
         }
     }
 }
 
-void distanceAttack(Perso *perso, EnemyStateData *enemyStateData, Map *map, ProjectileData *projectile) {
+void distanceAttackEnemy2(Perso *perso, Enemy2 *enemy2, Map *map, ProjectileData *projectile) {
     int attack_range = 300; // Portée de l'attaque à distance
-    float dx = (perso->x * map->pix_rect) - enemyStateData->dst_rect.x;
-    float dy = (perso->y * map->pix_rect) - enemyStateData->dst_rect.y;
+    float dx = (perso->x * map->pix_rect) - enemy2->dst_rect.x;
+    float dy = (perso->y * map->pix_rect) - enemy2->dst_rect.y;
     float distance = sqrt(dx * dx + dy * dy);
     if (distance <= attack_range) {
         // L'ennemi est dans la portée d'attaque à distance
@@ -349,10 +349,48 @@ void distanceAttack(Perso *perso, EnemyStateData *enemyStateData, Map *map, Proj
         static int j = 0;
         printf("Attaque à distance %d\n", j++);
         //enemyStateData->health -= 1; // Infliger 1 point de dégât
-        if (enemyStateData->health <= 0) {
+        if (enemy2->health <= 0) {
             // Faire disparaître l'ennemi, par exemple en le déplaçant hors de l'écran
-            enemyStateData->dst_rect.x = -1000;
-            enemyStateData->dst_rect.y = -1000;
+            enemy2->dst_rect.x = -1000;
+            enemy2->dst_rect.y = -1000;
+        }
+    }
+}
+
+void persoAttackEnemy3(Perso *perso, Enemy3 *enemy3) {
+    SDL_Rect attackHitbox = perso->hitbox;
+    int attackRange = 20; // Portée de l'attaque
+    attackHitbox.x += perso->facing * attackRange;
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&attackHitbox, &enemy3->dst_rect, &intersection)) {
+        static int i = 0;
+        printf("Attaque %d\n", i++);
+        printf("Santé ennemi : %d\n", enemy3->health);
+        enemy3->health -= 1; // Infliger 1 point de dégât
+        printf("Santé ennemi : %d\n", enemy3->health);
+        if (enemy3->health <= 0) {
+            // Faire disparaître l'ennemi, par exemple en le déplaçant hors de l'écran
+            enemy3->dst_rect.x = -1000;
+            enemy3->dst_rect.y = -1000;
+        }
+    }
+}
+
+void persoAttackBat(Perso *perso, EnemyBatData *enemyBatData) {
+    SDL_Rect attackHitbox = perso->hitbox;
+    int attackRange = 20; // Portée de l'attaque
+    attackHitbox.x += perso->facing * attackRange;
+    SDL_Rect intersection;
+    if (SDL_IntersectRect(&attackHitbox, &enemyBatData->dst_rect, &intersection)) {
+        static int i = 0;
+        printf("Attaque %d\n", i++);
+        printf("Santé ennemi : %d\n", enemyBatData->health);
+        enemyBatData->health -= 1; // Infliger 1 point de dégât
+        printf("Santé ennemi : %d\n", enemyBatData->health);
+        if (enemyBatData->health <= 0) {
+            // Faire disparaître l'ennemi, par exemple en le déplaçant hors de l'écran
+            enemyBatData->dst_rect.x = -1000;
+            enemyBatData->dst_rect.y = -1000;
         }
     }
 }
@@ -404,7 +442,7 @@ void updatePersoDashing(Perso *perso, Map *map) {
 }
 
 
-void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const Uint8 *state, Mix_Chunk **sounds, AttackData *attack, ProjectileData *projectile) {
+void updatePerso(Perso *perso, Map *map, Enemy2 *enemy2, Enemy3 *enemy3, EnemyBatData *enemyBatData, const Uint8 *state, Mix_Chunk **sounds, AttackData *attack, ProjectileData *projectile) {
     perso->jump_delay = max(perso->jump_delay - 1, 0);
     perso->dash_duration = max(perso->dash_duration - 1, 0);
     perso->dash_delay = max(perso->dash_delay - 1, 0);
@@ -442,33 +480,21 @@ void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData, const U
         }
         if (state[SDL_SCANCODE_K] && !attack->attack_active) {
             if (SDL_GetTicks() - attack->last_attack > 500) {
-                persoAttack(perso, enemyStateData);
-                // Marquer que la touche K a été pressée dans cette frame
-                //k_pressed_this_frame = 1;
+                persoAttackEnemy2(perso, enemy2);
+                persoAttackEnemy3(perso, enemy3);
+                persoAttackBat(perso, enemyBatData);
                 attack->attack_active = 1;
                 attack->last_attack = SDL_GetTicks();
             }
         }
-        // Réinitialiser la variable locale si la touche K est relâchée
         if (!state[SDL_SCANCODE_K]) {
-            //k_pressed_this_frame = 0;
-            //attack->attack_active = 0;
             initAttackAnimation(perso->x*map->pix_rect+10, perso->y*map->pix_rect - 50, attack);
         }
         if (state[SDL_SCANCODE_L] && !projectile->distance_attack_active) {
             if (SDL_GetTicks() - projectile->last_distance_attack > 500) {
-                distanceAttack(perso, enemyStateData, map, projectile);
-                // Marquer que la touche L a été pressée dans cette frame
-                //l_pressed_this_frame = 1;
-                /* projectile->last_distance_attack = SDL_GetTicks();
-                initProjectile(perso->x*map->pix_rect+10, perso->y*map->pix_rect - 50, perso->facing, projectile);
-                projectile->distance_attack_active = 1; */
+                distanceAttackEnemy2(perso, enemy2, map, projectile);
+                distanceAttackBat(perso, enemyBatData, map, projectile);
             }
-        }
-        // Réinitialiser la variable locale si la touche L est relâchée
-        if (!state[SDL_SCANCODE_L]) {
-            //l_pressed_this_frame = 0;
-            //initProjectile(perso->x*map->pix_rect+10, perso->y*map->pix_rect - 50, perso->facing, projectile);
         }
 
         int i = floor(perso->y);

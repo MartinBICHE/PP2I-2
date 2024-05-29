@@ -8,11 +8,11 @@
 #include "fight.h"
 
 
-void game(EnemyStateData enemyStateData, Boss *boss, Map *map, Perso *perso, const Uint8 *state, Mix_Chunk **sounds, AttackData *attackData, ProjectileData *projectile) {
+void game(Enemy2 enemy2, Enemy3 enemy3, EnemyBatData enemyBatData, Boss *boss, Map *map, Perso *perso, const Uint8 *state, Mix_Chunk **sounds, AttackData *attackData, ProjectileData *projectile) {
     if (!afficherImage && !isBossMap) {
         perso->vx = 0;
         updateCam(perso, map);
-        updatePerso(perso, map, &enemyStateData, state, sounds, attackData, projectile);
+        updatePerso(perso, map, &enemy2, &enemy3, &enemyBatData, state, sounds, attackData, projectile);
     }
 
     if (afficherImage && isBossMap) {
@@ -37,7 +37,7 @@ void game(EnemyStateData enemyStateData, Boss *boss, Map *map, Perso *perso, con
             totalPauseDuration = 0;
         }
 
-        updatePerso(perso, map, &enemyStateData, state, sounds, attackData, projectile);
+        updatePerso(perso, map, &enemy2, &enemy3, &enemyBatData, state, sounds, attackData, projectile);
         if (currentTime1 - lastBossMoveTime >= BOSS_MOVE_INTERVAL) {
             updateBoss(boss, map);
             lastBossMoveTime = currentTime1;
