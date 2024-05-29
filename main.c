@@ -173,6 +173,7 @@ int main(int argc, char **argv) {
     
     /////////////////////////////////////////////////////////* Déclaration enemis *///////////////////////////////////////////////////////////////////
 
+
     EnemyStateData enemyStateData;
     EnemyStateData enemyStateData1;
     EnemyStateData enemyStateData2;
@@ -516,7 +517,9 @@ again :
             }
         }
     }
+    destroy_graph(graph, map);
     quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
+    destroyMap(map2);
 	free(attack1);
 	free(attack2);
 	free(attack3);
