@@ -492,6 +492,10 @@ again :
                             renderStatusBoss(renderer,boss);
                         }
                     }
+                    if (isBossMap && boss->health <= 0) {
+                        perso->health = 0;
+                        goto again;
+                    }
                     if (!afficherImage && !parametre && !gameplay2) {
                         renderStatusHealth(renderer,perso); 
                     }
