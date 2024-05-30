@@ -51,11 +51,12 @@ SDL_Event e;
 SDL_Texture *bgTextures[6];
 Mix_Chunk *sounds[4];
 SDL_Texture *persoTexture;
+SDL_Texture *bossTexture;
 SDL_Texture *scratchTexture;
 SDL_Texture *hitpointTexture;
 SDL_Texture *bgDeathTexture;
 SDL_Texture *tileTextures;
-SDL_Texture* projectileTexture = NULL;
+SDL_Texture *projectileTexture;
 bool showMenu = true;
 bool parametre = false;
 bool afficherImage = false;
@@ -67,15 +68,21 @@ bool quit = false;
 bool running = true;
 float currentGravity = ACC;
 float jumpSpeed = JUMPSPEED;
+float bossMove = BOSS_MOVE_INTERVAL;
+float projectileSpeed = PROJECTILE_SPEED;
 bool showAttentionImage = true;
 bool firstIteration = true;
+bool firstSwicthMusic = true;
+bool gameplay2 = false;
 
 Uint32 lastGravityChange = 0;
 Uint32 lastProjectileLoad = 0;
 Uint32 lastBossMoveTime = 0;
 Uint32 boutonGTime = 0;
 Uint32 currentTime1 = 0;
-
+Uint32 bossAngry1 = 0;
+Uint32 bossAngry2 = 0;
+Uint32 bossAngry3 = 0;
 Uint32 pauseStartTime = 0;
 Uint32 totalPauseDuration = 0;
 
@@ -85,7 +92,12 @@ bool isBossMap = false;
 Projectile projectiles[MAX_PROJECTILES] = {
     {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 1
     {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 2
-    {0.0f, 0.0f, 0.0f, 0.0f, false}  // Projectile 3
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 3
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 4
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 5
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 6
+    {0.0f, 0.0f, 0.0f, 0.0f, false}, // Projectile 7
+    {0.0f, 0.0f, 0.0f, 0.0f, false} // Projectile 8
 };
 
 
@@ -146,6 +158,8 @@ int main(int argc, char **argv) {
 
     int running = 1;
 
+    loadMusicGameplay1();
+    loadMusicGameplay2();
 
     // Initialiser SDL_mixer
     /* if (!initSDL_mixer()) { */
@@ -247,28 +261,18 @@ int main(int argc, char **argv) {
     initEnemy2(&enemy2, startEnemy2, goalEnemy2, map);
     initEnemy2(&enemy21, startEnemy21, goalEnemy21, map);
 
-
-
-
-
-
-
-
     ///////////////////////////////////////////////////* fin init des ennemis *////////////////////////////////////////////////////////////////////////:
-
 
     loadSounds(sounds);
 
-    // Jouer la musique lorsque le menu s'ouvre
-    playMusic();
-
 again :
-
+    Mix_HaltMusic();
     retourMenu = false;
     startGame = false;
     prevShowMenu = true;
     if (perso -> health == 0) {
         resetGame(&window, &renderer, &map2, &mapBoss, &perso, &boss);
+        currentGravity = ACC;
         map = map2;
     }
     // Boucle principale du menu
@@ -281,14 +285,15 @@ again :
                 return -1;
             }
 
+            loadSounds(sounds);
             loadBackgroundTextures(renderer, bgTextures, 5);
             loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
             loadPersoTexture(renderer, &persoTexture, "./asset/spritesheet/ss_mc.png");
+            loadBossTexture(renderer,&bossTexture,"./asset/spritesheet/boss.png");
+            loadProjectileTexture(renderer,&projectileTexture,"./asset/spritesheet/tornade.png");
             initAnimation(scratchAnim, scratchTexture, 2400, 160, 10, 150);
             initAnimation(hitpointAnim, hitpointTexture, 960 ,160, 4, 200);
             initAnimation(bgDeathAnim, bgDeathTexture, 12960,480, 18, 100);
-
-
 
             while (running) {
                 Uint64 start = SDL_GetTicks();
@@ -300,18 +305,25 @@ again :
                     } else if (perso->x > 296) {
                         boutonGTime = SDL_GetTicks();
                         isBossMap = true;
+                        int health = perso -> health;
                         free(perso);
                         map = mapBoss;
                         perso = create_perso(map);
+                        perso -> health = health;
                         lastGravityChange = currentTime1;
                         lastProjectileLoad = currentTime1;
                         lastBossMoveTime = currentTime1;
                     } else if (e.key.keysym.sym == SDLK_p && !afficherImage) {
                         perso -> health = 0;
                     }
+                    }   
+                    if (retourMenu) {
+                        perso -> health = 0;
+                        goto again;
+                    } 
                     
-                }   
-                if (retourMenu) {
+                if (isBossMap && (perso->x > 26.7 || perso->y > 14.94 || perso->x < 1.3 || perso->y < 1)) {
+                    perso->health = 0;
                     goto again;
                 } 
                     
@@ -330,11 +342,13 @@ again :
                         printf("Error drawing the perso");
                         exit(-1);
                     }
-                    if (!isBossMap) {
+                    if (!isBossMap && !afficherImage && !parametre) {
                          /////////////////////////////////* les mouvements de chaque ennemi *////////////////////////////////////////////////
+                        
                         enemy1_movement(renderer, &enemyStateData, map);
                         enemy1Attack(&enemyStateData, perso, map);
                         updatePersoEnemy1(perso, map, &enemyStateData);
+                    
 
                         enemy1_movement(renderer, &enemyStateData1, map);
                         enemy1Attack(&enemyStateData1, perso, map);
@@ -469,31 +483,54 @@ again :
                         render_text(renderer, instructionText, BLACK, &instructionBox, map);
                         //////////////////////////////* fin mouvements de chaque ennemi *////////////////////////////////////////////////
                     }
-                    if (isBossMap) {
-                        displayBoss(renderer, boss, map);
+                    if (isBossMap && boss->health > 0) {
+                        displayBoss(renderer, boss, map,bossTexture,0);
                         if (showAttentionImage) {
                             renderImage(renderer,"./asset/UI/attention.png",(WINWIDTH / 2 - ImageAttentionWidth / 2),(WINHEIGHT / 2 - ImageAttentionHeight / 2), ImageAttentionWidth, ImageAttentionHeight);
                         }
-                        renderProjectiles(renderer);
+                        renderProjectiles(renderer,map);
+                        if (!afficherImage && !parametre) {
+                            renderStatusBoss(renderer,boss);
+                        }
                     }
-                    renderStatusHealth(renderer,perso);
+                    if (!afficherImage && !parametre && !gameplay2) {
+                        renderStatusHealth(renderer,perso); 
+                    }
 
                     if (perso->health == 0) {
                         gameOver(renderer, bgTextures, 5, map, '?');
                     }
                 } else {
+                    gameplay2 = true;
+                    if (firstSwicthMusic) {
+                        Mix_HaltMusic();
+                        firstSwicthMusic = !firstSwicthMusic;
+                        playMusic(gMusic2);
+                    }
+                    isBossMap = false;
                     animateBackground(renderer, bgDeathAnim);
                     game2(renderer, playerInFight, bossDeath, attack1, attack2, attack3, attack4, attack5, attack6,scratchAnim,hitpointAnim);
                     renderStatusHealthFight(renderer,playerInFight);
                     invincibility(playerInFight);
                     if (bossDeath->health <= 0) {
+                        gameplay2 = false;
+                        firstSwicthMusic = !firstSwicthMusic;
                         revive(perso);
+                        firstSwicthMusic = true;
+                        isBossMap = true;
+                        if (firstSwicthMusic) {
+                            Mix_HaltMusic();
+                            firstSwicthMusic = !firstSwicthMusic;
+                            playMusic(gMusic1);
+                        }
                         bossDeath->health = 9;
                         playerInFight->health = 9;
                         bossDeath->phase = 1;
                         resetGameplay2(bossDeath, attack1, attack2, attack3, attack4, attack5, attack6);
                     }
                     if (playerInFight -> health == 0) {
+                        firstSwicthMusic = !firstSwicthMusic;
+                        gameplay2 = false;
                         bossDeath->health = 9;
                         playerInFight->health = 9;
                         bossDeath->phase = 1;
@@ -513,13 +550,11 @@ again :
                 Uint64 end = SDL_GetTicks();
                 float elapsedMS = (end - start);
                 SDL_Delay(fmaxf((1000 * DT - elapsedMS) / 1.0f, 0));
-            
             }
         }
     }
     destroy_graph(graph, map);
     quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
-    destroyMap(map2);
 	free(attack1);
 	free(attack2);
 	free(attack3);
