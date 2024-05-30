@@ -32,8 +32,8 @@ void handleVolumeCursor(SDL_Event *e);
 void drawMenu(SDL_Renderer *renderer);
 void drawMapMenu(SDL_Renderer *renderer);
 void interactionMenu(SDL_Renderer *renderer);
-void interactionPauseJeu(SDL_Renderer *renderer);
-void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **perso, Boss **boss);
-void gameOver1(SDL_Renderer *renderer, SDL_Texture*[], int layer, Map*);
+void interactionPauseJeu(SDL_Renderer *renderer, Map **map2, Map **mapBoss, Perso **perso, Boss **boss);
+void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map2, Map **MapBoss, Perso **perso, Boss **boss);
+void gameOver(SDL_Renderer *renderer, SDL_Texture*[], int layer, Map*, char);
 
 #endif /* MENU_H */

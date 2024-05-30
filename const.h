@@ -145,7 +145,7 @@ typedef struct _AttackFight {
     int y;
     int warning; // Position de l'attaque
     int delay; // Temps avant la prochaine attaque
-    int hitPoint; // Si l'attaque est un point pour infliger des dégats au boss
+    int hitPoint;
 } AttackFight;
 
 typedef struct _bossFight {
@@ -157,6 +157,16 @@ typedef struct _bossFight {
     int attack3Delay;
     int speed;  // Le vitesse d'enchainement des attaques
 } bossFight;
+
+typedef struct _Animation {
+    SDL_Texture* texture;
+    int frameWidth;
+    int frameHeight;
+    int numFrames;
+    int currentFrame;
+    Uint32 frameDuration; // Duration of each frame in milliseconds
+    Uint32 lastFrameTime; // Time when the last frame was rendered
+} Animation;
 
 typedef struct {
     float x; 

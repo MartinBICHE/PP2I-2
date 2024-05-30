@@ -15,7 +15,7 @@
 
 Perso *create_perso(Map*);
 void loadPersoTexture(SDL_Renderer*, SDL_Texture**, char*);
-int display_perso(SDL_Renderer*, Perso*, Map*, SDL_Texture*, int, Mix_Chunk**);
+int display_perso(SDL_Renderer*, Perso*, Map*, SDL_Texture*, SDL_Texture*, int, Mix_Chunk**);
 int hitbox_bottom(Perso*, Map*);
 int hitbox_top(Perso*, Map*);
 int hitbox_left(Perso*, Map*);

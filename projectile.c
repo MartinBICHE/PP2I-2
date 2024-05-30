@@ -168,6 +168,7 @@ void loadProjectileTexture(SDL_Renderer* renderer, SDL_Texture **projectileTextu
 
     SDL_FreeSurface(projectileSurface);
 }
+
 void spawnProjectile(int indice, int startTileX, int startTileY, float targetX, float targetY, Map* map) {
     if (indice < MAX_PROJECTILES) {
         projectiles[indice].x = startTileX * map->pix_rect;

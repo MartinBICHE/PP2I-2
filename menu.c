@@ -293,7 +293,7 @@ void interactionMenu(SDL_Renderer *renderer) {
     drawMenu(renderer);
 }
 
-void interactionPauseJeu(SDL_Renderer *renderer) {
+void interactionPauseJeu(SDL_Renderer *renderer, Map **map2, Map **mapBoss, Perso **perso, Boss **boss) {
     if (e.type == SDL_QUIT) {
         quit = true;
     } else if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
@@ -309,6 +309,7 @@ void interactionPauseJeu(SDL_Renderer *renderer) {
                 toggleMusic();
                 afficherImage = !afficherImage;
                 isBossMap = false;
+                // resetGame(&window, &renderer, map2, mapBoss, perso, boss);
             } else if (mouseX >= (WINWIDTH - ImageParametrePauseWidth) && mouseX <= WINWIDTH &&
                        mouseY >= 0 && mouseY <= ImageParametrePauseHeight) {
                 parametre = !parametre;
@@ -336,13 +337,14 @@ void interactionPauseJeu(SDL_Renderer *renderer) {
     }
 }
 
-void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **perso, Boss **boss) {
+void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map2, Map **mapBoss, Perso **perso, Boss **boss) {
     // Nettoyez les ressources existantes
     cleanupProjectiles();
     freeProjectileTexture();
-    closeSDL_mixer();
+    // closeSDL_mixer();
     free(*perso);
-    destroyMap(*map); 
+    destroyMap(*map2);
+    destroyMap(*mapBoss); 
     free(*boss);
 
     // Réinitialisez les variables globales
@@ -354,27 +356,38 @@ void resetGame(SDL_Window **window, SDL_Renderer **renderer, Map **map, Perso **
     startGame = false;
     prevShowMenu = true;
     musicToggled = false;
-    currentGravity = ACC;
     jumpSpeed = JUMPSPEED;
     showAttentionImage = true;
+
+    lastGravityChange = - boutonGTime;
+    lastProjectileLoad = - boutonGTime;
+    lastBossMoveTime = - boutonGTime;
+    boutonGTime = SDL_GetTicks();
+    currentTime1 = 0;
+    currentTime1 = SDL_GetTicks();
+
+    pauseStartTime = 0;
+    totalPauseDuration = 0;
 
     // Réinitialisez les projectiles
     resetProjectiles();
 
-    // Initialiser la carte, le personnage et le boss en fonction de la valeur de isBossMap
-    if (isBossMap) {
-        *map = initMap("mapBoss1");
-    } else {
-        *map = initMap("map2");
-    }
+    // if (!loadProjectileTexture(renderer,&projectileTexture,"./asset/spritesheet/tornade.png")) {
+    //     SDL_Log("Erreur lors du chargement de la texture du projectile.");
+    //     exit(1);
+    // }
 
-    *perso = create_perso(*map);
+    isBossMap = false;
+    *map2 = initMap("map2");
+    *mapBoss = initMap("mapBoss1");
+    *boss = create_boss(*mapBoss);
+
+    *perso = create_perso(*map2);
 }
 
 
-void gameOver1(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Map *map) { // cette fonction joue une "cinématique" de game over et est joué entre les gameplay 1 et 2 quand le perso meurt
-    printf("game over\n");
-    SDL_Surface *gameOverSurface = IMG_Load("asset/aseprite/Sprite-0002.png");
+void gameOver(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Map *map, char c) { // cette fonction joue une "cinématique" de game over et est joué entre les gameplay 1 et 2 quand le perso meurt
+    SDL_Surface *gameOverSurface = IMG_Load("asset/spritesheet/gameOver.png");
     if (!gameOverSurface){
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init game over surface : %s", SDL_GetError());
 		exit(-1);
@@ -385,8 +398,24 @@ void gameOver1(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Ma
 		exit(-1);
 	}
 
-    int n1 = 60; // nombre de frames de la cinématique
-    SDL_SetRenderDrawColor(renderer, 200, 200, 200, 0);
+    SDL_Surface *markSurface;
+    if (c == '?') {
+        markSurface = IMG_Load("asset/spritesheet/interogation.png");
+    } else {
+        markSurface = IMG_Load("asset/spritesheet/exclamation.png");
+    }
+    
+    if (!markSurface){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init mark surface : %s", SDL_GetError());
+		exit(-1);
+	}
+    SDL_Texture *markTexture = SDL_CreateTextureFromSurface(renderer, markSurface);
+    if (!markTexture){
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in init mark texture : %s", SDL_GetError());
+		exit(-1);
+	}
+
+    int n1 = 120;
     for (int i = 0; i < n1; i++) {
         drawBackground(renderer, bgTextures, layer, map);
         SDL_SetTextureAlphaMod(gameOverTexture, (i*255)/n1);
@@ -394,8 +423,21 @@ void gameOver1(SDL_Renderer * renderer, SDL_Texture *bgTextures[], int layer, Ma
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }
+    
+    int n2 = 120;
+    for (int i = 0; i < n2; i++) {
+        drawBackground(renderer, bgTextures, layer, map);
+        SDL_SetTextureAlphaMod(gameOverTexture, 255 - (i*255)/n1);
+        SDL_RenderCopy(renderer, gameOverTexture, NULL, NULL);
+        SDL_SetTextureAlphaMod(markTexture, (i*255)/n2);
+        SDL_RenderCopy(renderer, markTexture, NULL, NULL);
+        SDL_RenderPresent(renderer);
+        SDL_Delay(16);
+    }
 
 
     SDL_FreeSurface(gameOverSurface);
     SDL_DestroyTexture(gameOverTexture);
+    SDL_FreeSurface(markSurface);
+    SDL_DestroyTexture(markTexture);
 }

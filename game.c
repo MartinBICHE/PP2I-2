@@ -63,6 +63,7 @@ void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const
         }
         updateCam(perso, map);
         if (boss -> health > 0) {
+            printf("currentTime1 : %u \n lastGravityChange : %u \n boutonGtime : %u\n",currentTime1,lastGravityChange,boutonGTime);
             if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL) {
                 changeGravity();
                 lastGravityChange = currentTime1; // Mettre à jour le temps du dernier changement de gravité
@@ -124,7 +125,7 @@ void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const
 }
 
 
-void game2(SDL_Renderer *renderer, PersoFight *playerInFight, bossFight *boss, AttackFight *nullAttack1, AttackFight *nullAttack2, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, AttackFight *attack4, AttackFight *attack5, AttackFight *attack6) {
-    fightBoss(renderer, boss, playerInFight, nullAttack1, nullAttack2, attack1, attack2, attack3, attack4, attack5, attack6);
+void game2(SDL_Renderer *renderer, PersoFight *playerInFight, bossFight *boss, AttackFight *attack1, AttackFight *attack2, AttackFight *attack3, AttackFight *attack4, AttackFight *attack5, AttackFight *attack6, Animation *scratchAnim, Animation *hitpointAnim) {
+    fightBoss(renderer, boss, playerInFight, attack1, attack2, attack3, attack4, attack5, attack6, scratchAnim, hitpointAnim);
     fightMovement(renderer, playerInFight);
 }

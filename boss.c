@@ -238,7 +238,7 @@ void updateBoss(Boss *boss, Map *map) {
         boss->isInvincible = false;
     }
 
-    if (boss -> parcoursIndex >= 20) {
+    if (boss -> currentMove == 20) {
         boss->parcoursIndex = rand() % 8;
         boss -> currentMove = 0;
     }
