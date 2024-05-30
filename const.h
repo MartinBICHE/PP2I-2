@@ -37,6 +37,7 @@ extern float bossMove;
 extern float projectileSpeed;
 extern Mix_Music* gMusic1;
 extern Mix_Music* gMusic2;
+extern bool gameplay2;
 
 #define Image1Width 200
 #define Image1Height 150

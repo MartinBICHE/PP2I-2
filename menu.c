@@ -323,7 +323,7 @@ void interactionPauseJeu(SDL_Renderer *renderer, Map **map2, Map **mapBoss, Pers
     } else if (e.type == SDL_MOUSEMOTION) {
         handleVolumeCursor(&e); // Ajout du gestionnaire de curseur
     } else if (e.type == SDL_KEYUP) {
-        if (e.key.keysym.sym == SDLK_ESCAPE && !afficherImage && !parametre) {
+        if (e.key.keysym.sym == SDLK_ESCAPE && !afficherImage && !parametre && !gameplay2) {
             afficherImage = !afficherImage;
             toggleMusic();
             parametre = false;

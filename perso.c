@@ -97,93 +97,43 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         SDL_Rect src_rect;
         if (currentGravity > 0) {
             if (hitbox_bottom(perso, map)) {
-                if (!afficherImage && !parametre) {
-                    perso->spriteOffset = (perso->spriteOffset + 1) % 24; // 6 frames par sprite, 4 sprites
-                }
+                perso->spriteOffset = (perso->spriteOffset + 1) % 24; // 6 frames par sprite, 4 sprites
                 src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 3*64, .w = 64, .h = 64};
             } else {
-                if (hitbox_top(perso, map)) {
-                    if (!afficherImage && !parametre) {
-                        perso->spriteOffset = (perso->spriteOffset + 1) % 24; // 6 frames par sprite, 4 sprites
-                    }
-                    src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 3*64, .w = 64, .h = 64};
-                } else {
-                    src_rect = (SDL_Rect){.x = 6*64, .y = 2*64, .w = 64, .h = 64};
-                }
-            }
-
-            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
-                exit(-1);
-            }
-
-            if (perso->dash_duration <= 4) {
-                SDL_Rect dst_rect1 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - 3*offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - centrage, .w = c, .h = c}; // rémanence très loin derrière
-                SDL_SetTextureAlphaMod(persoTexture, 63);
-                if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect1, angle, NULL, flip)) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
-                    exit(-1);
-                }
-            }
-
-            if (perso->dash_duration <= 7) {
-                SDL_Rect dst_rect2 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - 2*offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - centrage, .w = c, .h = c}; // rémanence loin derrière
-                SDL_SetTextureAlphaMod(persoTexture, 95);
-                if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect2, angle, NULL, flip)) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
-                    exit(-1);
-                }
-            }
-
-            SDL_Rect dst_rect3 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - centrage, .w = c, .h = c}; // rémanence proche derrière
-            SDL_SetTextureAlphaMod(persoTexture, 159);
-            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect3, angle, NULL, flip)) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
-                exit(-1);
-            }
-
-            SDL_SetTextureAlphaMod(persoTexture, 255);
-        
-        } else if (perso->vy != 0) {
-            if (!afficherImage && !parametre) {
-                perso->spriteOffset = (perso->spriteOffset + 1) % 42; // 6 frames par sprite, 7 sprites
-            }
-            SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 2*64, .w = 64, .h = 64};
-            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
-                exit(-1);
-            }
-        } else if (perso->vx != 0) {
-            if (!afficherImage && !parametre) {
-                perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
-            }
-            SDL_Rect src_rect;
-            if (currentGravity > 0) {
-                src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
-            } else {
-                src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
-            }
-            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
-                exit(-1);
+                src_rect = (SDL_Rect){.x = 6*64, .y = 2*64, .w = 64, .h = 64};
             }
         } else {
-            if (!afficherImage && !parametre) {
-                perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
+            if (hitbox_top(perso, map)) {
+                perso->spriteOffset = (perso->spriteOffset + 1) % 24; // 6 frames par sprite, 4 sprites
+                src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 3*64, .w = 64, .h = 64};
+            } else {
+                src_rect = (SDL_Rect){.x = 6*64, .y = 2*64, .w = 64, .h = 64};
             }
-            SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 0, .w = 64, .h = 64};
-            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
+        }
+
+        if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
+            exit(-1);
+        }
+
+        if (perso->dash_duration <= 4) {
+            SDL_Rect dst_rect1 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - 3*offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - centrage, .w = c, .h = c}; // rémanence très loin derrière
+            SDL_SetTextureAlphaMod(persoTexture, 63);
+            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect1, angle, NULL, flip)) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
                 exit(-1);
             }
         }
 
-        if (showHitbox) {
-            if (display_perso_hitbox(renderer, perso, map)) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in display perso hitbox: %s", SDL_GetError());
+        if (perso->dash_duration <= 7) {
+            SDL_Rect dst_rect2 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - 2*offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - centrage, .w = c, .h = c}; // rémanence loin derrière
+            SDL_SetTextureAlphaMod(persoTexture, 95);
+            if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect2, angle, NULL, flip)) {
+                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
                 exit(-1);
             }
         }
+
         SDL_Rect dst_rect3 = {.x = perso->x*map->pix_rect - map->x_cam - c/2 - offset*perso->facing, .y = perso->y*map->pix_rect - c/2 - centrage, .w = c, .h = c}; // rémanence proche derrière
         SDL_SetTextureAlphaMod(persoTexture, 159);
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect3, angle, NULL, flip)) {
@@ -193,9 +143,7 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
 
         SDL_SetTextureAlphaMod(persoTexture, 255);
     } else if (perso->vy != 0) { // perso en train de sauter
-        if (!afficherImage && !parametre) {
         perso->spriteOffset = (perso->spriteOffset + 1) % 42; // 6 frames par sprite, 7 sprites
-        }
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 2*64, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
@@ -216,9 +164,7 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
                 exit(-1);
             }
         }
-        if (!afficherImage && !parametre) {
-            perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
-        }
+        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
         SDL_Rect src_rect;
             src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
@@ -226,9 +172,7 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
             exit(-1);
         }
     } else { // perso immobile
-        if (!afficherImage && !parametre) {
-            perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
-        }
+        perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 sprites
         SDL_Rect src_rect = {.x = (perso->spriteOffset/6)*64, .y = 0, .w = 64, .h = 64};
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
@@ -254,8 +198,6 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
 
     return 0;
 }
-
-
 
 
 int hitbox_top(Perso *perso, Map *map) {
