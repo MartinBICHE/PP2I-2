@@ -367,7 +367,7 @@ void updatePersoDashing(Perso *perso, Map *map) {
     updateHitbox(perso, map);
 }
 
-void updatePerso(Perso *perso, Map *map, EnemyStateData *enemyStateData,Boss* boss, const Uint8 *state, Mix_Chunk **sounds) {
+void updatePerso(Perso *perso, Map *map, Boss* boss, const Uint8 *state, Mix_Chunk **sounds) {
     perso->jump_delay = max(perso->jump_delay - 1, 0);
     perso->dash_duration = max(perso->dash_duration - 1, 0);
     perso->dash_delay = max(perso->dash_delay - 1, 0);

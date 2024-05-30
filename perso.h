@@ -26,7 +26,7 @@ float max(float, float);
 float min(float, float);
 void updatePersoDashing(Perso *perso, Map *map);
 void updateHitbox(Perso*, Map*);
-void updatePerso(Perso*, Map*, EnemyStateData*,Boss*, const Uint8*, Mix_Chunk**);
+void updatePerso(Perso*, Map*,Boss*, const Uint8*, Mix_Chunk**);
 void jump(Perso*, Map*);
 void changeGravity(void);
 
