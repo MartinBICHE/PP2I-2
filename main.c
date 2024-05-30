@@ -519,7 +519,6 @@ again :
     }
     destroy_graph(graph, map);
     quitSDL(&renderer, &window, perso, map2, mapBoss, boss);
-    destroyMap(map2);
 	free(attack1);
 	free(attack2);
 	free(attack3);
