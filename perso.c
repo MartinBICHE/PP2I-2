@@ -395,6 +395,27 @@ void persoAttackBat(Perso *perso, EnemyBatData *enemyBatData) {
     }
 }
 
+void distanceAttackBat(Perso *perso, EnemyBatData *enemyBatData, Map *map, ProjectileData *projectile) {
+    int attack_range = 300; // Portée de l'attaque à distance
+    float dx = (perso->x * map->pix_rect) - enemyBatData->dst_rect.x;
+    float dy = (perso->y * map->pix_rect) - enemyBatData->dst_rect.y;
+    float distance = sqrt(dx * dx + dy * dy);
+    if (distance <= attack_range) {
+        // L'ennemi est dans la portée d'attaque à distance
+        projectile->last_distance_attack = SDL_GetTicks();
+        initProjectile(perso->x*map->pix_rect+10, perso->y*map->pix_rect - 50, perso->facing, projectile);
+        projectile->distance_attack_active = 1;
+        static int j = 0;
+        printf("Attaque à distance %d\n", j++);
+        //enemyStateData->health -= 1; // Infliger 1 point de dégât
+        if (enemyBatData->health <= 0) {
+            // Faire disparaître l'ennemi, par exemple en le déplaçant hors de l'écran
+            enemyBatData->dst_rect.x = -1000;
+            enemyBatData->dst_rect.y = -1000;
+        }
+    }
+}
+
 void changeGravity(void) {
 	if (currentGravity == ACC) {
 		currentGravity = ACC_INVERTED;

@@ -251,9 +251,7 @@ again :
                 
                 //x_cam = updateCamm(perso->x*PIX_RECT, x_cam);
                 if (perso-> health > 0) {
-                    //game(enemyStateData, boss, map, perso, state, sounds, &attack, &projectile);
-                    updateCam(perso, map);
-                    updatePerso(perso, map, &enemy2, &enemy3, &enemyBatData, state, sounds, &attack, &projectile);
+                    game(&enemy2, &enemy3, &enemyBatData, boss, map, perso, state, sounds, &attack, &projectile);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
                         printf("Error drawing the background");
                         exit(-1);

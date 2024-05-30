@@ -35,6 +35,7 @@ void persoAttackEnemy2(Perso *perso, Enemy2 *enemy2);
 void distanceAttackEnemy2(Perso *perso, Enemy2 *enemy2, Map *map, ProjectileData *projectile);
 void persoAttackEnemy3(Perso *perso, Enemy3 *enemy2);
 void persoAttackBat(Perso *perso, EnemyBatData *enemyBatData);
+void distanceAttackBat(Perso *perso, EnemyBatData *enemyBatData, Map *map, ProjectileData *projectile);
 void changeGravity(void);
 
 #endif

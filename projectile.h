@@ -5,6 +5,8 @@
 #include "perso.h"
 #include "enemy1.h"
 
+typedef struct _EnemyBatData EnemyBatData; // Forward declaration
+
 
 bool isValidPosition(Map* map, float x, float y);
 void updateProjectile(Projectile* projectiles,Perso* perso, float targetX, float targetY, Map* map);
