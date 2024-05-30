@@ -11,11 +11,11 @@ bool firstTime1 = true;
 bool firstTime2 = true;
 bool firstTime3 = true;
 
-void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const Uint8 *state, Mix_Chunk **sounds) {
+void game(Boss *boss,Map *map, Perso *perso,const Uint8 *state, Mix_Chunk **sounds) {
     if (!afficherImage && !isBossMap) {
         perso->vx = 0;
         updateCam(perso, map);
-        updatePerso(perso, map, &enemyStateData, boss,state,sounds);
+        updatePerso(perso, map, boss,state,sounds);
     }
     if ((afficherImage || parametre) && isBossMap) {
         if (pauseStartTime == 0) {
@@ -54,7 +54,7 @@ void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const
         }
         // 
 
-        updatePerso(perso, map, &enemyStateData,boss,state,sounds);
+        updatePerso(perso, map, boss,state,sounds);
         if (boss -> health > 0) {
             if (currentTime1 - lastBossMoveTime >= bossMove) {
                 updateBoss(boss, map);

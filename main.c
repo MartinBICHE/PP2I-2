@@ -329,7 +329,7 @@ again :
                     
 
                 if (perso-> health > 0) {
-                    game(enemyStateData, boss, map, perso, state, sounds);
+                    game(boss, map, perso, state, sounds);
                     if (drawBackground(renderer, bgTextures, 5, map)) {
                         printf("Error drawing the background");
                         exit(-1);
