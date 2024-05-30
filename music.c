@@ -6,7 +6,7 @@ Mix_Chunk *musicEnemySnake = NULL;
 Mix_Chunk *musicEnemyBat = NULL;
 Mix_Chunk *musicEnemyBatAttack = NULL;
 
-int load_music() {
+int load_music(void) {
     musicEnemyFleche = Mix_LoadWAV("asset/Music/fleche.wav");
     musicEnemySnake = Mix_LoadWAV("asset/Music/snake.wav");
     musicEnemyBat = Mix_LoadWAV("asset/Music/batWings.wav");
@@ -31,7 +31,7 @@ int load_music() {
 }
 
 
-int free_music(){
+int free_music(void){
     Mix_FreeChunk(musicEnemyFleche);
     Mix_FreeChunk(musicEnemySnake);
     Mix_FreeChunk(musicEnemyBat);

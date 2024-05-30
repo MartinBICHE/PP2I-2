@@ -20,9 +20,13 @@ int hitbox_bottom(Perso*, Map*);
 int hitbox_top(Perso*, Map*);
 int hitbox_left(Perso*, Map*);
 int hitbox_right(Perso*, Map*);
+int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData);
+int hitbox_boss(Perso *perso, Map *map, Boss *boss);
 float max(float, float);
 float min(float, float);
-void updatePerso(Perso*, Map*, EnemyStateData*, const Uint8*, Mix_Chunk**);
+void updatePersoDashing(Perso *perso, Map *map);
+void updateHitbox(Perso*, Map*);
+void updatePerso(Perso*, Map*, EnemyStateData*,Boss*, const Uint8*, Mix_Chunk**);
 void jump(Perso*, Map*);
 void changeGravity(void);
 

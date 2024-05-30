@@ -186,6 +186,9 @@ int drawMap(SDL_Renderer *renderer, Map *map, SDL_Texture *tileTexture) {
 				if (map->matrix[i][j] == 'p') {
 					display_tile(renderer,3,1,j,i, map, tileTexture); // Angle superieur gauche
 				}
+				if (map->matrix[i][j] == 'm') {
+					display_tile(renderer,4,1,j,i, map, tileTexture); // Angle superieur gauche
+				}
 				if (map->matrix[i][j] == 'a') {
 					display_tile(renderer,0,0,j,i, map, tileTexture); // Plateforme extremite droit
 				}

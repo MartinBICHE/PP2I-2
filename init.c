@@ -43,39 +43,13 @@ void initSDL(SDL_Window **window, SDL_Renderer **renderer){
         exit(-1);
     }
     TTF_Init();
+    initCursorRects();
     load_music();
-
     loadTextures(*renderer);
     loadFonts();
 }
 
-void loadSounds(Mix_Chunk **sounds){
-    sounds[0] = Mix_LoadWAV("./asset/sounds/walk1.wav");
-    if (sounds[0] == NULL) {
-        printf("Failed to load walking sound 1 effect! SDL_mixer Error: %s\n", Mix_GetError());
-        exit(-1);
-    }
-    sounds[1] = Mix_LoadWAV("./asset/sounds/walk2.wav");
-    if (sounds[1] == NULL) {
-        printf("Failed to load walking sound 2 effect! SDL_mixer Error: %s\n", Mix_GetError());
-        exit(-1);
-    }
-    Mix_VolumeChunk(sounds[1], MIX_MAX_VOLUME/3);
-    sounds[2] = Mix_LoadWAV("./asset/sounds/dash.wav");
-    if (sounds[2] == NULL) {
-        printf("Failed to load dashing sound effect! SDL_mixer Error: %s\n", Mix_GetError());
-        exit(-1);
-    }
-    Mix_VolumeChunk(sounds[2], MIX_MAX_VOLUME/3);
-    sounds[3] = Mix_LoadWAV("./asset/sounds/true_crack.wav");
-    if (sounds[3] == NULL) {
-        printf("Failed to load crack sound effect! SDL_mixer Error: %s\n", Mix_GetError());
-        exit(-1);
-    }
-}
-
-
-void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map2, Map *mapBoss, Boss *boss){
+void quitSDL(SDL_Renderer **renderer, SDL_Window **window,  Perso *perso, Map *map2, Map* mapBoss, Boss *boss){
     SDL_DestroyRenderer(*renderer);
     free(boss);
     destroyMap(map2);

@@ -19,15 +19,16 @@
 #include "boss.h"
 #include <string.h>
 
-
-
+void loadSounds(Mix_Chunk **sounds);
+void initCursorRects(void);
 void renderSprite(SDL_Renderer *renderer);
 void renderImage(SDL_Renderer *renderer, const char* imagePath, int x, int y, int width, int height);
-bool initSDL_mixer(void);
-bool loadMusic(void);
-void playMusic(void);
+bool loadMusicGameplay1(void);
+bool loadMusicGameplay2(void);
+void playMusic(Mix_Music* music);
 void closeSDL_mixer(void);
 void toggleMusic(void);
+void handleVolumeCursor(SDL_Event *e);
 void drawMenu(SDL_Renderer *renderer);
 void drawMapMenu(SDL_Renderer *renderer);
 void interactionMenu(SDL_Renderer *renderer);
