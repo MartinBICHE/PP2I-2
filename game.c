@@ -63,7 +63,6 @@ void game(EnemyStateData enemyStateData, Boss *boss,Map *map, Perso *perso,const
         }
         updateCam(perso, map);
         if (boss -> health > 0) {
-            printf("currentTime1 : %u \n lastGravityChange : %u \n boutonGtime : %u\n",currentTime1,lastGravityChange,boutonGTime);
             if (currentTime1 - lastGravityChange >= GRAVITY_CHANGE_INTERVAL) {
                 changeGravity();
                 lastGravityChange = currentTime1; // Mettre à jour le temps du dernier changement de gravité

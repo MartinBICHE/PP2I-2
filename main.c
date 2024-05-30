@@ -305,9 +305,11 @@ again :
                     } else if (perso->x > 296) {
                         boutonGTime = SDL_GetTicks();
                         isBossMap = true;
+                        int health = perso -> health;
                         free(perso);
                         map = mapBoss;
                         perso = create_perso(map);
+                        perso -> health = health;
                         lastGravityChange = currentTime1;
                         lastProjectileLoad = currentTime1;
                         lastBossMoveTime = currentTime1;
@@ -321,6 +323,7 @@ again :
                     } 
                     
                 if (isBossMap && (perso->x > 26.7 || perso->y > 14.94 || perso->x < 1.3 || perso->y < 1)) {
+                    perso->health = 0;
                     goto again;
                 } 
                     
@@ -489,7 +492,7 @@ again :
                             renderStatusBoss(renderer,boss);
                         }
                     }
-                    if (!afficherImage && !parametre) {
+                    if (!afficherImage && !parametre && !gameplay2) {
                         renderStatusHealth(renderer,perso); 
                     }
 
@@ -525,6 +528,7 @@ again :
                         resetGameplay2(bossDeath, attack1, attack2, attack3, attack4, attack5, attack6);
                     }
                     if (playerInFight -> health == 0) {
+                        firstSwicthMusic = !firstSwicthMusic;
                         gameplay2 = false;
                         bossDeath->health = 9;
                         playerInFight->health = 9;
