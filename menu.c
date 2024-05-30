@@ -11,7 +11,6 @@ int volumeLevel = MAX_VOLUME / 2; // Volume initial à 50%
 int sfxVolumeLevel = MAX_VOLUME / 2; // Volume initial pour les bruitages à 50%
 SDL_Rect cursorRect;
 SDL_Rect cursorRectSFX;
-Mix_Chunk* sounds[4];
 
 void initCursorRects(void) {
     cursorRect.x = WINWIDTH / 4 + (volumeLevel * (WINWIDTH / 2)) / MAX_VOLUME - CURSOR_WIDTH / 2;

@@ -21,6 +21,16 @@ SDL_Texture* textureHealth6 = NULL;
 SDL_Texture* textureHealth7 = NULL;
 SDL_Texture* textureHealth8 = NULL;
 SDL_Texture* textureHealth9 = NULL;
+SDL_Texture* textureHealthBoss0 = NULL;
+SDL_Texture* textureHealthBoss1 = NULL;
+SDL_Texture* textureHealthBoss2 = NULL;
+SDL_Texture* textureHealthBoss3 = NULL;
+SDL_Texture* textureHealthBoss4 = NULL;
+SDL_Texture* textureHealthBoss5 = NULL;
+SDL_Texture* textureHealthBoss6 = NULL;
+SDL_Texture* textureHealthBoss7 = NULL;
+SDL_Texture* textureHealthBoss8 = NULL;
+SDL_Texture* textureHealthBoss9 = NULL;
 SDL_Texture* textureFleche = NULL;
 SDL_Texture* textureBat = NULL;
 SDL_Texture* textureBatAttack = NULL;
@@ -30,6 +40,7 @@ SDL_Texture* textureAttack = NULL;
 SDL_Texture* texturePortail = NULL;
 
 SDL_Texture *healthTextures[10];
+SDL_Texture *healthTexturesBoss[10];
 
 
 
@@ -54,6 +65,16 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_Surface *surfaceHealth7 = IMG_Load("asset/spritesheet/health7.png");
     SDL_Surface *surfaceHealth8 = IMG_Load("asset/spritesheet/health8.png");
     SDL_Surface *surfaceHealth9 = IMG_Load("asset/spritesheet/health9.png");
+    SDL_Surface *surfaceHealthBoss0 = IMG_Load("asset/spritesheet/heathBoss0.png");
+    SDL_Surface *surfaceHealthBoss1 = IMG_Load("asset/spritesheet/heathBoss1.png");
+    SDL_Surface *surfaceHealthBoss2 = IMG_Load("asset/spritesheet/heathBoss2.png");
+    SDL_Surface *surfaceHealthBoss3 = IMG_Load("asset/spritesheet/heathBoss3.png");
+    SDL_Surface *surfaceHealthBoss4 = IMG_Load("asset/spritesheet/heathBoss4.png");
+    SDL_Surface *surfaceHealthBoss5 = IMG_Load("asset/spritesheet/heathBoss5.png");
+    SDL_Surface *surfaceHealthBoss6 = IMG_Load("asset/spritesheet/heathBoss6.png");
+    SDL_Surface *surfaceHealthBoss7 = IMG_Load("asset/spritesheet/heathBoss7.png");
+    SDL_Surface *surfaceHealthBoss8 = IMG_Load("asset/spritesheet/heathBoss8.png");
+    SDL_Surface *surfaceHealthBoss9 = IMG_Load("asset/spritesheet/heathBoss9.png");
     SDL_Surface *surfaceFleche = IMG_Load("asset/spritesheet/fleche.png");
     // SDL_Surface *surfaceBat = IMG_Load("asset/spritesheet/Bat.png");
     // SDL_Surface *surfaceBatAttack = IMG_Load("asset/spritesheet/batattack.png");
@@ -86,6 +107,16 @@ int loadTextures(SDL_Renderer *renderer){
     textureHealth7 = SDL_CreateTextureFromSurface(renderer, surfaceHealth7);
     textureHealth8 = SDL_CreateTextureFromSurface(renderer, surfaceHealth8);
     textureHealth9 = SDL_CreateTextureFromSurface(renderer, surfaceHealth9);
+    textureHealthBoss0 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss0);
+    textureHealthBoss1 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss1);
+    textureHealthBoss2 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss2);
+    textureHealthBoss3 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss3);
+    textureHealthBoss4 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss4);
+    textureHealthBoss5 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss5);
+    textureHealthBoss6 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss6);
+    textureHealthBoss7 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss7);
+    textureHealthBoss8 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss8);
+    textureHealthBoss9 = SDL_CreateTextureFromSurface(renderer, surfaceHealthBoss9);
     textureFleche = SDL_CreateTextureFromSurface(renderer, surfaceFleche);
     textureBat = SDL_CreateTextureFromSurface(renderer, surfaceBat);
     textureBatAttack = SDL_CreateTextureFromSurface(renderer, surfaceBatAttack);
@@ -110,6 +141,16 @@ int loadTextures(SDL_Renderer *renderer){
     healthTextures[8] = textureHealth8;
     healthTextures[9] = textureHealth9;
 
+    healthTexturesBoss[0] = textureHealthBoss0;
+    healthTexturesBoss[1] = textureHealthBoss1;
+    healthTexturesBoss[2] = textureHealthBoss2;
+    healthTexturesBoss[3] = textureHealthBoss3;
+    healthTexturesBoss[4] = textureHealthBoss4;
+    healthTexturesBoss[5] = textureHealthBoss5;
+    healthTexturesBoss[6] = textureHealthBoss6;
+    healthTexturesBoss[7] = textureHealthBoss7;
+    healthTexturesBoss[8] = textureHealthBoss8;
+    healthTexturesBoss[9] = textureHealthBoss9;
 
     SDL_FreeSurface(surfaceEnemy1);
     SDL_FreeSurface(surfaceEnemy2);
@@ -128,6 +169,18 @@ int loadTextures(SDL_Renderer *renderer){
     SDL_FreeSurface(surfaceHealth7);
     SDL_FreeSurface(surfaceHealth8);
     SDL_FreeSurface(surfaceHealth9);
+
+    SDL_FreeSurface(surfaceHealthBoss0);
+    SDL_FreeSurface(surfaceHealthBoss1);
+    SDL_FreeSurface(surfaceHealthBoss2);
+    SDL_FreeSurface(surfaceHealthBoss3);
+    SDL_FreeSurface(surfaceHealthBoss4);
+    SDL_FreeSurface(surfaceHealthBoss5);
+    SDL_FreeSurface(surfaceHealthBoss6);
+    SDL_FreeSurface(surfaceHealthBoss7);
+    SDL_FreeSurface(surfaceHealthBoss8);
+    SDL_FreeSurface(surfaceHealthBoss9);
+
     SDL_FreeSurface(surfaceFleche);
     SDL_FreeSurface(surfaceBat);
     SDL_FreeSurface(surfaceBatAttack);
@@ -159,6 +212,18 @@ int freeTextures(void){
     SDL_DestroyTexture(textureHealth7);
     SDL_DestroyTexture(textureHealth8);
     SDL_DestroyTexture(textureHealth9);
+
+    SDL_DestroyTexture(textureHealthBoss0);
+    SDL_DestroyTexture(textureHealthBoss1);
+    SDL_DestroyTexture(textureHealthBoss2);
+    SDL_DestroyTexture(textureHealthBoss3);
+    SDL_DestroyTexture(textureHealthBoss4);
+    SDL_DestroyTexture(textureHealthBoss5);
+    SDL_DestroyTexture(textureHealthBoss6);
+    SDL_DestroyTexture(textureHealthBoss7);
+    SDL_DestroyTexture(textureHealthBoss8);
+    SDL_DestroyTexture(textureHealthBoss9);
+
     SDL_DestroyTexture(textureBat);
     SDL_DestroyTexture(textureFleche);
     SDL_DestroyTexture(textureBatAttack);
@@ -183,6 +248,18 @@ int freeTextures(void){
     textureHealth7 = NULL;
     textureHealth8 = NULL;
     textureHealth9 = NULL;
+
+    textureHealthBoss0 = NULL;
+    textureHealthBoss1 = NULL;
+    textureHealthBoss2 = NULL;
+    textureHealthBoss3 = NULL;
+    textureHealthBoss4 = NULL;
+    textureHealthBoss5 = NULL;
+    textureHealthBoss6 = NULL;
+    textureHealthBoss7 = NULL;
+    textureHealthBoss8 = NULL;
+    textureHealthBoss9 = NULL;
+
     textureFleche = NULL;
     textureBat = NULL;
     textureBatAttack = NULL;
