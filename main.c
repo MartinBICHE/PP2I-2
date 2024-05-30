@@ -348,6 +348,7 @@ again :
                         enemy1_movement(renderer, &enemyStateData, map);
                         enemy1Attack(&enemyStateData, perso, map);
                         updatePersoEnemy1(perso, map, &enemyStateData);
+                    
 
                         enemy1_movement(renderer, &enemyStateData1, map);
                         enemy1Attack(&enemyStateData1, perso, map);

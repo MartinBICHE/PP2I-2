@@ -42,7 +42,9 @@ void enemy1_movement(SDL_Renderer *renderer, EnemyStateData *enemyStateData,
         enemyStateData->dst_rect.h += speed;
         enemyStateData->dst_rect.y -= speed;
         enemyStateData->pauseStartBits = SDL_GetTicks();
+
       } else {
+        
         enemyStateData->state = ANIMATION_START;
       }
     }
