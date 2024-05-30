@@ -237,12 +237,16 @@ Node* get_nearest_walkable_neighbor(Node** graph, Map *map, int xPos, int yPos) 
     return NULL;
 }
 
-void destroy_graph(Node **graph, Map *map){
-    for (int i = 0; i<map->height; i++){
-        if (graph[i] != NULL){
-            free(graph[i]->neighbors);
-            free(graph[i]);
+void destroy_graph(Node **graph, Map *map) {
+    for (int i = 0; i < map->height; i++) {
+        for (int j = 0; j < map->width; j++) {
+            Node *node = &graph[i][j];
+            if (node->neighbors) {
+                free(node->neighbors);
+                node->neighbors = NULL;
+            }
         }
+        free(graph[i]);
     }
     free(graph);
 }

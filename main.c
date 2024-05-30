@@ -284,7 +284,6 @@ again :
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Erreur lors du chargement de la carte.");
                 return -1;
             }
-
             loadSounds(sounds);
             loadBackgroundTextures(renderer, bgTextures, 5);
             loadTileTextures(renderer, &tileTextures, "./asset/tileset/ground-1.png");
@@ -321,7 +320,7 @@ again :
                         perso -> health = 0;
                         goto again;
                     } 
-                    
+
                 if (isBossMap && (perso->x > 26.7 || perso->y > 14.94 || perso->x < 1.3 || perso->y < 1)) {
                     perso->health = 0;
                     goto again;
@@ -492,6 +491,10 @@ again :
                         if (!afficherImage && !parametre) {
                             renderStatusBoss(renderer,boss);
                         }
+                    }
+                    if (isBossMap && boss->health <= 0) {
+                        perso->health = 0;
+                        goto again;
                     }
                     if (!afficherImage && !parametre && !gameplay2) {
                         renderStatusHealth(renderer,perso); 
