@@ -19,6 +19,17 @@ extern SDL_Texture* textureHealth7;
 extern SDL_Texture* textureHealth8;
 extern SDL_Texture* textureHealth9;
 
+extern SDL_Texture* textureHealthBoss0;
+extern SDL_Texture* textureHealthBoss1;
+extern SDL_Texture* textureHealthBoss2;
+extern SDL_Texture* textureHealthBoss3;
+extern SDL_Texture* textureHealthBoss4;
+extern SDL_Texture* textureHealthBoss5;
+extern SDL_Texture* textureHealthBoss6;
+extern SDL_Texture* textureHealthBoss7;
+extern SDL_Texture* textureHealthBoss8;
+extern SDL_Texture* textureHealthBoss9;
+
 extern SDL_Texture* textureFleche;
 extern SDL_Texture* textureBat;
 extern SDL_Texture* textureBatAttack;
@@ -28,6 +39,7 @@ extern SDL_Texture* textureAttack;
 extern SDL_Texture* texturePortail;
 
 extern SDL_Texture *healthTextures[10];
+extern SDL_Texture *healthTexturesBoss[10];
 
 int loadTextures(SDL_Renderer *renderer);
 

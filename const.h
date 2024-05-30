@@ -22,6 +22,7 @@ extern Uint32 lastProjectileLoad;
 extern Uint32 lastBossMoveTime;
 extern SDL_Event e;
 extern SDL_Window* window;
+extern Mix_Chunk *sounds[4];
 extern SDL_Renderer* renderer;
 extern SDL_Texture* projectileTexture;
 extern bool isBossMap;

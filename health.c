@@ -22,7 +22,7 @@ void renderStatusHealthFight(SDL_Renderer *renderer, PersoFight *perso){
 void renderStatusBoss(SDL_Renderer *renderer, Boss *boss) {
     SDL_Rect dst_rect = {990, -80, 128*2, 128*2};
     if (boss->health >= 0 && boss->health <= 9){
-        SDL_RenderCopy(renderer, healthTextures[boss->health], NULL, &dst_rect);
+        SDL_RenderCopy(renderer, healthTexturesBoss[boss->health], NULL, &dst_rect);
     }
 }
 

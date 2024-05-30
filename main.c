@@ -517,7 +517,6 @@ again :
                         firstSwicthMusic = !firstSwicthMusic;
                         revive(perso);
                         firstSwicthMusic = true;
-                        isBossMap = true;
                         if (firstSwicthMusic) {
                             Mix_HaltMusic();
                             firstSwicthMusic = !firstSwicthMusic;
@@ -572,5 +571,4 @@ again :
     /* closeSDL_mixer(); */
     atexit(SDL_Quit);
     return 0;
-    
 }
