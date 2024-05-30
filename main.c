@@ -537,5 +537,4 @@ again :
     /* closeSDL_mixer(); */
     atexit(SDL_Quit);
     return 0;
-    
 }
