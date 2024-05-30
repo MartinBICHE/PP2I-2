@@ -17,6 +17,7 @@ Perso *create_perso(Map *map) {
     res->dash_duration = 0;
     res->dash_speed = 21.0f;
     res->dash_delay = 0;
+    res->invincibility_timer = 0;
     return res;
 }
 
@@ -83,7 +84,7 @@ int hitbox_bottom(Perso *perso, Map *map) {
 }
 
 
-int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, int showHitbox, Mix_Chunk **sounds) {
+int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *persoTexture, SDL_Texture *texturePortail, int showHitbox, Mix_Chunk **sounds) {
     int c = 96; // côté du carré de destination du sprite du perso
     int centrage = 6;
     if (currentGravity < 0) {
@@ -178,11 +179,7 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         }
         perso->spriteOffset = (perso->spriteOffset + 1) % 72; // 6 frames par sprite, 12 
         SDL_Rect src_rect;
-        // if (currentGravity > 0) {
             src_rect = (SDL_Rect){.x = (perso->spriteOffset/6)*64, .y = 64, .w = 64, .h = 64};
-        // } else {
-        //     src_rect = (SDL_Rect){.x =64, .y = (perso->spriteOffset/6)*64, .w = 64, .h = 64};
-        // }
         if (SDL_RenderCopyEx(renderer, persoTexture, &src_rect, &dst_rect, angle, NULL, flip)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render copy: %s", SDL_GetError());
             exit(-1);
@@ -203,10 +200,17 @@ int display_perso(SDL_Renderer *renderer, Perso *perso, Map *map, SDL_Texture *p
         }
     }
 
+    // Portail :
+
+    SDL_Rect src_rectP = {.x = ((perso->spriteOffset)%16/4)*64, .y = 0, .w = 64, .h = 64};
+    SDL_Rect dst_rectP = {.x = 296*map->pix_rect - map->x_cam, .y = 7.5*map->pix_rect, .w = c, .h = c};
+    if (SDL_RenderCopy(renderer, texturePortail, &src_rectP, &dst_rectP)) {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Error in render portail copy: %s", SDL_GetError());
+        exit(-1);
+    }
+
     return 0;
 }
-
-
 
 
 int hitbox_top(Perso *perso, Map *map) {
@@ -278,20 +282,19 @@ int hitbox_right(Perso *perso, Map *map) {
     return 0;
 }
 
-/* int hitbox_enemy(Perso *perso, Map *map, EnemyStateData *enemyStateData) {
-    SDL_Rect enemyHitbox = enemyStateData->dst_rect;
-    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
-    enemyHitbox.x -= margin;
-    enemyHitbox.y -= margin;
-    enemyHitbox.w += 2 * margin;
-    enemyHitbox.h += 2 * margin;
+int hitbox_boss(Perso *perso, Map *map, Boss *boss) {
+    SDL_Rect bossHitbox = boss->hitbox;
+    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox du boss
+    bossHitbox.x -= margin;
+    bossHitbox.y -= margin;
+    bossHitbox.w += 2 * margin;
+    bossHitbox.h += 2 * margin;
     SDL_Rect intersection;
-    if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
+    if (SDL_IntersectRect(&perso->hitbox, &bossHitbox, &intersection)) {
         return 1;
     }
     return 0;
-} */
-
+}
 
 float max(float a, float b) {
     if (a<b)return b;
@@ -416,6 +419,27 @@ void distanceAttackBat(Perso *perso, EnemyBatData *enemyBatData, Map *map, Proje
     }
 }
 
+void distanceAttackBoss(Perso *perso, Boss *boss, Map *map, ProjectileData *projectile) {
+    int attack_range = 300; // Portée de l'attaque à distance
+    float dx = (perso->x * map->pix_rect) - boss->hitbox.x;
+    float dy = (perso->y * map->pix_rect) - boss->hitbox.y;
+    float distance = sqrt(dx * dx + dy * dy);
+    if (distance <= attack_range) {
+        // L'ennemi est dans la portée d'attaque à distance
+        projectile->last_distance_attack = SDL_GetTicks();
+        initProjectile(perso->x*map->pix_rect+10, perso->y*map->pix_rect - 50, perso->facing, projectile);
+        projectile->distance_attack_active = 1;
+        static int j = 0;
+        printf("Attaque à distance %d\n", j++);
+        //enemyStateData->health -= 1; // Infliger 1 point de dégât
+        if (boss->health <= 0) {
+            // Faire disparaître l'ennemi, par exemple en le déplaçant hors de l'écran
+            boss->hitbox.x = -1000;
+            boss->hitbox.y = -1000;
+        }
+    }
+}
+
 void changeGravity(void) {
 	if (currentGravity == ACC) {
 		currentGravity = ACC_INVERTED;
@@ -429,6 +453,7 @@ void changeGravity(void) {
 void updateHitbox(Perso *perso, Map *map) {
     perso->hitbox = (SDL_Rect){.x = (perso->x - PERSO_WIDTH/2.0f)*map->pix_rect, .y = (perso->y - PERSO_HEIGHT/2.0f)*map->pix_rect, .w = PERSO_WIDTH*map->pix_rect, .h = PERSO_HEIGHT*map->pix_rect};
 }
+
 
 void updatePersoDashing(Perso *perso, Map *map) {
     perso->vy = 0;
@@ -462,11 +487,11 @@ void updatePersoDashing(Perso *perso, Map *map) {
     updateHitbox(perso, map);
 }
 
-
-void updatePerso(Perso *perso, Map *map, Enemy2 *enemy2, Enemy3 *enemy3, EnemyBatData *enemyBatData, const Uint8 *state, Mix_Chunk **sounds, AttackData *attack, ProjectileData *projectile) {
+void updatePerso(Perso *perso, Map *map, Boss *boss, Enemy2 *enemy2, Enemy3 *enemy3, EnemyBatData *enemyBatData, const Uint8 *state, Mix_Chunk **sounds, AttackData *attack, ProjectileData *projectile) {
     perso->jump_delay = max(perso->jump_delay - 1, 0);
     perso->dash_duration = max(perso->dash_duration - 1, 0);
     perso->dash_delay = max(perso->dash_delay - 1, 0);
+    perso->invincibility_timer = max(perso->invincibility_timer - 1, 0); 
     //static int k_pressed_this_frame = 0; // Variable locale pour suivre l'état de la touche K dans cette frame
     //static int l_pressed_this_frame = 0; // Variable locale pour suivre l'état de la touche L dans cette frame
     if (perso->dash_duration > 0) updatePersoDashing(perso, map);
@@ -515,13 +540,14 @@ void updatePerso(Perso *perso, Map *map, Enemy2 *enemy2, Enemy3 *enemy3, EnemyBa
             if (SDL_GetTicks() - projectile->last_distance_attack > 500) {
                 distanceAttackEnemy2(perso, enemy2, map, projectile);
                 distanceAttackBat(perso, enemyBatData, map, projectile);
+                distanceAttackBoss(perso, boss, map, projectile);
             }
         }
 
         int i = floor(perso->y);
         int j = floor(perso->x);
         perso->vy += currentGravity*DT;
-        int v = 17; // vitesse à partir de laquelle le son "crack" est joué quand le perso s'écrase au sol
+        int v = 17;
         if (currentGravity > 0) {
             if (hitbox_bottom(perso, map)) {
                 if (perso->vy > v) {
@@ -567,10 +593,62 @@ void updatePerso(Perso *perso, Map *map, Enemy2 *enemy2, Enemy3 *enemy3, EnemyBa
         perso->y += perso->vy*DT;
         perso->x += perso->vx*DT;
         updateHitbox(perso, map);
-        if (hitbox_bottom(perso, map)) {
+        if ((hitbox_bottom(perso, map) && currentGravity > 0) || (hitbox_top(perso, map) && currentGravity < 0)) {
             perso->jumps = 2;
             perso->dashes = 2;
         }
     }
-}
+    if (isBossMap) {
+        if (hitbox_boss(perso, map, boss)) {
+            if (perso->invincibility_timer == 0) {
+                perso->invincibility_timer = 150;
+                perso->health--;
+            }
 
+            float dx = perso->vx * DT;
+            float dy = perso->vy * DT;
+            float recoilAmount = 1.5f;
+            if (currentGravity > 0) {
+                if (dx > 0) { // Le personnage se déplace vers la droite
+                    perso->vx = max(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox du boss (côté gauche)
+                    perso->x = boss->hitbox.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
+                    perso->x -= recoilAmount;
+                } else if (dx < 0) { // Le personnage se déplace vers la gauche
+                    perso->vx = min(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox du boss (côté droit)
+                    perso->x = (boss->hitbox.x + boss->hitbox.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
+                    perso->x += recoilAmount;
+                }
+                if (dy > 0) { // Le personnage se déplace vers le bas
+                    // Faire rebondir le personnage au-dessus du boss
+                    perso->vy = -JUMPSPEED;
+                }
+                if (dy < 0) { // Le personnage se déplace vers le haut
+                    // Faire rebondir le personnage en dessous du boss
+                    perso->vy = JUMPSPEED;
+                }
+            } else {
+                if (dx > 0) { // Le personnage se déplace vers la droite
+                    perso->vx = max(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox du boss (côté gauche)
+                    perso->x = boss->hitbox.x / map->pix_rect - PERSO_WIDTH / 2.0f + 0.5;
+                    perso->x -= recoilAmount;
+                } else if (dx < 0) { // Le personnage se déplace vers la gauche
+                    perso->vx = min(perso->vx, 0.0f);
+                    // Position juste avant le début de la hitbox du boss (côté droit)
+                    perso->x = (boss->hitbox.x + boss->hitbox.w) / map->pix_rect + PERSO_WIDTH / 2.0f + 0.3;
+                    perso->x += recoilAmount;
+                }
+                if (dy < 0) { // Le personnage se déplace vers le bas
+                    // Faire rebondir le personnage au-dessus du boss
+                    perso->vy = -JUMPSPEED;
+                }
+                if (dy > 0) { // Le personnage se déplace vers le haut
+                    // Faire rebondir le personnage en dessous du boss
+                    perso->vy = -JUMPSPEED;
+                }
+            }
+        }
+    }
+}

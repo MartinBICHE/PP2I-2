@@ -6,6 +6,9 @@
 #include <SDL2/SDL_ttf.h>
 /* #include "perso.h" */
 #include "map.h"
+#define INIT_ENEMY1(enemy, map, x, y) initEnemy1((x) * (map)->pix_rect, (y) * (map)->pix_rect, enemy)
+
+
 
 enum EnemyState {
     MOVING_UP,

@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 #ifndef CONST_H
 #define CONST_H
 #include <stdbool.h>
@@ -21,6 +22,7 @@ extern Uint32 lastProjectileLoad;
 extern Uint32 lastBossMoveTime;
 extern SDL_Event e;
 extern SDL_Window* window;
+extern Mix_Chunk *sounds[4];
 extern SDL_Renderer* renderer;
 extern SDL_Texture* projectileTexture;
 extern bool isBossMap;
@@ -29,26 +31,27 @@ extern Uint32 boutonGTime;
 extern Uint32 pauseStartTime;
 extern Uint32 totalPauseDuration;
 extern const Uint8 *state;
+extern Uint32 bossAngry1;
+extern Uint32 bossAngry2;
+extern Uint32 bossAngry3;
+extern float bossMove;
+extern float projectileSpeed;
+extern Mix_Music* gMusic1;
+extern Mix_Music* gMusic2;
+extern bool gameplay2;
 
-#define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2
-#define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2
-// #define PIX_RECT 30
-// #define WINWIDTH WIDTH*PIX_RECT
-// #define WINHEIGHT HEIGHT*PIX_RECT
-// #define MENU_WINDOW_WIDTH 1400
-// #define MENU_WINDOW_HEIGHT 800
 #define Image1Width 200
 #define Image1Height 150
 #define ImageAttentionWidth 800
 #define ImageAttentionHeight 500
-// #define LOADING_WINDOW_WIDTH 600
-// #define LOADING_WINDOW_HEIGHT 400
 #define BLUR_AMOUNT 0.5f
 #define ImageRetourMenuWidth 200
 #define ImageRetourMenuHeight 50
 #define ImageQuitterJeuWidth 200
 #define ImageQuitterJeuHeight 50
 #define ImageParametrePauseWidth 50
+#define ImageParametreMenuWidth 150
+#define ImageParametreMenuHeight 150
 #define ImageParametrePauseHeight 50
 #define ImageRetourArrièreWidth 50
 #define ImageRetourArrièreHeight 50
@@ -57,10 +60,7 @@ extern const Uint8 *state;
 // Taille du curseur
 #define CURSOR_WIDTH 20
 #define CURSOR_HEIGHT 40
-
-// Coordonnées du curseur
-// #define cursorX WINWIDTH / 2 - CURSOR_WIDTH / 2;
-// #define cursorY WINHEIGHT / 2 - CURSOR_HEIGHT / 2;
+#define MAX_VOLUME 128
 
 #define WINHEIGHT 720 // en pixels
 #define WINWIDTH 1260 // en pixels
@@ -79,19 +79,22 @@ extern const Uint8 *state;
 #define JUMPSPEED_INVERTED -11.0f 
 #define MOOVSPEED 7.0f
 #define PROJECTILE_SPEED 150 // Vitesse du projectile (en nombre de tiles par frame)
-#define MAX_PROJECTILES 3
+#define PROJECTILE_ANGRY_SPEED 200 
+#define MAX_PROJECTILES 8
 #define PROJECTILE_WIDTH 50
 #define PROJECTILE_HEIGHT 50
 #define BOSS_SPEED 5
-#define BOSS_WIDTH 1.33333f // en nombre de tiles
-#define BOSS_HEIGHT 2.66666f // en nombre de tiles
+#define BOSS_WIDTH 2.5f // en nombre de tiles
+#define BOSS_HEIGHT 3.2f // en nombre de tiles
 #define BOSS_LEFT_LIMIT 0
 #define BOSS_RIGHT_LIMIT 100
 #define MAX_ROTATION_ANGLE 0.02f // Limite de rotation par mise à jour en radians
+// #define INVINCIBILITY_FRAMES 1000
 
-#define GRAVITY_CHANGE_INTERVAL 10000
+#define GRAVITY_CHANGE_INTERVAL 30000
 #define PROJECTILE_LOAD_INTERVAL 5000
 #define BOSS_MOVE_INTERVAL 2000
+#define BOSS_ANGRY_MOVE_INTERVAL 1000
 
 typedef struct _Map {
     char** matrix;
@@ -119,6 +122,7 @@ typedef struct _Perso {
     int health; // je l'ai rajouté
     int jumps; // nombre de sauts restants
     int recoil_timer;
+    int invincibility_timer;
     int jump_delay; // délai entre les sauts (22 frames)
     int dashes; // nombre de dashs restants
     int dash_duration;
@@ -143,7 +147,7 @@ typedef struct _AttackFight {
     int y;
     int warning; // Position de l'attaque
     int delay; // Temps avant la prochaine attaque
-    int hitPoint; // Si l'attaque est un point pour infliger des dégats au boss
+    int hitPoint;
 } AttackFight;
 
 typedef struct _bossFight {
@@ -156,6 +160,16 @@ typedef struct _bossFight {
     int speed;  // Le vitesse d'enchainement des attaques
 } bossFight;
 
+typedef struct _Animation {
+    SDL_Texture* texture;
+    int frameWidth;
+    int frameHeight;
+    int numFrames;
+    int currentFrame;
+    Uint32 frameDuration; // Duration of each frame in milliseconds
+    Uint32 lastFrameTime; // Time when the last frame was rendered
+} Animation;
+
 typedef struct {
     float x; 
     float y;
@@ -163,6 +177,7 @@ typedef struct {
     float vy;
     bool active;
     SDL_Rect hitbox;
+    int spriteOffset;
 } Projectile;
 
 extern Projectile projectiles[MAX_PROJECTILES]; // Tableau pour stocker les projectiles actifs

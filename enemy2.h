@@ -29,9 +29,9 @@ typedef struct _Enemy2 Enemy2;
 
 
 void enemy2_follow(SDL_Renderer *renderer, Enemy2 *enemy, Node **graph, Map *map);
-void initEnemy2(Enemy2 *enemy, Node *start, Node *goal, Map *map);
 void enemy2Attack(Enemy2 *enemy, Perso *perso, Map *map);
 int hitbox_enemy2(Perso *perso, Map *map, Enemy2 *enemy);
 void updatePersoEnemy2(Perso *perso, Map *map, Enemy2 *enemy);
+void initEnemy2(Enemy2 *enemy, Node *start, Node *goal, Map *map);
 
 #endif

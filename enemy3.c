@@ -32,7 +32,7 @@ void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax){
 
     enemy->xPosition = enemy->dst_rect.x;
     enemy->yPosition = enemy->dst_rect.y;
-    enemy->speed = 10;
+    enemy->speed = 20;
     enemy->xCollisionMax = xCollisionMax;
     enemy->xCollisionMin = enemy->dst_rect.x;
     enemy->dx = 1;
@@ -43,11 +43,6 @@ void initEnemy3(Enemy3 *enemy, int x, int y, int xCollisionMax){
 
 int hitbox_enemy3(Perso *perso, Map *map, Enemy3 *enemy) {
     SDL_Rect enemyHitbox = enemy->dst_rect;
-    int margin = 10; // Marge pour que le personnage ne soit pas collé à la hitbox de l'ennemi
-    enemyHitbox.x -= margin;
-    enemyHitbox.y -= margin;
-    enemyHitbox.w += round(1.0 * margin);
-    enemyHitbox.h += round(1.0 * margin);
     SDL_Rect intersection;
     if (SDL_IntersectRect(&perso->hitbox, &enemyHitbox, &intersection)) { // Détecte si le personnage rencontre l'ennemi
         return 1;
@@ -81,9 +76,6 @@ void updatePersoEnemy3(Perso *perso, Map *map, Enemy3 *enemy){
 
 
 void enemy3_movement(SDL_Renderer *renderer, Enemy3 *enemy, Map *map) {
-    Uint32 ticks = SDL_GetTicks();
-    int frameNumber = 9;
-    Uint32 sprite = (ticks / 400) % frameNumber;
     int bitsSpeed = 100;
     double position_tolerance = 10;
     int interval = 1000;
