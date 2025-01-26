@@ -1,19 +1,21 @@
-# PPII2
-On fait un jeu vidéo ouuuuuuuu
+# Projet SDL2 - Jeu
 
-yo les quoicoubébous 
+## Cloner le répertoire
 
-Lisez le makefile pour compiler et tout.
+Clonez le repository Git du projet sur votre machine locale avec la commande suivante :
 
+```bash
+git clone https://github.com/MartinBICHE/PP2I-2.git
+cd PP2I-2
+```
 
-Changelog : 
+## Compilation du projet
+```bash
+make run
+```
 
-Taille de fenètre : 1280x720, la fenètre glisse sur le côté quand le personnage se déplace
+## Nettoyage des fichiers générés
+```bash
+make clean
+```
 
-Création d'une fonction drawBackground dans map.c
-
-Dans les metadata d'une map : 
-- 1ère ligne : nombre de tiles en hauteur, nombre de tiles en largeur, abscisse départ, ordonnée départ, abscisse arrivée, ordonnée arrivée, nombre de checkpoint
-- nième ligne : abscisse du (n-1)-ième checkpoint, ordonnée du (n-1)-ème checkpoint
-
-Nouvelle fonctionnalité de dash : touche J

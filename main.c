@@ -391,8 +391,6 @@ again :
                         updatePersoEnemy3(perso, map, &enemy34);
                         enemy3Attack(&enemy34, perso, map);
 
-
-
                         enemyBat_mouvement(renderer, &enemyBatData, map, perso);
                         batAttack(&enemyBatData, perso, map);
                         updatePersoEnemyBat(perso, map, &enemyBatData);
@@ -420,8 +418,6 @@ again :
                         enemyBat_mouvement(renderer, &enemyBatData6, map, perso);
                         batAttack(&enemyBatData6, perso, map);
                         updatePersoEnemyBat(perso, map, &enemyBatData6);
-
-
 
                         enemyFleche_mouvement(renderer, &enemyFlecheData, map);
                         updatePersoEnemyFleche(perso, map, &enemyFlecheData);
@@ -466,8 +462,6 @@ again :
                         enemyFleche_mouvement(renderer, &enemyFlecheData10, map);
                         updatePersoEnemyFleche(perso, map, &enemyFlecheData10);
                         flecheAttack(&enemyFlecheData10, perso, map);
-
-
 
                         enemyPendule_mouvement(renderer, &enemyPenduleData, map);
                         penduleAttack(&enemyPenduleData, perso, map);
